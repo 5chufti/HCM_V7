@@ -410,6 +410,11 @@
 	DOUBLE PRECISION	LONG, LAT, N_LONG, N_LAT
 	DOUBLE PRECISION	DP, T, T1, T2, DIR    
 !
+	IF (D .EQ. 0.0D0) THEN
+	  N_LONG = LONG
+	  N_LAT = LAT
+	  RETURN
+	END IF
 !
 !	Distance 'DP' in degrees:
 	DP = DBLE(D) / 1.112D2

@@ -1,6 +1,6 @@
 !
 !	Line_calculation.f90
-!												02.02.2004
+!												28.09.2004
 !
 !	Subroutine to calculate the field strengs on a line
 !	or to calculate the cross border field strength.
@@ -39,7 +39,7 @@
 	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
 	INTEGER				IOS, N_rec, N_List, Rec_N_list(3), N_cp
-	INTEGER				N_List1, Rec_N_list1(3)
+	INTEGER				N_List1, Rec_N_list1(3), teststep
 	INTEGER				I, J, K, N_Start, N_Stop, Rec_N_x, Rec_x
 	INTEGER*4			T_L, M_L, B_L
 	DOUBLE PRECISION	N_Record(22), RB, PI, Lo, La
@@ -158,9 +158,11 @@
 !
 !	1st: calculate to every 100th centerpoint:
 !	Use 1st list:
-	N_rec = 1	! record number in file
+	teststep = 100
+90	N_rec = 1	! record number in file
 	N_List = 0	! number of stored record numbers and field strength
 	Calculated_FS = -999.9	! default setting
+	IOS = 0
 !
 	DO WHILE (IOS .EQ. 0)
 	  READ (3, REC=N_rec, IOSTAT=IOS) C_Record
@@ -191,59 +193,80 @@
 	  IF (HCM_Error .EQ. 1028) GOTO 100	! Distance > 1000 km
 	  IF (HCM_Error .NE. 0) RETURN
 	  CALL Manage_List (N_rec, N_List, Rec_N_list, FS_list, Calculated_FS)
-100	  N_rec = N_rec + 100
-	END DO      
+100	  N_rec = N_rec + teststep
+	END DO
 !
-!	2nd: calculate to every 10th centerpoint +50/-40 neighbouring centerpoints
-!	of stored record-numbers:
-!	Use 2nd list:
-	N_List1 = 0	! number of stored records and field strength
-	Calculated_FS = -999.9	! default setting
-	IF (N_List .GT. 0) THEN
-	  DO I = 1, N_List
-		J = Rec_N_list(I)
-		IF (J .EQ. 1) THEN
-			N_Start = 1
-			N_Stop  = 51
-		  ELSE
-			N_Start = J - 40
-			N_Stop  = J + 50
+	IF (N_List .EQ. 0) THEN
+	  IF (teststep .EQ. 100) THEN
+	    teststep = 10
+		GOTO 90
+	  END IF
+	  IF (teststep .EQ. 10) THEN
+	    teststep = 1
+	    GOTO 90
+	  END IF
+	END IF     
+!
+	IF (teststep .EQ. 100) THEN
+!		2nd: calculate to every 10th centerpoint +50/-40 neighbouring centerpoints
+!		of stored record-numbers:
+!		Use 2nd list:
+		N_List1 = 0	! number of stored records and field strength
+		Calculated_FS = -999.9	! default setting
+		IF (N_List .GT. 0) THEN
+		  DO I = 1, N_List
+			J = Rec_N_list(I)
+			IF (J .EQ. 1) THEN
+				N_Start = 1
+				N_Stop  = 51
+			  ELSE
+				N_Start = J - 40
+				N_Stop  = J + 50
+			END IF
+			DO J = N_Start, N_Stop, 10
+			  IF (J .EQ. Rec_N_list(I)) THEN
+!				  This calculation is already done in the previous step!
+				  Calculated_FS = FS_list(I)
+				ELSE
+				  READ (3, REC=J, IOSTAT=IOS) C_Record
+				  IF ((IOS .LT. 0) .OR. (IOS .EQ. 36)) EXIT ! end of file reached
+				  IF (IOS .NE. 0) THEN   
+					HCM_Error = 1049
+!					Error in line data
+					CLOSE (UNIT = 3)
+					RETURN
+				  END IF
+				  LongRx = N_Record(21) * RB
+				  LatRx  = N_Record(22) * RB
+				  Lo = LongTx
+				  La = LatTx
+				  IF (CBR) THEN
+					CALL CBR_Coordinates (LongRx, LatRx, Lo, La, &
+								  CBR_D, Tx_serv_area, Take_it)
+					IF (.NOT. Take_it) GOTO 110
+				  END IF
+				  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx, T_L, M_L, B_L, &
+											H_Tx_Ant_top, H_Rx_Ant_top )
+				  IF (Info(7)) THEN
+!				    Distance between Tx and Rx is less than both service area radius.
+				    RETURN
+				  END IF
+				  IF (HCM_Error .EQ. 1028) GOTO 110	! Distance > 1000 km
+				  IF (HCM_Error .NE. 0) RETURN
+			  END IF
+			  CALL Manage_List (J, N_List1, Rec_N_list1, FS_list1, Calculated_FS)
+110			  CONTINUE
+			END DO
+		  END DO
 		END IF
-		DO J = N_Start, N_Stop, 10
-		  IF (J .EQ. Rec_N_list(I)) THEN
-!			  This calculation is already done in the previous step!
-			  Calculated_FS = FS_list(I)
-			ELSE
-			  READ (3, REC=J, IOSTAT=IOS) C_Record
-			  IF ((IOS .LT. 0) .OR. (IOS .EQ. 36)) EXIT ! end of file reached
-			  IF (IOS .NE. 0) THEN   
-				HCM_Error = 1049
-!				Error in line data
-				CLOSE (UNIT = 3)
-				RETURN
-			  END IF
-			  LongRx = N_Record(21) * RB
-			  LatRx  = N_Record(22) * RB
-			  Lo = LongTx
-			  La = LatTx
-			  IF (CBR) THEN
-			    CALL CBR_Coordinates (LongRx, LatRx, Lo, La, &
-							  CBR_D, Tx_serv_area, Take_it)
-				IF (.NOT. Take_it) GOTO 110
-			  END IF
-			  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx, T_L, M_L, B_L, &
-										H_Tx_Ant_top, H_Rx_Ant_top )
-			  IF (Info(7)) THEN
-!			    Distance between Tx and Rx is less than both service area radius.
-			    RETURN
-			  END IF
-			  IF (HCM_Error .EQ. 1028) GOTO 110	! Distance > 1000 km
-			  IF (HCM_Error .NE. 0) RETURN
-		  END IF
-		  CALL Manage_List (J, N_List1, Rec_N_list1, FS_list1, Calculated_FS)
-110		  CONTINUE
-		END DO
-	  END DO
+	  ELSE
+		IF (teststep .EQ. 10) THEN
+		  N_List1 = N_List
+		  DO I = 1, 3
+		    Rec_N_list1(I) = Rec_N_list(I)
+		    FS_list1(I) = FS_list(I)
+		  END DO
+		END IF
 	END IF
 !
 !	3rd:  calculate to every +5/-4 neighbouring centerpoint of stored centerpoints
@@ -334,7 +357,7 @@
 		  IF (HCM_Error .EQ. 1028) GOTO 130	! Distance > 1000 km
 		  IF (HCM_Error .NE. 0) RETURN
 !		  Find maximun of field strength:
-		  IF (Calculated_FS .GT. FS_x) THEN
+		  IF (Calculated_FS .GE. FS_x) THEN
 			FS_x = Calculated_FS
 			Rec_x = K
 			Rec_N_x = J
@@ -346,6 +369,7 @@
 !
 !	5th: calculate to point of maximum field strength again to get all
 !		 output values:
+	IF (REC_N_x .EQ. 0) GOTO 140
 	READ (3, REC=Rec_N_x, IOSTAT=IOS) C_Record
 	IF (IOS .NE. 0) THEN   
 	  HCM_Error = 1049
@@ -357,7 +381,7 @@
 	LatRx  = N_Record(Rec_x+1) * RB
 	Lo = LongTx
 	La = LatTx
-	IF (CBR) THEN
+140	IF (CBR) THEN
 	  CALL CBR_Coordinates (LongRx, LatRx, Lo, La, &
 							  CBR_D, Tx_serv_area, Take_it)
 	  IF (.NOT. Take_it) RETURN

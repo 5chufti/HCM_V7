@@ -1,7 +1,7 @@
 !	
 !	HCMMS_V7.F90					P.Benner Reg TP Krefeld
 !
-!	Version 7.00					29.04.2004
+!	Version 7.00					23.02.2004
 !
 !	Harmonized Calculation Method for mobile services
 !
@@ -690,15 +690,21 @@
 !
 !	Input value MARAIN ?
 	IF (Max_CBR_D_input .NE. '   ') THEN
-	  READ (Max_CBR_D_input, '(I3)', IOSTAT = IOS) IMR
-	  IF (IOS .NE. 0) THEN  
-		HCM_error = 1027
-!		Error in input value of maximum cross border range
-		RETURN
-	  END IF      
-	  CBR_D = FLOAT(IMR)
-	  Info(6) = .TRUE.
-!	  Input value of maximum cross border range is used
+		READ (Max_CBR_D_input, '(I3)', IOSTAT = IOS) IMR
+		IF (IOS .NE. 0) THEN  
+		  HCM_error = 1027
+!		  Error in input value of maximum cross border range
+		  RETURN
+		END IF      
+!		Input value of maximum cross border range is used
+		CBR_D = FLOAT(IMR)
+		Info(6) = .TRUE.
+	  ELSE
+!		No Agreement frequency and CBR is missing
+		IF ((INFO(4)) .AND. (C_mode .LT. 0) .AND. (D_to_border .LT. 0)) THEN
+		  HCM_error = 1050
+		  RETURN
+		END IF
 	END IF  
 !
 !	Sea temparatur:
@@ -856,6 +862,7 @@
 !	1047	Distance to borderline is too long
 !	1048	Selected line data not available
 !	1049	Error in line data
+!	1050	No Agreement frequency and CBR input is missing
 !
 !	2000	wrong Figure_frequency (from Get_figure_FS_value)
 !	2001	wrong Time_percentage  (from Get_figure_FS_value)
