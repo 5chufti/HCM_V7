@@ -1,0 +1,224 @@
+{\rtf1\ansi\deff0\ansicpg1252{\fonttbl{\f0\froman\fcharset0 Times New Roman;}{\f1\froman\fcharset177 Times New Roman (Hebrew);}{\f2\froman\fcharset178 Times New Roman (Arabic);}{\f3\froman\fcharset161 Times New Roman Greek;
+}{\f4\froman\fcharset162 Times New Roman TUR;}{\f5\froman\fcharset186 Times New Roman Baltic;}{\f6\froman\fcharset238 Times New Roman CE;}{\f7\froman\fcharset204 Times New Roman CYR;}{\f8\froman\fcharset163 Times New Roman (Vietnamese);
+}{\f9\froman\fcharset0 SimSun;}{\f10\froman\fcharset0 Arial;}{\f11\froman\fcharset177 Arial (Hebrew);}{\f12\froman\fcharset178 Arial (Arabic);}{\f13\froman\fcharset161 Arial Greek;}{\f14\froman\fcharset162 Arial TUR;}{\f15\froman
+\fcharset186 Arial Baltic;}{\f16\froman\fcharset238 Arial CE;}{\f17\froman\fcharset204 Arial CYR;}{\f18\froman\fcharset163 Arial (Vietnamese);}{\f19\froman\fcharset0 Tahoma;}{\f20\froman\fcharset177 Tahoma (Hebrew);}{\f21\froman
+\fcharset178 Tahoma (Arabic);}{\f22\froman\fcharset161 Tahoma Greek;}{\f23\froman\fcharset162 Tahoma TUR;}{\f24\froman\fcharset186 Tahoma Baltic;}{\f25\froman\fcharset238 Tahoma CE;}{\f26\froman\fcharset204 Tahoma CYR;}{\f27
+\froman\fcharset222 Tahoma Thai;}{\f28\froman\fcharset163 Tahoma (Vietnamese);}{\f29\froman\fcharset0 Times New Roman CE;}{\f30\froman\fcharset177 Times New Roman CE (Hebrew);}{\f31\froman\fcharset178 Times New Roman CE (Arabic);
+}{\f32\froman\fcharset161 Times New Roman CE Greek;}{\f33\froman\fcharset162 Times New Roman CE TUR;}{\f34\froman\fcharset186 Times New Roman CE Baltic;}{\f35\froman\fcharset238 Times New Roman CE CE;}{\f36\froman\fcharset204
+Times New Roman CE CYR;}{\f37\froman\fcharset163 Times New Roman CE (Vietnamese);}{\f38\froman\fcharset0 Times New Roman Cyr;}{\f39\froman\fcharset177 Times New Roman Cyr (Hebrew);}{\f40\froman\fcharset178 Times New Roman Cyr (Arabic);
+}{\f41\froman\fcharset161 Times New Roman Cyr Greek;}{\f42\froman\fcharset162 Times New Roman Cyr TUR;}{\f43\froman\fcharset186 Times New Roman Cyr Baltic;}{\f44\froman\fcharset238 Times New Roman Cyr CE;}{\f45\froman\fcharset204
+Times New Roman Cyr CYR;}{\f46\froman\fcharset163 Times New Roman Cyr (Vietnamese);}{\f47\froman\fcharset0 Times New Roman Greek;}{\f48\froman\fcharset177 Times New Roman Greek (Hebrew);}{\f49\froman\fcharset178 Times New Roman Greek (Arabic);
+}{\f50\froman\fcharset161 Times New Roman Greek Greek;}{\f51\froman\fcharset162 Times New Roman Greek TUR;}{\f52\froman\fcharset186 Times New Roman Greek Baltic;}{\f53\froman\fcharset238 Times New Roman Greek CE;}{\f54\froman
+\fcharset204 Times New Roman Greek CYR;}{\f55\froman\fcharset163 Times New Roman Greek (Vietnamese);}{\f56\froman\fcharset0 Times New Roman Tur;}{\f57\froman\fcharset177 Times New Roman Tur (Hebrew);}{\f58\froman\fcharset178
+Times New Roman Tur (Arabic);}{\f59\froman\fcharset161 Times New Roman Tur Greek;}{\f60\froman\fcharset162 Times New Roman Tur TUR;}{\f61\froman\fcharset186 Times New Roman Tur Baltic;}{\f62\froman\fcharset238 Times New Roman Tur CE;
+}{\f63\froman\fcharset204 Times New Roman Tur CYR;}{\f64\froman\fcharset163 Times New Roman Tur (Vietnamese);}{\f65\froman\fcharset0 Times New Roman Baltic;}{\f66\froman\fcharset177 Times New Roman Baltic (Hebrew);}{\f67\froman
+\fcharset178 Times New Roman Baltic (Arabic);}{\f68\froman\fcharset161 Times New Roman Baltic Greek;}{\f69\froman\fcharset162 Times New Roman Baltic TUR;}{\f70\froman\fcharset186 Times New Roman Baltic Baltic;}{\f71\froman
+\fcharset238 Times New Roman Baltic CE;}{\f72\froman\fcharset204 Times New Roman Baltic CYR;}{\f73\froman\fcharset163 Times New Roman Baltic (Vietnamese);}{\f74\froman\fcharset0 Arial CE;}{\f75\froman\fcharset177 Arial CE (Hebrew);
+}{\f76\froman\fcharset178 Arial CE (Arabic);}{\f77\froman\fcharset161 Arial CE Greek;}{\f78\froman\fcharset162 Arial CE TUR;}{\f79\froman\fcharset186 Arial CE Baltic;}{\f80\froman\fcharset238 Arial CE CE;}{\f81\froman\fcharset204
+Arial CE CYR;}{\f82\froman\fcharset163 Arial CE (Vietnamese);}{\f83\froman\fcharset0 Arial Cyr;}{\f84\froman\fcharset177 Arial Cyr (Hebrew);}{\f85\froman\fcharset178 Arial Cyr (Arabic);}{\f86\froman\fcharset161 Arial Cyr Greek;
+}{\f87\froman\fcharset162 Arial Cyr TUR;}{\f88\froman\fcharset186 Arial Cyr Baltic;}{\f89\froman\fcharset238 Arial Cyr CE;}{\f90\froman\fcharset204 Arial Cyr CYR;}{\f91\froman\fcharset163 Arial Cyr (Vietnamese);}{\f92\froman
+\fcharset0 Arial Greek;}{\f93\froman\fcharset177 Arial Greek (Hebrew);}{\f94\froman\fcharset178 Arial Greek (Arabic);}{\f95\froman\fcharset161 Arial Greek Greek;}{\f96\froman\fcharset162 Arial Greek TUR;}{\f97\froman\fcharset186
+Arial Greek Baltic;}{\f98\froman\fcharset238 Arial Greek CE;}{\f99\froman\fcharset204 Arial Greek CYR;}{\f100\froman\fcharset163 Arial Greek (Vietnamese);}{\f101\froman\fcharset0 Arial Tur;}{\f102\froman\fcharset177 Arial Tur (Hebrew);
+}{\f103\froman\fcharset178 Arial Tur (Arabic);}{\f104\froman\fcharset161 Arial Tur Greek;}{\f105\froman\fcharset162 Arial Tur TUR;}{\f106\froman\fcharset186 Arial Tur Baltic;}{\f107\froman\fcharset238 Arial Tur CE;}{\f108\froman
+\fcharset204 Arial Tur CYR;}{\f109\froman\fcharset163 Arial Tur (Vietnamese);}{\f110\froman\fcharset0 Arial Baltic;}{\f111\froman\fcharset177 Arial Baltic (Hebrew);}{\f112\froman\fcharset178 Arial Baltic (Arabic);}{\f113\froman
+\fcharset161 Arial Baltic Greek;}{\f114\froman\fcharset162 Arial Baltic TUR;}{\f115\froman\fcharset186 Arial Baltic Baltic;}{\f116\froman\fcharset238 Arial Baltic CE;}{\f117\froman\fcharset204 Arial Baltic CYR;}{\f118\froman
+\fcharset163 Arial Baltic (Vietnamese);}{\f119\froman\fcharset2 Wingdings;}{\f120\froman\fcharset2 Symbol;}}{\colortbl;\red0\green0\blue0;\red0\green0\blue255;\red0\green255\blue255;\red0\green255\blue0;
+\red255\green0\blue255;\red255\green0\blue0;\red255\green255\blue0;\red255\green255\blue255;\red0\green0\blue127;\red0\green127\blue127;\red0\green127\blue0;\red127\green0\blue127;\red127\green0\blue0;
+\red127\green127\blue0;\red127\green127\blue127;\red192\green192\blue192;\red230\green230\blue230;\red204\green204\blue204;\red179\green179\blue179;\red153\green153\blue153;\red127\green127\blue127;
+\red102\green102\blue102;\red77\green77\blue77;\red51\green51\blue51;}{\stylesheet {\s1\ltrpar\ql\li0\ri0\fi0\level0\sb0\sa0\sbauto0\saauto0\nowidctlpar\sl0\hyphpar1\brsp60\brsp60\brsp60\brsp60\rtlch\af0\afs52\alang1031\ab
+\ltrch\dbch\af0\afs52\alang1031\ab\hich\af0\afs52\alang1031\ab\loch\f0\fs52\cf1\up0\charscalex100\expndtw0\b1\scaps0\ulnone\i0\kerning0\strike0\v0\caps0\lang1031\highlight0\snext1 Normal;}{\s2\ltrpar\ql\li0\ri0\fi0\level0\sb0
+\sa0\sbauto0\saauto0\nowidctlpar\sl0\keepn\hyphpar1\brsp60\brsp60\brsp60\brsp60\rtlch\af10\afs22\alang1031\ltrch\dbch\af10\afs22\alang1031\hich\af10\afs22\alang1031\loch\f10\fs22\cf1\up0\charscalex100\expndtw0\b0\scaps0\ul
+\i0\kerning0\strike0\v0\caps0\lang1031\highlight0\sbasedon1\snext1 Heading 1;}{\s3\ltrpar\ql\li0\ri0\fi0\level2\sb240\sa60\sbauto0\saauto0\nowidctlpar\sl0\keepn\hyphpar1\keep\brsp60\brsp60\brsp60\brsp60\rtlch\af10\afs32\alang1031
+\ab\ltrch\dbch\af9\afs32\alang1031\ab\hich\af10\afs32\alang1031\ab\loch\f10\fs32\cf1\up0\charscalex100\expndtw0\b1\scaps0\ulnone\i0\kerning1\strike0\v0\caps0\lang1031\highlight0\sbasedon2\snext1 Heading 2;}{\s4\ltrpar\ql\li0
+\ri0\fi0\level3\sb240\sa60\sbauto0\saauto0\nowidctlpar\sl0\keepn\hyphpar1\keep\brsp60\brsp60\brsp60\brsp60\rtlch\af10\afs28\alang1031\ab\ltrch\dbch\af9\afs28\alang1031\ab\hich\af10\afs28\alang1031\ab\loch\f10\fs28\cf1\up0\charscalex100
+\expndtw0\b1\scaps0\ulnone\i0\kerning1\strike0\v0\caps0\lang1031\highlight0\sbasedon3\snext1 Heading 3;}{\*\cs5\rtlch\af0\afs20\alang1031\ltrch\dbch\af9\afs20\alang1031\hich\af0\afs20\alang1031\loch\f0\fs20\cf1\up0\charscalex100
+\expndtw0\b0\scaps0\ulnone\i0\kerning1\strike0\v0\caps0\lang1031 Normal;}{\*\cs6\rtlch\af0\afs24\alang1031\ltrch\dbch\af0\afs24\alang1031\hich\af0\afs24\alang1031\loch\f0\fs24\cf1\up0\charscalex100\expndtw0\b0\scaps0\ulnone
+\i0\kerning0\strike0\v0\caps0\lang1031\sbasedon5 Default Paragraph Font;}}{\*\revtbl {Unknown;}}{\info {\title Modifications of the interface to the HCMMS_V7_DLL}{\subject }{\author 224-9}{\keywords }{\doccomm }{\operator
+Frequenzb\'fcr }{\creatim\yr2004\mo2\dy11\hr11\min2\sec2 }{\revtim\yr2005\mo11\dy3\hr10\min33 }}\deflang1031\widowctrl\formshade\gutter0\paperw11906\paperh16838\margl1417\margr1417\margt1417\margb1134\sectd\sbkpage\guttersxn0
+\vertalt\ltrpar\pard\ltrpar\s1\qc\li0\ri0\fi0\level0\sb0\sa0\sbauto0\saauto0\sl0\hyphpar1\brsp60\brsp60\brsp60\brsp60\rtlch\af10\afs24\alang1031\ab\ltrch\dbch\af10\afs24\alang1031\ab\hich\af10\afs24\alang1033\ab\loch\f10\fs24
+\cf1\up0\charscalex100\expndtw0\b1\scaps0\ulnone\i0\kerning0\strike0\v0\caps0\lang1033\highlight0 Modifications of the interface to the HCMMS_V7_DLL.DLL in relation to the interface to the HCMMS_V6.DLL\par
+\par
+\ql\rtlch\af10\afs22\alang1031\ltrch\dbch\af10\afs22\alang1031\hich\af10\afs22\alang1033\loch\fs22\b0 Please note:\par
+The order of the variables has changed in the interface of the HCMMS_V7_DLL-DLL !\par
+Modifications of the format are with gray background.\par
+\par
+\tab HCMMS_V/7_DLL.DLL\tab\tab\tab\tab\tab HCMMS_V6.DLL\par
+\pard\ltrpar\pard\ltrpar\s2\ql\li0\ri0\fi0\level0\sb0\sa0\sbauto0\saauto0\sl0\keepn\hyphpar1\brsp60\brsp60\brsp60\brsp60\rtlch\af10\afs22\alang1031\ltrch\dbch\af10\afs22\alang1031\hich\af10\afs22\alang1031\loch\f10\fs22\cf1
+\up0\charscalex100\expndtw0\b0\scaps0\ul\i0\kerning0\strike0\v0\caps0\lang1031\highlight0 Name\tab\tab\tab Format\tab\tab\tab\tab Name\tab\tab Format\tab\tab\tab\par
+\pard\ltrpar\pard\ltrpar\s1\ql\li0\ri0\fi0\level0\sb0\sa0\sbauto0\saauto0\sl0\hyphpar1\brsp60\brsp60\brsp60\brsp60\rtlch\af10\afs22\alang1031\ltrch\dbch\af10\afs22\alang1031\hich\af10\afs22\alang1031\loch\f10\fs22\cf1\up0\charscalex100
+\expndtw0\b0\scaps0\ulnone\i0\kerning0\strike0\v0\caps0\lang1031\highlight0\par
+C_mode\tab\tab INTEGER*4\tab\tab\tab CMODE\tab INTEGER*4\par
+Bor_dis\tab\tab INTEGER*4\tab\tab\tab BORDIS\tab INTEGER*4\par
+\rtlch\af10\afs22\alang1031\ltrch\dbch\af10\afs22\alang1031\hich\af10\afs22\alang1033\loch\lang1033 PD\tab\tab\tab DOUBLE PRECISION\tab PD\tab\tab DOUBLE PRECISION\par
+Distance\tab\tab DOUBLE PRECISION\tab DIST\tab\tab DOUBLE PRECISION\par
+\pard\ltrpar\pard\ltrpar\s1\ql\li0\ri0\fi0\level0\sb0\sa0\sbauto0\saauto0\sl0\hyphpar1\brsp0\brsp0\brsp0\brsp0\shading0\cfpat1\cbpat18\rtlch\af10\afs22\alang1031\ltrch\dbch\af10\afs22\alang1031\hich\af10\afs22\alang1033\loch
+\f10\fs22\cf1\up0\charscalex100\expndtw0\b0\scaps0\ulnone\i0\kerning0\strike0\v0\caps0\lang1033\highlight0 H_Datab_Tx\tab\tab INTEGER*2\tab\tab\tab HTT\tab\tab INTEGER*4\par
+\rtlch\af10\afs22\alang1031\ltrch\dbch\af10\afs22\alang1031\hich\af10\afs22\alang1031\loch\lang1031 H_Datab_Rx\tab\tab INTEGER*2\tab\tab\tab HRT\tab\tab INTEGER*4\par
+\pard\ltrpar\pard\ltrpar\s1\ql\li0\ri0\fi0\level0\sb0\sa0\sbauto0\saauto0\sl0\hyphpar1\brsp60\brsp60\brsp60\brsp60\rtlch\af10\afs22\alang1031\ltrch\dbch\af10\afs22\alang1031\hich\af10\afs22\alang1031\loch\f10\fs22\cf1\up0\charscalex100
+\expndtw0\b0\scaps0\ulnone\i0\kerning0\strike0\v0\caps0\lang1031\highlight0 HCM_error\tab\tab INTEGER*4\tab\tab\tab ERROR\tab INTEGER*4\par
+\rtlch\af10\afs22\alang1031\ltrch\dbch\af10\afs22\alang1031\hich\af10\afs22\alang1033\loch\lang1033 Heff\tab\tab\tab REAL*4\tab\tab\tab H1\tab\tab REAL*4\par
+Dh\tab\tab\tab REAL*4\tab\tab\tab DH\tab\tab REAL*4\par
+Dh_corr\tab\tab REAL*4\tab\tab\tab CDH\tab\tab REAL*4\par
+Power_to_Rx\tab\tab REAL*4\tab\tab\tab PR\tab\tab REAL*4\par
+Free_space_FS\tab REAL*4\tab\tab\tab E0\tab\tab REAL*4\par
+Land_FS\tab\tab REAL*4\tab\tab\tab EL\tab\tab REAL*4\par
+Sea_FS\tab\tab REAL*4\tab\tab\tab ES\tab\tab REAL*4\par
+Tx_ant_corr\tab\tab REAL*4\tab\tab\tab C1\tab\tab REAL*4\par
+Tx_ant_type_corr\tab REAL*4\tab\tab\tab C2\tab\tab REAL*4\par
+\pard\ltrpar\pard\ltrpar\s1\ql\li0\ri0\fi0\level0\sb0\sa0\sbauto0\saauto0\sl0\hyphpar1\brsp0\brsp0\brsp0\brsp0\shading0\cfpat1\cbpat18\rtlch\af10\afs22\alang1031\ltrch\dbch\af10\afs22\alang1031\hich\af10\afs22\alang1033\loch
+\f10\fs22\cf1\up0\charscalex100\expndtw0\b0\scaps0\ulnone\i0\kerning0\strike0\v0\caps0\lang1033\highlight0 Dir_Tx_Rx\tab\tab DOUBLE PRECISION\tab DIRRX\tab\tab REAL*4\par
+V_angle_Tx_Rx\tab DOUBLE PRECISION\tab ANGLEV\tab REAL*4\par
+\pard\ltrpar\pard\ltrpar\s1\ql\li0\ri0\fi0\level0\sb0\sa0\sbauto0\saauto0\sl0\hyphpar1\brsp60\brsp60\brsp60\brsp60\rtlch\af10\afs22\alang1031\ltrch\dbch\af10\afs22\alang1031\hich\af10\afs22\alang1033\loch\f10\fs22\cf1\up0\charscalex100
+\expndtw0\b0\scaps0\ulnone\i0\kerning0\strike0\v0\caps0\lang1033\highlight0 Tx_TCA\tab\tab REAL*4\tab\tab\tab TX_CLA\tab REAL*4\par
+Rx_TCA\tab\tab REAL*4\tab\tab\tab RX_CLA\tab REAL*4\par
+Tx_TCA_corr\tab\tab REAL*4\tab\tab\tab TX_CAC\tab REAL*4\par
+Rx_TCA_corr\tab\tab REAL*4\tab\tab\tab RX_CAC\tab REAL*4\par
+\pard\ltrpar\pard\ltrpar\s1\ql\li0\ri0\fi0\level0\sb0\sa0\sbauto0\saauto0\sl0\hyphpar1\brsp0\brsp0\brsp0\brsp0\shading0\cfpat1\cbpat18\rtlch\af10\afs22\alang1031\ltrch\dbch\af10\afs22\alang1031\hich\af10\afs22\alang1033\loch
+\f10\fs22\cf1\up0\charscalex100\expndtw0\b0\scaps0\ulnone\i0\kerning0\strike0\v0\caps0\lang1033\highlight0 D_sea_calculated\tab DOUBLE PRECISION\tab DSEA_C\tab REAL*4\par
+\pard\ltrpar\pard\ltrpar\s1\ql\li0\ri0\fi0\level0\sb0\sa0\sbauto0\saauto0\sl0\hyphpar1\brsp60\brsp60\brsp60\brsp60\rtlch\af10\afs22\alang1031\ltrch\dbch\af10\afs22\alang1031\hich\af10\afs22\alang1033\loch\f10\fs22\cf1\up0\charscalex100
+\expndtw0\b0\scaps0\ulnone\i0\kerning0\strike0\v0\caps0\lang1033\highlight0 Rx_ant_corr\tab\tab REAL*4\tab\tab\tab C1R\tab\tab REAL*4\par
+Rx_ant_type_corr\tab REAL*4\tab\tab\tab C2R\tab\tab REAL*4\par
+\pard\ltrpar\pard\ltrpar\s1\ql\li0\ri0\fi0\level0\sb0\sa0\sbauto0\saauto0\sl0\hyphpar1\brsp0\brsp0\brsp0\brsp0\shading0\cfpat1\cbpat18\rtlch\af10\afs22\alang1031\ltrch\dbch\af10\afs22\alang1031\hich\af10\afs22\alang1033\loch
+\f10\fs22\cf1\up0\charscalex100\expndtw0\b0\scaps0\ulnone\i0\kerning0\strike0\v0\caps0\lang1033\highlight0 Delta_frequency\tab DOUBLE PRECISION\tab DF\tab\tab REAL*4\par
+\pard\ltrpar\pard\ltrpar\s1\ql\li0\ri0\fi0\level0\sb0\sa0\sbauto0\saauto0\sl0\hyphpar1\brsp60\brsp60\brsp60\brsp60\rtlch\af10\afs22\alang1031\ltrch\dbch\af10\afs22\alang1031\hich\af10\afs22\alang1033\loch\f10\fs22\cf1\up0\charscalex100
+\expndtw0\b0\scaps0\ulnone\i0\kerning0\strike0\v0\caps0\lang1033\highlight0 Corr_delta_f\tab\tab REAL*4\tab\tab\tab CDF\tab\tab REAL*4\par
+Calculated_FS\tab REAL*4\tab\tab\tab EC\tab\tab REAL*4\par
+Perm_FS\tab\tab REAL*4\tab\tab\tab EP\tab\tab REAL*4\par
+CBR_D\tab\tab REAL*4\tab\tab\tab MAXRA\tab REAL*4\par
+ERP_ref_Tx\tab\tab REAL*4\tab\tab\tab ERPRT\tab REAL*4\par
+Prot_margin\tab\tab REAL*4\tab\tab\tab PROTM\tab REAL*4\par
+\pard\ltrpar\pard\ltrpar\s1\ql\li0\ri0\fi0\level0\sb0\sa0\sbauto0\saauto0\sl0\hyphpar1\brsp0\brsp0\brsp0\brsp0\shading0\cfpat1\cbpat18\rtlch\af10\afs22\alang1031\ltrch\dbch\af10\afs22\alang1031\hich\af10\afs22\alang1033\loch
+\f10\fs22\cf1\up0\charscalex100\expndtw0\b0\scaps0\ulnone\i0\kerning0\strike0\v0\caps0\lang1033\highlight0 I_str\tab\tab\tab CHARACTER*432\tab\tab INTSTR\tab CHARACTER*459\par
+(not longer used)\tab\tab\tab\tab\tab OFFDEY\tab INTEGER*4\par
+(not longer used)\tab\tab\tab\tab\tab HT\tab\tab INTEGER*4\par
+(not longer used)\tab\tab\tab\tab\tab AM\tab\tab REAL*4\par
+(not longer used)\tab\tab\tab\tab\tab AMS\tab\tab REAL*4\par
+(not longer used)\tab\tab\tab\tab\tab DAV\tab\tab REAL*4\par
+(not longer used)\tab\tab\tab\tab\tab DAH\tab\tab REAL*4\par
+(not longer used)\tab\tab\tab\tab\tab AV\tab\tab REAL*4\par
+(not longer used)\tab\tab\tab\tab\tab DAZI\tab\tab REAL*4\par
+(not longer used)\tab\tab\tab\tab\tab DELE\tab\tab REAL*4\par
+(not longer used)\tab\tab\tab\tab\tab CSR\tab\tab REAL*4\par
+(not longer used)\tab\tab\tab\tab\tab CSI\tab\tab REAL*4\par
+(not longer used)\tab\tab\tab\tab\tab EP0\tab\tab REAL*4\par
+\page\pard\ltrpar\pard\ltrpar\s1\ql\li0\ri0\fi0\level0\sb0\sa0\sbauto0\saauto0\sl0\hyphpar1\brsp60\brsp60\brsp60\brsp60\rtlch\af10\afs22\alang1031\ltrch\dbch\af10\afs22\alang1031\hich\af10\afs22\alang1033\loch\f10\fs22\cf1
+\up0\charscalex100\expndtw0\b0\scaps0\ulnone\i0\kerning0\strike0\v0\caps0\lang1033\highlight0\par
+\tab HCMMS_V/7_DLL.DLL\tab\tab\tab\tab\tab HCMMS_V6.DLL\par
+\pard\ltrpar\pard\ltrpar\s2\ql\li0\ri0\fi0\level0\sb0\sa0\sbauto0\saauto0\sl0\keepn\hyphpar1\brsp60\brsp60\brsp60\brsp60\rtlch\af10\afs22\alang1031\ltrch\dbch\af10\afs22\alang1031\hich\af10\afs22\alang1033\loch\f10\fs22\cf1
+\up0\charscalex100\expndtw0\b0\scaps0\ul\i0\kerning0\strike0\v0\caps0\lang1033\highlight0 Name\tab\tab\tab Format\tab\tab\tab\tab Name\tab\tab Format\tab\tab\tab\par
+\pard\ltrpar\pard\ltrpar\s1\ql\li0\ri0\fi0\level0\sb0\sa0\sbauto0\saauto0\sl0\hyphpar1\brsp60\brsp60\brsp60\brsp60\rtlch\af10\afs22\alang1031\ltrch\dbch\af10\afs22\alang1031\hich\af10\afs22\alang1033\loch\f10\fs22\cf1\up0\charscalex100
+\expndtw0\b0\scaps0\ulnone\i0\kerning0\strike0\v0\caps0\lang1033\highlight0\par
+\pard\ltrpar\pard\ltrpar\s1\ql\li0\ri0\fi0\level0\sb0\sa0\sbauto0\saauto0\sl0\hyphpar1\brsp0\brsp0\brsp0\brsp0\shading0\cfpat1\cbpat18\rtlch\af10\afs22\alang1031\ltrch\dbch\af10\afs22\alang1031\hich\af10\afs22\alang1033\loch
+\f10\fs22\cf1\up0\charscalex100\expndtw0\b0\scaps0\ulnone\i0\kerning0\strike0\v0\caps0\lang1033\highlight0 (now in Calculated_FS)\tab\tab\tab\tab MAXFS\tab REAL*4\par
+(now in Distance)\tab\tab\tab\tab\tab DISBOR\tab DOUBLE PRECISION\par
+(now in Dir_Tx_Rx)\tab\tab\tab\tab\tab DIRBOR\tab DOUBLE PRECISION\par
+\pard\ltrpar\pard\ltrpar\s1\ql\li0\ri0\fi0\level0\sb0\sa0\sbauto0\saauto0\sl0\hyphpar1\brsp60\brsp60\brsp60\brsp60\rtlch\af10\afs22\alang1031\ltrch\dbch\af10\afs22\alang1031\hich\af10\afs22\alang1033\loch\f10\fs22\cf1\up0\charscalex100
+\expndtw0\b0\scaps0\ulnone\i0\kerning0\strike0\v0\caps0\lang1033\highlight0\par
+\par
+\par
+\rtlch\af10\afs24\alang1031\ab\ltrch\dbch\af10\afs24\alang1031\ab\hich\af10\afs24\alang1033\ab\loch\fs24\b1 Modifications of the string variable (I_str / INTSTR)\par
+\rtlch\af10\afs22\alang1031\ltrch\dbch\af10\afs22\alang1031\hich\af10\afs22\alang1033\loch\fs22\b0\par
+The first modification is in \u8220\'93Corr.Fact.Acc.freq.diff\u8221\'94, starting position = 175. All following positions are changed! After \u8220\'93Version number\u8221\'94 everything has changed.\par
+\par
+\par
+\rtlch\af10\afs24\alang1031\ab\ltrch\dbch\af10\afs24\alang1031\ab\hich\af10\afs24\alang1033\ab\loch\fs24\b1 All HCM_error codes and all Info(i) values are new!\par
+\sect\sectd\sbkpage\guttersxn0\vertalt\marglsxn1418\margrsxn1418\margtsxn1418\pgnstarts3\pgnrestart\pard\ltrpar\pard\ltrpar\s1\ql\li0\ri0\fi0\level0\sb240\sa60\sbauto0\saauto0\sl0\keepn\hyphpar1\brsp60\brsp60\brsp60\brsp60\rtlch
+\af10\afs32\alang1031\ab\ltrch\dbch\af10\afs32\alang1031\ab\hich\af10\afs32\alang2057\ab\loch\f10\fs32\cf1\up0\charscalex100\expndtw0\b1\scaps0\ulnone\i0\kerning1\strike0\v0\caps0\lang2057\highlight0 VERSION 7\par
+\pard\ltrpar\pard\ltrpar\s1\ql\li0\ri0\fi0\level0\sb0\sa0\sbauto0\saauto0\sl0\hyphpar1\brsp60\brsp60\brsp60\brsp60\rtlch\af0\afs24\alang1031\ltrch\dbch\af0\afs24\alang1031\hich\af0\afs24\alang2057\loch\f0\fs24\cf1\up0\charscalex100
+\expndtw0\b0\scaps0\ulnone\i0\kerning0\strike0\v0\caps0\lang2057\highlight0\par
+\rtlch\af19\afs22\alang1031\ltrch\dbch\af19\afs22\alang1031\hich\af19\afs22\alang2057\loch\f19\fs22\ul Start position \tab Stop position\tab Description\tab\tab\tab In-/ Output\tab\tab Format\par
+\rtlch\af19\afs22\alang1031\ltrch\dbch\af19\afs22\alang1031\hich\af19\afs22\alang2057\loch\ulnone\tab 1\tab\tab 15\tab Tx co-ordinates\tab\tab Input\tab\tab 009E223350N4422\par
+\tab 16\tab\tab 30\tab Rx co-ordinates\tab\tab Input\tab\tab 009E223350N4422\par
+\tab 31\tab\tab 34\tab Height of Tx site\tab\tab Input\tab\tab 9999 or four blanks\par
+\tab 35\tab\tab 38\tab Height of Rx site\tab\tab Input\tab\tab 9999 or four blanks\par
+\tab 39\tab\tab 45\tab Tx hor. ant. Type\tab\tab Input\tab\tab 000ND00\par
+\tab 46\tab\tab 52\tab Tx vert. ant. type\tab\tab Input\tab\tab 000ND00\par
+\tab 53\tab\tab 57\tab Tx Azimuth\tab\tab\tab Input\tab\tab 999.9\par
+\tab 58\tab\tab 62\tab Tx Elevation\tab\tab\tab Input\tab\tab +99.9\par
+\tab 63\tab\tab 66\tab Tx Antenna height\tab\tab Input\tab\tab 9999\par
+\tab 67\tab\tab 70\tab Rx Antenna Height\tab\tab Input\tab\tab 9999\par
+\tab 71\tab\tab 71\tab Tx Type of antenna\tab\tab Input\tab\tab\u8216\'91E\u8217\'92 or \u8216\'91I\u8217\'92\par
+\tab 72\tab\tab 77\tab Max. radiated power\tab\tab Input\tab\tab +999.9\par
+\tab 78\tab\tab 89\tab Tx Frequency\tab\tab\tab Input\tab\tab 99999.99999M\par
+\tab 90\tab\tab 90\tab Channel occupation\tab\tab Input\tab\tab\u8216\'910\u8217\'92 or \u8216\'911\u8217\'92\par
+\tab 91\tab\tab 91\tab Sea temperature\tab\tab Input\tab\tab\u8216\'91C\u8217\'92 or \u8216\'91W\u8217\'92\par
+\tab 92\tab\tab 96\tab Tx Service area\tab\tab Input\tab\tab 99999\par
+\tab 97\tab\tab 101\tab Rx Service area\tab\tab Input\tab\tab 99999\par
+\tab 102\tab\tab 106\tab Distance over sea\tab\tab Input\tab\tab 99999 or 5 blanks\par
+\tab 107\tab\tab 118\tab Rx Frequency\tab\tab\tab Input\tab\tab 99999.99999M\par
+\tab 119\tab\tab 127\tab Rx Design. of emm.\tab\tab Input\tab\tab 14k0.....\par
+\tab 128\tab\tab 136\tab Tx Design. of emm.\tab\tab Input\tab\tab 14k0.....\par
+\tab 137\tab\tab 143\tab Rx hor. ant. Type\tab\tab Input\tab\tab 000ND00\par
+\tab 144\tab\tab 150\tab Rx vert. ant. Type\tab\tab Input\tab\tab 000ND00\par
+\tab 151\tab\tab 155\tab Rx Azimuth\tab\tab\tab Input\tab\tab 999.9\par
+\tab 156\tab\tab 160\tab Rx Elevation\tab\tab\tab Input\tab\tab +99.9\par
+\tab 161\tab\tab 161\tab Rx Type of ant.\tab\tab Input\tab\tab\u8216\'91E\u8217\'92 or \u8216\'91I\u8217\'92\par
+\tab 162\tab\tab 165\tab Rx Antenna gain\tab\tab Input\tab\tab 99.9\par
+\tab 166\tab\tab 169\tab Depolarisation loss\tab\tab Input\tab\tab 99.9\par
+\tab 170\tab\tab 174\tab Perm. Field strength\tab\tab Input\tab\tab +99.9 or 5 blanks\par
+\tab 175\tab\tab 178\tab Corr. fact. acc. freq. diff.\tab Input\tab\tab 99.9 or four blanks\par
+\tab 179\tab\tab 181\tab County code to calcul. to\tab Input\tab\tab XXX\par
+\tab 182\tab\tab 184\tab County code of Tx\tab\tab Input\tab\tab XXX\par
+\tab 185\tab\tab 187\tab Max. cross border range\tab Input\tab\tab 999 or 3 blanks\par
+\tab 188\tab\tab 250\tab Path of terrain data\tab\tab Input\tab\tab C:\\TOPO..... (63 C)\par
+\tab 251\tab\tab 313\tab Path of borderline data\tab Input\tab\tab C:\\BORDER (63 C)\par
+\tab 314\tab\tab 376\tab Path of morphological data\tab Input\tab\tab C:\\MORPHO (63C)\par
+\tab 377\tab\tab 382\tab Version number\tab\tab Output\tab\par
+\tab 383\tab\tab 402\tab Info values (field, 20 values)\tab Output\tab\tab\u8216\'91T\u8217\'92rue  or \u8216\'91F\u8217\'92alse\par
+\tab 403\tab\tab 417\tab Tx co-ordinates calculated\tab Output\tab\tab 008E213651N2137\par
+\tab 418\tab\tab 432\tab Rx co-ordinates calculated\tab Output\tab\tab 007E413672N4127\par
+\tab 433\tab\tab ???\tab Debug directory (optional)\tab Input\tab\tab e.g. \u8216\'91C:\\Temp\u8217\'92\par
+\page\pard\ltrpar\pard\ltrpar\s1\ql\li0\ri0\fi0\level0\sb240\sa60\sbauto0\saauto0\sl0\keepn\hyphpar1\brsp60\brsp60\brsp60\brsp60\rtlch\af10\afs32\alang1031\ab\ltrch\dbch\af10\afs32\alang1031\ab\hich\af10\afs32\alang2057\ab
+\loch\f10\fs32\cf1\up0\charscalex100\expndtw0\b1\scaps0\ulnone\i0\kerning1\strike0\v0\caps0\lang2057\highlight0 VERSION 6\par
+\pard\ltrpar\pard\ltrpar\s1\ql\li0\ri0\fi0\level0\sb0\sa0\sbauto0\saauto0\sl0\hyphpar1\brsp60\brsp60\brsp60\brsp60\rtlch\af0\afs24\alang1031\ltrch\dbch\af0\afs24\alang1031\hich\af0\afs24\alang2057\loch\f0\fs24\cf1\up0\charscalex100
+\expndtw0\b0\scaps0\ulnone\i0\kerning0\strike0\v0\caps0\lang2057\highlight0\par
+\rtlch\af19\afs22\alang1031\ltrch\dbch\af19\afs22\alang1031\hich\af19\afs22\alang2057\loch\f19\fs22 Start position \tab Stop position\tab Description\tab\tab\tab In-/ Output\tab\tab Format\par
+\tab 1\tab\tab 15\tab Tx co-ordinates\tab\tab Input\tab\tab 009E223350N4422\par
+\tab 16\tab\tab 30\tab Rx co-ordinates\tab\tab Input\tab\tab 009E223350N4422\par
+\tab 31\tab\tab 34\tab Height of Tx site\tab\tab Input\tab\tab 9999 or four blanks\par
+\tab 35\tab\tab 38\tab Height of Rx site\tab\tab Input\tab\tab 9999 or four blanks\par
+\tab 39\tab\tab 45\tab Tx hor. ant. Type\tab\tab Input\tab\tab 000ND00\par
+\tab 46\tab\tab 52\tab Tx vert. ant. type\tab\tab Input\tab\tab 000ND00\par
+\tab 53\tab\tab 57\tab Tx Azimuth\tab\tab\tab Input\tab\tab 999.9\par
+\tab 58\tab\tab 62\tab Tx Elevation\tab\tab\tab Input\tab\tab +99.9\par
+\tab 63\tab\tab 66\tab Tx Antenna height\tab\tab Input\tab\tab 9999\par
+\tab 67\tab\tab 70\tab Rx Antenna Height\tab\tab Input\tab\tab 9999\par
+\tab 71\tab\tab 71\tab Tx Type of antenna\tab\tab Input\tab\tab\u8216\'91E\u8217\'92 or \u8216\'91I\u8217\'92\par
+\tab 72\tab\tab 77\tab Max. radiated power\tab\tab Input\tab\tab +999.9\par
+\tab 78\tab\tab 89\tab Tx Frequency\tab\tab\tab Input\tab\tab 99999.99999M\par
+\tab 90\tab\tab 90\tab Channel occupation\tab\tab Input\tab\tab\u8216\'910\u8217\'92 or \u8216\'911\u8217\'92\par
+\tab 91\tab\tab 91\tab Sea temperature\tab\tab Input\tab\tab\u8216\'91C\u8217\'92 or \u8216\'91W\u8217\'92\par
+\tab 92\tab\tab 96\tab Tx Service area\tab\tab Input\tab\tab 99999\par
+\tab 97\tab\tab 101\tab Rx Service area\tab\tab Input\tab\tab 99999\par
+\tab 102\tab\tab 106\tab Distance over sea\tab\tab Input\tab\tab 99999 or 5 blanks\par
+\tab 107\tab\tab 118\tab Rx Frequency\tab\tab\tab Input\tab\tab 99999.99999M\par
+\tab 119\tab\tab 127\tab Rx Design. of emm.\tab\tab Input\tab\tab 14k0.....\par
+\tab 128\tab\tab 136\tab Tx Design. of emm.\tab\tab Input\tab\tab 14k0.....\par
+\tab 137\tab\tab 143\tab Rx hor. ant. Type\tab\tab Input\tab\tab 000ND00\par
+\tab 144\tab\tab 150\tab Rx vert. ant. Type\tab\tab Input\tab\tab 000ND00\par
+\tab 151\tab\tab 155\tab Rx Azimuth\tab\tab\tab Input\tab\tab 999.9\par
+\tab 156\tab\tab 160\tab Rx Elevation\tab\tab\tab Input\tab\tab +99.9\par
+\tab 161\tab\tab 161\tab Rx Type of ant.\tab\tab Input\tab\tab\u8216\'91E\u8217\'92 or \u8216\'91I\u8217\'92\par
+\tab 162\tab\tab 165\tab Rx Antenna gain\tab\tab Input\tab\tab 99.9\par
+\tab 166\tab\tab 169\tab Depolarisation loss\tab\tab Input\tab\tab 99.9\par
+\tab 170\tab\tab 174\tab Perm. Field strength\tab\tab Input\tab\tab +99.9 or 5 blanks\par
+\tab 175\tab\tab 176\tab Corr. fact. acc. freq. diff.\tab Input\tab\tab 99 or two blanks\par
+\tab 177\tab\tab 179\tab County code to calcul. to\tab Input\tab\tab XXX\par
+\tab 180\tab\tab 182\tab County code of Tx\tab\tab Input\tab\tab XXX\par
+\tab 183\tab\tab 185\tab Max. cross border range\tab Input\tab\tab 999 or 3 blanks\par
+\tab 186\tab\tab 248\tab Path of terrain data\tab\tab Input\tab\tab C:\\TOPO..... (63 C)\par
+\tab 249\tab\tab 311\tab Path of borderline data\tab Input\tab\tab C:\\BORDER (63 C)\par
+*\tab 312\tab\tab 374\tab Path of morphological data\tab Input\tab\tab C:\\MORPHO (63 C)\par
+\tab 375\tab\tab 380\tab Version number\tab\tab Output\tab\par
+\tab 381\tab\tab 383\tab Land figure (ITU-R)\tab\tab Output\par
+\tab 384\tab\tab 386\tab Sea figure (ITU-R)\tab\tab Output\par
+\tab 387\tab\tab 401\tab Line co-ordinates\tab\tab Output\tab\tab 009E223350N2233\par
+*\tab 402\tab\tab 416\tab Tx co-ordinates calculated\tab Output\tab\tab 008E213651N2137\par
+*\tab 417\tab\tab 431\tab Rx co-ordinates calculated\tab Output\tab\tab 007E413672N4127\par
+\tab 432\tab\tab 451\tab INFO2 values (field x 20)\tab Output\tab\tab\u8216\'91T\u8217\'92rue  or \u8216\'91F\u8217\'92alse\par
+\tab 452\tab\tab 456\tab INFO3 values (field x 5)\tab Output\tab\tab\u8216\'91T\u8217\'92rue  or \u8216\'91F\u8217\'92alse\par
+\tab 457\tab\tab 457\tab INFOA2 (Tx ant. 999XX99)\tab Output\tab\tab\u8216\'91T\u8217\'92rue  or \u8216\'91F\u8217\'92alse\par
+\tab 458\tab\tab 458\tab INFOA3 (Rx ant. 999XX99)\tab Output\tab\tab\u8216\'91T\u8217\'92rue  or \u8216\'91F\u8217\'92alse\par
+\tab 459\tab\tab 459\tab Vienna calculation\tab\tab Output\tab\tab\u8216\'91T\u8217\'92rue  or \u8216\'91F\u8217\'92alse\par
+\tab 460\tab\tab ???\tab Debug directory (optional)\tab Input\tab\tab e.g. \u8216\'91C:\\Temp\u8217\'92\par
+\rtlch\af10\afs24\alang1031\ab\ltrch\dbch\af10\afs24\alang1031\ab\hich\af10\afs24\alang2057\ab\loch\f10\fs24\b1 }
