@@ -1,6 +1,6 @@
 !
-!	Permissible_FS_calculation.f90
-!															25.02.2004
+!	Permissible_FS_calculation.f90						P. Benner		25.02.2004
+!														G.H.			17.04.2005
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -325,9 +325,9 @@
 	RETURN
 !
 !	*****************************************************************
-!	*																*
-!	*						Module GSM 900							*
-!	*																*
+!	*								
+!	*						Module GSM 900	
+!	*								
 !	*****************************************************************
 !     
 !	Tx - bandwidth > 100 kHz ?
@@ -425,9 +425,9 @@
 !
 !
 !	*****************************************************************
-!	*																*
-!	*						Module GSM 1800							*
-!	*																*
+!	*								
+!	*						Module GSM 1800	
+!	*								
 !	*****************************************************************
 !
 60    IF (Delta_frequency .GT. 600.0) THEN
@@ -460,10 +460,10 @@
 !	
 !
 !	*****************************************************************
-!	*																*
-!	*						Module 380 - 400 MHz					*
-!	*					(or Tx and Rx are digital systems)			*
-!	*																*
+!	*								
+!	*			Module 380 - 400 MHz			
+!	*	(or Tx and Rx are digital systems)			
+!	*								
 !	*****************************************************************
 !
 !	If at least one station is not digital modulation, use normal
@@ -490,11 +490,11 @@
 	GOTO 300
 !
 !	*****************************************************************
-!	*																*
-!	*					Module normal Agreement						*
-!	*																*
-!	*	Determination of correction factor according to delta f		*
-!	*																*
+!	*								
+!	*					Module normal Agreement	
+!	*								
+!	*	Determination of correction factor according to delta f	
+!	*								
 !	*****************************************************************
 !
 !
@@ -696,37 +696,26 @@
 !
 !	Calculation of antenna correction factors "Rx_ant_corr" and "Rx_ant_type_corr":
 !
-	IF ((Ant_typ_V_Rx .EQ. '000ND00') .AND. (Ant_typ_H_Rx .EQ. '000ND00')) THEN
+	IF ((C_mode .LT. 0) .OR. (C_mode .EQ. 99) .OR. &
+		((Ant_typ_V_Rx .EQ. '000ND00') .AND. (Ant_typ_H_Rx .EQ. '000ND00'))) THEN
 		Rx_ant_corr  = 0.0
-	  ELSE
-		IF (Ant_typ_V_Rx .EQ. '000ND00') THEN
-			V_diff_angle_Rx_Tx = 0.0
-		  ELSE
-			V_angle_Rx_Tx = ATAND ( (H_Tx_Ant_top - H_Rx_Ant_top) / (1000.0 * Distance) )
-			READ (Ele_Rx_input, *, IOSTAT=IOS) Rx_Elevation
-			IF (IOS .NE. 0) THEN
-			  HCM_Error = 1042
-!			  Error in Rx elevation
+	ELSE
+		V_angle_Rx_Tx = ATAND ( (H_Tx_Ant_top - H_Rx_Ant_top) / (1000.0 * Distance) )
+		READ (Ele_Rx_input, *, IOSTAT=IOS) Rx_Elevation
+		IF (IOS .NE. 0) THEN
+		  HCM_Error = 1042
+!		  Error in Rx elevation
 		  RETURN
 		END IF
-		V_diff_angle_Rx_Tx = Rx_Elevation - V_angle_Rx_Tx
-		IF (V_diff_angle_Rx_Tx .LT. 0.0) V_diff_angle_Rx_Tx = 360.0 + V_diff_angle_Rx_Tx
+		READ (Azi_Rx_input, *, IOSTAT=IOS) Rx_Azimuth
+		IF (IOS .NE. 0) THEN
+		  HCM_Error = 1043
+!		  Error in Rx azimuth
+		  RETURN
 		END IF
-		IF (Ant_typ_H_Rx .EQ. '000ND00') THEN
-			H_diff_angle_Rx_Tx = 0.0
-		  ELSE
-			READ (Azi_Rx_input, *, IOSTAT=IOS) Rx_Azimuth
-			IF (IOS .NE. 0) THEN
-			  HCM_Error = 1043
-!			  Error in Rx azimuth
-			  RETURN
-			END IF
-			H_diff_angle_Rx_Tx = Dir_Rx_Tx - Rx_Azimuth
-			IF (H_diff_angle_Rx_Tx .LT. 0.0) H_diff_angle_Rx_Tx = 360.0 + H_diff_angle_Rx_Tx
-		END IF
-		DI1 = H_diff_angle_Rx_Tx
-		DI2 = V_diff_angle_Rx_Tx
+		CALL Ctransf (Dir_Rx_Tx,Rx_Azimuth,V_angle_Rx_Tx,Rx_Elevation,DI1,DI2)
 		CALL Antenna_correction (DI1, DI2, Ant_typ_H_Rx, Ant_typ_V_Rx, Rx_ant_corr, HCM_Error)
+		IF (HCM_Error .NE. 0) RETURN
 	END IF
 !
 	Perm_FS = Perm_FS + Rx_ant_corr

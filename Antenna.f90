@@ -1,7 +1,7 @@
 !
-!	Antenna.f90
+!	Antenna.f90											P. Benner		14.03.2000
 !
-!						                                14.03.2000
+!						                                
 !
 !	Subroutine to calculate the gain (loss) of an antenna.
 !

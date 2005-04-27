@@ -1,6 +1,6 @@
 !
-!	Get_figure_FS_value.f90						P.Benner
-!												06.10.2003
+!	Get_figure_FS_value.f90								P.Benner		06.10.2003
+!												
 !
 !	SUBROUTINE Get_figure_FS_value (Figure_frequency, Time_percentage, Sea_temperature, &
 !									Figure_Heff, Figure_distance, Land_figure_FS, &

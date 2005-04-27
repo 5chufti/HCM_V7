@@ -1,8 +1,6 @@
 !
-!	TCA_correction_calculation.f90
-!														P. Benner
-!														29.10.2003
-!
+!	TCA_correction_calculation.f90						P. Benner		29.10.2003
+!														
 !
 !	Subroutine to calculate the Terrain Clearance Angle (TCA) correction.
 !

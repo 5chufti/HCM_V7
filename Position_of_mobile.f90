@@ -1,6 +1,6 @@
 !
-!	Position_of_mobile.f90
-!																	24.08.2004
+!	Position_of_mobile.f90								P. Benenr		24.08.2004
+!																	
 !
 !	Subroutine to calculate the new position of Tx (New_LongTx, New_LatTx)
 !	and/or Rx (New_LongRx, New_latRx) if at least one is a mobile and

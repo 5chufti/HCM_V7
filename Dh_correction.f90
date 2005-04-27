@@ -1,6 +1,6 @@
 !
-!	Dh_Correction.f90									P. Benner
-!														10.10.2003
+!	Dh_Correction.f90									P. Benner		10.10.2003
+!														
 !
 !	Subroutine to calculate the correction factor according terrain
 !	irregularity 'CDH'.

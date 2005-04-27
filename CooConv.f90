@@ -1,5 +1,5 @@
 !
-!	CooConv.f90							15.12.2003
+!	CooConv.f90											P. Benner		15.12.2003
 !
 !	This subroutine converts co-ordinates from numbers
 !	(longitude, latitude) to a string.

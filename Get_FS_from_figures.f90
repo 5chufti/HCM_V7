@@ -1,6 +1,6 @@
 !
-!	Get_FS_from_figures.f90						P. Benner
-!												06.10.2003
+!	Get_FS_from_figures.f90								P. Benner		06.10.2003
+!												
 !
 !	SUBROUTINE Get_FS_from_figures ( Land_FS_1kW, Sea_FS_1kW )
 !

@@ -1,6 +1,6 @@
 !
-!	Dh_calculation.f90									P. Benner
-!														20.11.2003
+!	Dh_calculation.f90									P. Benner		20.11.2003
+!														G.H.			18.04.2005
 !
 !	Subroutine to calculate the terrain irregularity 'Dh'.
 !
@@ -28,9 +28,8 @@
 !
 	INCLUDE		'HCM_MS_V7_definitions.f90'
 !
-	INTEGER				HI(1670), PStart, PStop
-	INTEGER				I, J, K, L, N, S1, S2, S3
-	DOUBLE PRECISION	XX
+	INTEGER		HI(1670), PStart, PStop
+	INTEGER		I, J, K, L, N, S1, S2, S3
 !
 !	*******************************************************************
 !
@@ -40,43 +39,35 @@
 	  Dh = 50.0
 	  RETURN
 	END IF
+!	prepare usefull values
+	N = 0
+	I = DINT(4.5D0 / PD)
+	L = DINT(2.5D1 / PD)
+!	Starting number of profile point 'PStart' and ending number 'PStop'
 !
 	IF (Distance .LE. 5.0D1) THEN
 !		Between 10 km and 50 km: Normal calculation mimus two times
 !		4.5 km (transmitter and receiver).
-!	
-!		Starting number of profile point 'PStart' and ending number
-!		'PStop':
-		XX = 4.5D0 / PD
-		PStart = INT(XX) + 1
-		XX = (Distance- 4.5D0) / PD
-		PStop  = INT(XX) + 1
-		N = 0
+		PStart = I + 1
+		PStop  = PN - I
 		DO J = PStart, PStop
 		  N = N + 1
 		  HI(N) = T_Prof(J)
 		END DO
-	  ELSE	! Distance > 50 km
-!		More than 50 km: Calculation of two parts: 4.5 to 25 km and
-!		distance - 25 km  to distance - 4.5 km.
-!
+	ELSE	
+!	Distance > 50 km
+!	Calculation of two parts: 4.5 to 25 km and
+!	distance - 25 km  to distance - 4.5 km.
 !		1st part:
-!		Starting number of profil point 'PStart' and ending number
-!		'PStop':
-		XX = 4.5D0 / PD
-		PStart = INT(XX) + 1
-		XX = 2.5D1 / PD
-		PStop  = INT(XX) + 1
-		N = 0
+		PStart = I + 1
+		PStop  = L + 1
 		DO J = PStart, PStop
 		  N = N + 1
 		  HI(N) = T_Prof(J)
 		END DO
 !		2nd part:
-		XX = (Distance-2.5D1) / PD
-		PStart = INT(XX) + 1
-		XX = (Distance-4.5D0) / PD
-		PStop  = INT (XX) + 1 
+		PStart = PN - L
+		PStop  = PN - I 
 		DO J = PStart, PStop
 		  N = N + 1
 		  HI(N) = T_Prof(J)
@@ -104,7 +95,7 @@
 !	is the value of 'Dh':
 !
 	IF (N .LT. 5) THEN
-		Dh = FLOAT(HI(N-NINT(FLOAT(N)/10.0)) - HI(1))
+		Dh = FLOAT(HI(N) - HI(1))
 	  ELSE
 		Dh = FLOAT(HI(N-NINT(FLOAT(N)/10.0)) - HI(NINT(FLOAT(N)/10.0)))
 	END IF

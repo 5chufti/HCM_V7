@@ -1,72 +1,142 @@
 !
 !	Antenna_correction.f90
-!													16.02.2003
+!														G.H.			17.04.2005
 !
-!	Subroutine to calculate the total antenna attenuation Attenuation
+!	Subroutine to calculate the corrected H_diff_angle, V_diff_angle
 !
-!
-	SUBROUTINE Antenna_correction (H_diff_angle, V_diff_angle, Ant_typ_H, &
-									Ant_typ_V, Attenuation, Error)
+	SUBROUTINE Ctransf (azi,aziM,ele,eleM,hda,vda)
 !
 	IMPLICIT	NONE
 !
-	CHARACTER*7	Ant_typ_H, Ant_typ_V
+	DOUBLE PRECISION	azi, aziM, ele, eleM
+	REAL				hda, vda
+	DOUBLE PRECISION	a, b, d
+!
+!	calc distance
+	a = DSIND((ele - eleM) / 2D0)**2D0 + DCOSD(eleM) * DCOSD(ele) & 
+		* DSIND((azi - aziM) / 2D0)**2D0
+	d = 2D0 * DATAN2D(DSQRT(a), DSQRT(1D0 - a))
+!	calc bearing
+	b = DATAN2D(DSIND(azi - aziM) * DCOSD(ele), &
+		DCOSD(eleM) * DSIND(ele) - DSIND(eleM) * DCOSD(ele) * DCOSD(azi - aziM))
+!	new point    
+!		sin(lat2) = cos(hdng1)*cos(lat1)*sin(alpha) + sin(lat1)*cos(alpha)
+!
+!		                     Cos (alpha) - Sin(lat1) * Sin(lat2)
+!		cos(long2-long1) =   ----------------------------------
+!		                           Cos (lat1) * Cos(lat2)
+!
+!   because p1=(0/0) lot of terms drop: sin(0)=0,cos(0)=1
+!
+	vda = SNGL(DASIND(DSIND(d) * DCOSD(b)))
+	hda = SNGL(DSIGN(d,b))
+	RETURN
+!
+	END SUBROUTINE Ctransf
+!
+!
+!
+!	Subroutine to calculate the total antenna attenuation Attenuation
+!
+	SUBROUTINE Antenna_correction (hda, vda, hCod,vCod, a, Error)
+!
+	IMPLICIT	NONE
+!
+	CHARACTER*7 hCod, vCod
 	INTEGER		Error
-	REAL		H_diff_angle, V_diff_angle, Attenuation, TDA, Correction_H, TDx
-	REAL		Correction_V, H_diff_angle_x, V_diff_angle_x
+	REAL		hda, vda, a, vdc, vfe, vbe, hb, vb, h, k
+	REAL		delv, w, w1, w2, vae, va0, ra
 !
-!	Calculate the total difference angle TDA:
-	TDA = ACOSD(COSD(V_diff_angle) * COSD(H_diff_angle))
-	H_diff_angle_x = H_diff_angle
-	V_diff_angle_x = V_diff_angle
+	vdc = -vda
 !
-!	Ensure, that H_diff_angle_x and V_diff_angle_x is in the range 0 - 360 degrees:
-	DO WHILE (H_diff_angle_x .LT. 0.0)
-	  H_diff_angle_x = 360.0 + H_diff_angle_x
-	END DO
-	DO WHILE (V_diff_angle_x .LT. 0.0)
-	  V_diff_angle_x = 360.0 + V_diff_angle_x
-	END DO
-	DO WHILE (H_diff_angle_x .GE. 360.0)
-	  H_diff_angle_x = H_diff_angle_x - 360.0
-	END DO
-	DO WHILE (V_diff_angle_x .GE. 360.0)
-	  V_diff_angle_x = V_diff_angle_x - 360.0
-	END DO
+!	simple case, only horizontal diagram relevant
 !
-!	Calculate the attenuation of the horizontal antenna Correction_H:
-	TDx  = TDA
-	IF (H_diff_angle_x .GT. 180.0) THEN
-	  TDx  = 360.0 - TDA
-	  H_diff_angle_x = 360.0 - H_diff_angle
-	END IF
-	CALL Antenna (Ant_typ_H, TDx, Correction_H, Error)
-	IF (Error .NE. 0) RETURN
-	Correction_H = -1.0 * Correction_H
+	IF (VDA .EQ. 0.0) THEN
+		CALL Antenna (hCod, hda, a, Error)
+		RETURN
+	ENDIF
 !
-!	Calculate the attenuation of the vertical antenna Correction_V:
-	TDx  = TDA
-	IF (V_diff_angle_x .GT. 180.0) THEN
-	  TDx  = 360.0 - TDA
-	  V_diff_angle_x = 360.0 - V_diff_angle
-	END IF
-	CALL Antenna (Ant_typ_V, TDx, Correction_V, Error)
+!	other simple case, only vertical diagram relevant
+!
+	IF (HDA .EQ. 0.0) THEN
+		CALL Antenna (vCod, vdc, a, Error)
+		RETURN
+	ENDIF
+!
+!	prepare needed values for further calculations
+!
+	CALL Antenna (vCod, vdc, vfe, Error)
+	CALL Antenna (vCod, (180.0 - vdc), vbe, Error)
+	CALL Antenna (vCod, 180.0, vb, Error)
+!
 	IF (Error .NE. 0) RETURN
 !
-	Correction_V = -1.0 * Correction_V
-!	Calculate the total antenna attenuation Attenuation:
-	IF (ABS(Correction_H-Correction_V) .LT. 0.0001) THEN
-		Attenuation = Correction_H
-	  ELSE
-		IF (Correction_H .GT. Correction_V) THEN
-			Attenuation = Correction_V+(Correction_H-Correction_V)*ABS(H_diff_angle_x)/ &
-					(ABS(H_diff_angle_x)+ABS(V_diff_angle_x))
-		  ELSE
-			Attenuation = Correction_H+(Correction_V-Correction_H)*ABS(V_diff_angle_x)/ &
-					(ABS(H_diff_angle_x)+ABS(V_diff_angle_x))
-		END IF
-	END IF
-	IF (Attenuation .GT. 40.0) Attenuation = 40.0
+	CALL Antenna (hCod, hda, h, Error)
+	CALL Antenna (hCod, 180.0, hb, Error)
+!
+	IF (Error .NE. 0) RETURN
+!
+!	match H and V backlobe
+!
+	IF (vb .GT. hb) THEN
+		k = hb / vb
+		vbe = vbe * SQRT(SIND(vda)**2.0 + k * COSD(vda)**2.0)
+		IF (vbe .LT. 0.01) vbe = 0.01
+	ELSEIF (vb .LT. hb) THEN
+		delv = vfe - vbe
+		IF (delv .GT. 0.0) THEN
+			k = (hb - vb) / (1.0 - vb)
+			vbe = vbe + k * delv
+			IF (vbe .GT. 1.0) vbe = 1.0
+		ENDIF
+	ENDIF
+!
+!	calculate weighing factors
+!
+	IF (hb .EQ. 1.0) THEN
+		w = ABS(hda) / 180.0
+	ELSEIF (hb .LT. 0.9) THEN
+		w = (1.0 - h) / (1.0 - hb)
+		IF (w .GT. 1.0) w = 1.0
+	ELSE
+		w1 = ABS(hda) / 180.0
+		w2 = (1.0 - h) / (1.0 - hb)
+		IF (w2 .GT. 1.0) w2 = 1.0
+		k = (1.0 - hb) * 10.0
+		IF (k .GT. 1.0) k = 1.0
+		w = (1.0 -k) * w1 + k * w2
+	ENDIF
+!
+!	interp. from vertical diagram
+!
+	vae = w * vbe + (1 - w) * vfe
+	IF (vae .GT. 1.0) THEN
+		vae = 1.0
+	ELSEIF (vae .LT. 0.01) THEN
+		vae = 0.01
+	ENDIF
+!
+	va0 = w * hb + ( 1.0 - w)
+	IF (va0 .GT. 1.0) THEN
+		va0 = 1.0
+	ELSEIF (va0 .LT. 0.01) THEN
+		va0 = 0.01
+	ENDIF
+!	
+	ra = h / va0
+	IF ( ra .EQ. 1.0) THEN
+		a = vae
+	ELSE
+		a = vae * SQRT(SIND(vda)**2.0 + ra * COSD(vda)**2.0)
+		IF (a .GT. 1.0) THEN
+			a = 1.0
+		ELSEIF (a .LT. 0.01) THEN
+			a = 0.01
+		ENDIF
+	ENDIF
+
+!
+	IF (a .GT. 40.0) a = 40.0
 !
 	RETURN
 !

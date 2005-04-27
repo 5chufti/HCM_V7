@@ -1,7 +1,6 @@
 !
-!	Pofile.f90										P. Benner
-!													20.11.2003
-!
+!	Pofile.f90											P. Benner		20.11.2003
+!														G.H.			27.04.2005
 !	This subroutine constructs a terrain- or morphological profile from point A to
 !	point B in steps of 100 m. The heights or morphological information are stored
 !	in 'Prof(i)'. The total number of points is in 'PN'. The first profile point
@@ -42,9 +41,11 @@
 !
 	INTEGER(2)			PN, Prof(10002)
 	INTEGER(4)			Error, T_L, M_L
-	DOUBLE PRECISION	LongA, LatA, LongB, LatB, PD, SILA, COLA
-	DOUBLE PRECISION	SILAB, COLAB, T, DA, DIS, DC, CODC, DP
-	DOUBLE PRECISION	CODD, DD, T1, T2, LAY, SILAY, COLAY, LOY
+	INTEGER(2)			I, PC
+	REAL				S
+	DOUBLE PRECISION	LongA, LatA, LongB, LatB, PD
+	DOUBLE PRECISION	SIDA, SILAB, COLAB, SILAA, COLAA, COLOA, SILOA, COLOB, SILOB
+	DOUBLE PRECISION	LAY, LOY, DD, DA, DIS, DC, DP, A, B, R, x, y, z
 	CHARACTER*1			P_Type
 	CHARACTER*63		Topo_path, Morpho_path
 !
@@ -53,143 +54,133 @@
 	Error = 0
 !
 !
-!	Calculate point A:
-	IF (P_Type .EQ. 'e') THEN
-		CALL Point_height (LongA, LatA, Prof(1), Error, Topo_path, T_L)
-		IF (Error .NE. 0) THEN
-		  Prof(1) = -9999
-		  RETURN
-		END IF
-	  ELSE
-		CALL Point_type (LongA, LatA, Prof(1), Error, Morpho_path, M_L)
-		IF (Error .NE. 0) THEN
-		  Prof(1) = 0
-		  RETURN
-		END IF
-	END IF
-!
-	SILA  = DSIND(LatA)
-	COLA  = DCOSD(LatA)
-	SILAB = DSIND(LatB)
-	COLAB = DCOSD(LatB)
-!
 !	Max. distance = 1000km; distance between two points = 100m
 !	-> number of points are 10.000 + 2 for Tx site and Rx site
+!	
+!	calculate avg. earthradius at given mean latitude  360/2*Pi = 57,295779513082321
+	R = (6.378137D3 - 2.1385D1 * DSIND((LatA + LatB) / 2D0)) / 5.7295779513082321D1
 !
-!	Calculate the total distance 'DA' in degrees, 'DIS' in km:
+!	Calculate the total distance 'DIS' in km:
+	CALL Calc_distance (LongA, LatA, LongB, LatB, DIS) 
 !
-	T = SILA * SILAB + COLA * COLAB * DCOSD(LongB-LongA)
-	IF (T .GT.  1.0D0) T =  1.0D0
-	IF (T .LT. -1.0D0) T = -1.0D0
-	DA   = DACOSD(T)
-	DIS = DA * 1.112D2
-!
-!	If the distance is greater than 1000 km, 'ERROR' value is 1000
-!
+!	If the distance is greater than 1000 km, 'ERROR' value is 1028
 	IF (DIS .GT. 1.0D3) THEN
 	  ERROR = 1028
 	  RETURN
 	END IF
 !
-!	Calculate the profile:
-!
-!	Direction 'DC' to ending point in degrees:
-	IF (LongA .NE. LongB) THEN
-		T = (SILAB - SILA * DCOSD(DA)) / (COLA * DSIND(DA))
-		IF (T .GT.  1.0D0) T =  1.0D0
-		IF (T .LT. -1.0D0) T = -1.0D0
-		DC = DACOSD(T)
-	  ELSE
-		IF (LatA .GE. LatB) THEN
-			DC = 1.8D2
-		  ELSE
-			DC = 0.0D0
-		END IF
-	END IF                   
-!
-	IF (DABS(LongB-LongA) .LT. 1.8D2) THEN
-		IF (LongB .LT. LongA) DC = 3.6D2 - DC
-	  ELSE
-		IF (LongB .GT. LongA) DC = 3.6D2 - DC
-	END IF
-!
-	CODC = DCOSD(DC)
+!	'DA' distance in degrees,
+	DA = DIS / R
+	SIDA  = DSIND(DA)
 !
 !	Distance 'DP' between two points in degrees:
-	DP   = PD / 1.112D2
+	DP   = PD / R
 !
-!	Loop:
-!	Loop starts with no. 2, because point 1 is Tx site height.
+!	how many points in profile?
+	S = MOD(SNGL(DIS),2.0)
+	IF ((S .GT. 0.0) .OR. (S .LT. 1.0)) THEN 
+		PN = DINT(DIS / PD) + 2
+	ELSE
+		PN = DINT(DIS / PD) + 1
+	ENDIF		
+
+!	Direction 'DC' to ending point in degrees:
+	CALL Calc_Direction (LongA,LatA,LongB,LatB,DC)
 !
-	DO PN = 2, 10002
-!	  Distance 'DD' between starting point and new point in degrees:
-	  DD = (PN-1) * DP
-!
-!	  Receiving point reached ?
-!	  If remaining distance is less or equal 10 cm -> 150
-!	  (10 cm is appr. 0.000000899 degree)
-!
-	  IF (DA-DD .LE. 8.99D-7) EXIT
-!
-	  CODD = DCOSD(DD)
-!
-!	  Next point coordinates 'LOY' and 'LAY':
-!
-	  T1 = COLA * DSIND(DD)
-	  T2 = (SILA * CODD) / T1
-	  T = T1 * (CODC + T2)
-	  IF (T .GT.  1.0D0) T =  1.0D0
-	  IF (T .LT. -1.0D0) T = -1.0D0
-	  LAY = DASIND(T)   
-!                                            
-	  SILAY = DSIND(LAY)                                         
-	  COLAY = DCOSD(LAY)
-!
-	  IF ((DC .EQ. 0.0D0) .OR. (DC .EQ. 1.8D2)) THEN
-		  LOY = LongA
-		ELSE
-		  T = (CODD - SILA * SILAY) / (COLA * COLAY)
-		  IF (T .GT.  1.0D0) T =  1.0D0
-		  IF (T .LT. -1.0D0) T = -1.0D0
-		  LOY = DACOSD(T)
-		  IF (DC .LT. 1.8D2) LOY = LongA + LOY
-		  IF (DC .GT. 1.8D2) LOY = LongA - LOY
-	  END IF
-!
-!	  Information of the point:
-50	  IF (LOY .GT. 1.8D2) LOY = LOY - 3.6D2
-!
-	  IF (P_Type .EQ. 'e') THEN 
-		  CALL Point_height (LOY, LAY, Prof(PN), Error, Topo_path, T_L) 
-		  IF (Error .NE. 0) THEN
-			Prof(PN) = -9999
-			RETURN
-		  END IF
-		ELSE
-		  CALL Point_type (LOY, LAY, Prof(PN), Error, Morpho_path, M_L)
-		  IF (Error .NE. 0) THEN
-			Prof(PN) = 0
-			RETURN
-		  END IF
-	  END IF	
-!	  End of loop:
-	END DO
-!
-!	Information of ending point:
+!	Calculate point #1 (TX):
 !
 	IF (P_Type .EQ. 'e') THEN
-		CALL Point_height (LongB, LatB, Prof(PN), Error, Topo_path, T_L)
-		IF (Error .NE. 0) THEN
-		  Prof(PN) = -9999
-		  RETURN
-		END IF
+		CALL Point_height (LongA, LatA, Prof(1), Error, Topo_path, T_L)
 	  ELSE
-		CALL Point_type (LongB, LatB, Prof(PN), Error, Morpho_path, M_L)
-		IF (Error .NE. 0) THEN
-		  Prof(PN) = 0
-		  RETURN
-		END IF
+		CALL Point_type (LongA, LatA, Prof(1), Error, Morpho_path, M_L)
 	END IF
+	IF (Error .NE. 0) RETURN
+!
+!	first part of profile (TX to middle)
+		SILAA = DSIND(LatA)
+		COLAA = DCOSD(LatA)
+		SILAB = DSIND(LatB)
+		COLAB = DCOSD(LatB)
+		SILOA = DSIND(LongA)
+		COLOA = DCOSD(LongA)
+		SILOB = DSIND(LongB)
+		COLOB = DCOSD(LongB)
+!
+!	Loop for waypoints
+	I = 1
+!	Loop starts with #2, because point #1 is S.
+	DO PC = 2, INT(PN/2), 1
+!	Distance 'DD' between starting point and new point in degrees:
+		DD = I * DP
+!	vector to new point
+		A = DSIND(DA - DD) / SIDA
+		B = DSIND(DD) / SIDA
+!	convert startpoint to x,y,z system and add vector
+		x = A * COLAA * COLOA +  B * COLAB * COLOB
+		y = A * COLAA * SILOA +  B * COLAB * SILOB
+		z = A * SILAA         +  B * SILAB
+!	convert new x,y,z to coordinates
+		LAY = DATAN2D(z,DSQRT(x**2D0 + y**2D0))
+		LOY = DATAN2D(y,x)
+!
+!	  get Information of new point:
+!
+		IF (P_Type .EQ. 'e') THEN 
+			CALL Point_height (LOY, LAY, Prof(PC), Error, Topo_path, T_L) 
+		ELSE
+			CALL Point_type (LOY, LAY, Prof(PC), Error, Morpho_path, M_L)
+		END IF	
+		IF (Error .NE. 0) RETURN
+!
+	I = I + 1
+	END DO
+!
+!	second part of profile RX to middle
+		SILAA = DSIND(LatB)
+		COLAA = DCOSD(LatB)
+		SILAB = DSIND(LatA)
+		COLAB = DCOSD(LatA)
+		SILOA = DSIND(LongB)
+		COLOA = DCOSD(LongB)
+		SILOB = DSIND(LongA)
+		COLOB = DCOSD(LongA)
+!
+!	Loop for waypoints
+	I = 1
+!	Loop starts with #PN-1, because point #PN is RX.
+	DO PC = (PN - 1), INT(PC/2), -1
+!	Distance 'DD' between starting point and new point in degrees:
+		DD = I * DP
+!	vector to new point
+		A = DSIND(DA - DD) / SIDA
+		B = DSIND(DD) / SIDA
+!	convert startpoint to x,y,z system and add vector
+		x = A * COLAA * COLOA +  B * COLAB * COLOB
+		y = A * COLAA * SILOA +  B * COLAB * SILOB
+		z = A * SILAA         +  B * SILAB
+!	convert new x,y,z to coordinates
+		LAY = DATAN2D(z,DSQRT(x**2D0 + y**2D0))
+		LOY = DATAN2D(y,x)
+!
+!	  get Information of new point:
+!
+		IF (P_Type .EQ. 'e') THEN 
+			CALL Point_height (LOY, LAY, Prof(PC), Error, Topo_path, T_L) 
+		ELSE
+			CALL Point_type (LOY, LAY, Prof(PC), Error, Morpho_path, M_L)
+		END IF	
+		IF (Error .NE. 0) RETURN
+!
+	I = I + 1
+	END DO
+!
+!	calculate last point #PC+1 (RX):
+	IF (P_Type .EQ. 'e') THEN
+		CALL Point_height (LongB, LatB, Prof(PN), Error, Topo_path, T_L)
+	ELSE
+		CALL Point_type (LongB, LatB, Prof(PN), Error, Morpho_path, M_L)
+	END IF
+	IF (Error .NE. 0) RETURN	
 !
 	RETURN
 !

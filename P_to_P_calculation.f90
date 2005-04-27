@@ -1,6 +1,6 @@
 !
-!	P_to_P_calculation.f90								P. Benner
-!														03.02.2004
+!	P_to_P_calculation.f90								P. Benner		03.02.2004
+!														G.H.			27.04.2005
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -193,7 +193,7 @@
 	REAL				A(11), Factor_of_path_over_sea
 	REAL				H_Tx_Ant_top, H_Rx_Ant_top
 	REAL				Land_FS_1kW, Sea_FS_1kW, DI1, DI2
-	DOUBLE PRECISION	XX, LongTx, LatTx, LongRx, LatRx
+	DOUBLE PRECISION	LongTx, LatTx, LongRx, LatRx
 	DOUBLE PRECISION	New_LongTx, New_LatTx, New_LongRx, New_LatRx
 	LOGICAL				Free, kdh_use, null
 	CHARACTER*1			Point_Type
@@ -205,9 +205,9 @@
 !
 !
 !	*****************************************************************
-!	*																*
-!	*	Calculate the distance 'Distance' between point A and B		*
-!	*																*
+!	*								
+!	*	Calculate the distance 'Distance' between point A and B	
+!	*								
 !	*****************************************************************
 !
 	Coo_Tx_new = Coo_Tx
@@ -343,56 +343,39 @@
 !
 !
 !	***************************************************************
-!	*															  *
-!	*             Free space field strength calculation           *
-!	*															  *
+!	*							      
+!	*             Free space field strength calculation           
+!	*							      
 !	***************************************************************
 !
 !	Calculation of power in direction of the receiver 'Power_to_Rx':
 !
-!	Setting of the vertical angle:
-	IF ((C_mode .GE. 0) .AND. (Tx_serv_area .EQ. 0.0) .AND. &
-		(Rx_serv_area .EQ. 0.0)) THEN
-!		Normal point to point calculation
-		V_angle_Tx_Rx = ATAN(((H_Rx+H_AntRx)-(H_Tx+H_AntTx))/(1.0E3*Distance))
-		V_angle_Tx_Rx = V_angle_Tx_Rx * 180.0 / 3.14159265
-	  ELSE
-!		Calculation on co-ordination lines
-		V_angle_Tx_Rx = 0.0
-	END IF
 !
 	IF ((Ant_typ_H_Tx .EQ. '000ND00') .AND. (Ant_typ_V_Tx .EQ. '000ND00')) THEN
 		Tx_ant_corr   = 0.0
-	  ELSE
-		IF (Ant_typ_V_Tx .EQ. '000ND00') THEN
-			V_diff_angle_Tx_Rx = 0.0
-		  ELSE
-			READ (Ele_Tx_input, '(F5.1)', IOSTAT=IOS) Tx_Elevation
-			IF (IOS .NE. 0) THEN
-			  HCM_Error = 1031
-!			  Error in Tx elevation.
-			  RETURN
-			END IF
-			V_diff_angle_Tx_Rx = Tx_Elevation - V_angle_Tx_Rx
-			IF (V_diff_angle_Tx_Rx .LT. 0.0) V_diff_angle_Tx_Rx = 360.0 + V_diff_angle_Tx_Rx
+	ELSE
+!	Setting of the vertical angle:
+		IF ((C_mode .GE. 0) .AND. (Tx_serv_area .EQ. 0.0) .AND. &
+			(Rx_serv_area .EQ. 0.0)) THEN
+!			Normal point to point calculation
+			V_angle_Tx_Rx = ATAND ((H_Rx + H_AntRx - H_Tx + H_AntTx) / (1E3 * Distance))
+		ELSE
+!			Calculation to co-ordination lines or mobiles
+			V_angle_Tx_Rx = 0D0
 		END IF
-		IF (Ant_typ_H_Tx .EQ. '000ND00') THEN
-			H_diff_angle_Tx_Rx = 0.0
-		  ELSE
-			READ (Azi_Tx_input, '(F5.1)', IOSTAT=IOS) Tx_Azimuth
-			IF (IOS .NE. 0) THEN
-			  HCM_Error = 1032
-!			  Error in Tx azimuth.
-			  RETURN
-			END IF
-			H_diff_angle_Tx_Rx = Dir_Tx_Rx - Tx_Azimuth
-			IF (H_diff_angle_Tx_Rx .LT.   0.0) H_diff_angle_Tx_Rx = 360.0 + &
-							H_diff_angle_Tx_Rx
-			IF (H_diff_angle_Tx_Rx .GT. 360.0) H_diff_angle_Tx_Rx = &
-							H_diff_angle_Tx_Rx - 360.0
+		READ (Ele_Tx_input, '(F5.1)', IOSTAT=IOS) Tx_Elevation
+		IF (IOS .NE. 0) THEN
+			HCM_Error = 1031
+!			Error in Tx elevation.
+			RETURN
 		END IF
-		DI1 = H_diff_angle_Tx_Rx
-		DI2 = V_diff_angle_Tx_Rx
+		READ (Azi_Tx_input, '(F5.1)', IOSTAT=IOS) Tx_Azimuth
+		IF (IOS .NE. 0) THEN
+			HCM_Error = 1032
+!			Error in Tx azimuth.
+			RETURN
+		END IF
+		CALL Ctransf (Dir_Tx_Rx, Tx_Azimuth, V_angle_Tx_Rx, Tx_Elevation, DI1, DI2)
 		CALL Antenna_correction (DI1, DI2, Ant_typ_H_Tx, Ant_typ_V_Tx, Tx_ant_corr, HCM_Error)
 		IF (HCM_Error .NE. 0) RETURN
 	END IF
@@ -421,9 +404,9 @@
 	END IF
 !
 !	*****************************************************************
-!	*																*
-!	*				Elements of the terrain profile					*
-!	*																*
+!	*								
+!	*				Elements of the terrain profile	
+!	*								
 !	*****************************************************************
 !
 	Point_Type = 'e'	! for elevation data
@@ -434,9 +417,9 @@
 !
 !
 !	*****************************************************************
-!	*																*
-!	*				Calculation the first Fresnel zone				*
-!	*																*
+!	*								
+!	*Calculation the first Fresnel zone				
+!	*								
 !	*****************************************************************
 !
 !	Add Tx antenna height to height of Tx, add Rx antenna height
@@ -450,31 +433,23 @@
 	IF ((Tx_serv_area .EQ. 0.0) .AND. (Rx_serv_area .EQ. 0.0) .AND. &
 		(C_Mode .GE. 0)) THEN
 !	  First value = height of Tx, last value (PN) = height of Rx !
-!	  "J" = number of points between Tx and Rx, excluding Tx-point
-!	  and Rx-point !
-!
-	  IF (PN * PD .EQ. Distance) THEN
-		  J = PN - 1
-		ELSE
-		  J = PN - 2
-	  END IF
-!
+!	  J is number of points between Rx and Tx
+	  J = PN - 2	
 !	  Calculate first Fresnel zone
 !	  Calculation of ho(z); add all ho to hz (='HDZ'):
 !
 	  DO I = 1, J
-		HDZ(I) = FLOAT (T_Prof(I+1)) + PD*I * (Distance - PD*I) / 17.0
+		HDZ(I) = FLOAT (T_Prof(I+1)) + ((PD * I) * (PD * (PN-1-I)) / 17.0)
 	  END DO
 !
 !
 !	  Add 10 m to all hz except the 1st and last km of the distance:
 !	  (If distance is less than 2 km, no addition is done !)
 !
-	  XX = 1.0D0 / PD
-	  I1 = NINT(XX)
-	  XX = (Distance - 1.0D0) / PD
-	  I2 = INT(xx)
 	  IF (Distance .GT. 2.0) THEN
+		I = DINT(1D0 / PD)
+		I1 = I
+		I2 = J - I
 		DO I = I1, I2
 		  HDZ(I) = HDZ(I) + 10.0
 		END DO
@@ -485,16 +460,16 @@
 !	  Calculate all differences 'HDD':
 !
 	  DO I = 1, J
-		HDC(I) = H_Tx_Ant_top - (H_Tx_Ant_top - H_Rx_Ant_top) * PD * I / &
-					Distance - HDZ(I)
-		X = PD*I*(Distance-PD*I)
+		HDC(I) = H_Tx_Ant_top - (H_Tx_Ant_top - H_Rx_Ant_top) * PD * I &
+					/ Distance - HDZ(I)
+		X = (PD * I) * (PD * (PN-1-I))
 		IF (X .LE. 0.0) THEN
 			HDF(I) = 0.0
 		  ELSE
 			HDF(I) = 547.7 * SQRT ( X / (Distance * Tx_frequency) )
 		END IF
 	  END DO
-!
+!	check if fresnel zone hdf is touched by hdc
 	  Free = .TRUE.
 	  DO I = 1, J
 		IF ((HDC(I) - HDF(I)) .LT. 0.0) THEN
@@ -505,18 +480,17 @@
 !
 	  IF (Free) THEN
 !		1st Fresnel zone is free:
+!		Free space field strength is used
 		Calculated_FS = Free_space_FS
 		Info(12) = .TRUE.
-!		Free space field strength is used, because 1st Fresnel zone
-!		is free.
 		RETURN
 	  END IF
 	END IF
 !
 !	**********************************************************************
-!	*																	 *
-!	*	Calculation of the field strength according to the ITU-R method	 *
-!	*																	 *
+!	*									
+!	*  Calculation of the field strength according to the ITU-R method	
+!	*									
 !	**********************************************************************
 !
 	Tx_TCA	= 0.0
@@ -529,28 +503,20 @@
 !
 	IF (Tx_serv_area .EQ. 0.0) THEN
 !	  Calculate Tx_TCA:
-	  Tx_TCA = -90.0
-	  IF (Distance .GE. 1.6D1) THEN
-		  XX = 1.6D1 / PD
+		Tx_TCA = -90.0
+		IF (Distance .GE. 1.6D1) THEN
+			J = DINT(1.6D1 / PD)
 		ELSE
-		  XX = Distance / PD
-	  END IF
-	  J = INT(XX) + 1
-	  IF (J .GT. 1) THEN
-		  DO I = 2, J
-			x_TCA = (FLOAT(T_Prof(I))-H_Tx_Ant_top)/((I-1)*PD*1000.0)
+			J = PN - 2
+		END IF
+		DO I = 1, J
+			x_TCA = (FLOAT(T_Prof(I+1))-H_Tx_Ant_top)/(DBLE(I)*PD*1D3)
 			x_TCA = ATAND (x_TCA)	! in degrees
 			IF (x_TCA .GT. Tx_TCA) Tx_TCA = x_TCA
-		  END DO
-		ELSE
-		  Tx_TCA = 0.0
-	  END IF
+		END DO
 	END IF
 !
-	IF (Tx_TCA .LT. 0.0) THEN
-		Tx_TCA_corr = 0.0
-!		Not used
-	  ELSE
+	IF (Tx_TCA .GT. 0.0) THEN
 !		Calculate correction factor:
 		CALL TCA_correction_calculation (Tx_TCA, Tx_frequency, Tx_TCA_corr)
 		IF (Distance .LT. 1.6D1) Tx_TCA_corr = Tx_TCA_corr * Distance / 16.0
@@ -562,57 +528,49 @@
 !
 	IF ((Rx_serv_area .EQ. 0.0) .AND. (C_Mode .GE. 0) .AND. (C_mode .NE. 99)) THEN
 !	  Calculate Rx_TCA and it's correction factor:
-	  Rx_TCA = -90.0
-	  IF (Distance .GE. 1.6D1) THEN
-		  XX = (Distance-1.6D1) / PD
-		  J = INT(XX) + 1
+		Rx_TCA = -90.0
+		IF (Distance .GE. 1.6D1) THEN
+			J = DINT(1.6D1 / PD)
 		ELSE
-		  J = 1
-	  END IF
-	  IF (PN .GT. 2) THEN
-		  DO I = J, PN-1
-			x_TCA = (FLOAT(T_Prof(I))-H_Rx_Ant_top)/((Distance-(I-1)*PD)*1000.0)
+			J = PN - 2
+		END IF
+		DO I = 1, J
+			x_TCA = (FLOAT(T_Prof(PN-I))-H_Rx_Ant_top)/(DBLE(I)*PD*1D3)
 			x_TCA = ATAND (x_TCA)	! in degrees
 			IF (x_TCA .GT. Rx_TCA) Rx_TCA = x_TCA
-		  END DO
-		ELSE
-		  Rx_TCA = 0.0
-	  END IF
+		END DO
 !
-	  IF (Rx_TCA .LT. 0.0) THEN
-		  Rx_TCA_corr = 0.0
-!		  Not used
-		ELSE
-!		  Calculate correction factor:
-		  CALL TCA_correction_calculation (Rx_TCA, Rx_frequency, Rx_TCA_corr)
-		  IF (Distance .LT. 1.6D1) Rx_TCA_corr = Rx_TCA_corr * Distance / 16.0
-	  END IF
+	ENDIF
+	IF (Rx_TCA .GT. 0.0) THEN
+!	  Calculate correction factor:
+		CALL TCA_correction_calculation (Rx_TCA, Rx_frequency, Rx_TCA_corr)
+		IF (Distance .LT. 1.6D1) Rx_TCA_corr = Rx_TCA_corr * Distance / 16.0
 	END IF
 !
 !	Effective antenna heights:
 	Heff_Tx = 0.0
 	Heff_Rx = 0.0
+	IF (Distance .LT. 1.5D1) THEN
+	    D1 = INT(PN / 15)
+		D2 = PN - 1
+	ELSE
+		D1 = DINT(1D0 / PD)  
+		D2 = DINT(1.5D1 / PD)
+	END IF
+!
 !	Transmitter:
 	IF (Tx_serv_area .GT. 0.0) THEN
 !		Height of a mobile 'hmTx'
 		hmTx = FLOAT(H_AntTx)
 		IF (hmTx .LT. 3.0) hmTx = 3.0
 		Heff_Tx = hmTx
-	  ELSE
+	ELSE
 		IF (Tx_TCA .LT. 0.0) THEN
 !		  Eff. antenna height of transmitter is only calculated,
 !		  if transmitter clearance angle is negativ.
-		  IF (Distance .LT. 1.5D1) THEN
-		      XX = (Distance+1.0D-7)/PD 
-		      D2 = DINT(XX)
-		    ELSE
-		      XX = (1.5D1+1.0D-7)/PD
-		      D2 = DINT(XX)
-		  END IF
 		  HSUM = 0
 		  NOH  = 0
-		  XX = (1.0D0+1.0D-7)/PD
-		  DO I = DINT(XX), D2
+		  DO I = D1, D2
 		    HSUM = HSUM + T_Prof(I+1)
 		    NOH  = NOH  + 1
 		  END DO
@@ -625,30 +583,23 @@
 !	Receiver: (only for point to point calculations)
 	IF ((C_Mode .GE. 0) .AND. (C_Mode .NE. 99)) THEN
 	  IF (Rx_serv_area .GT. 0) THEN
-!		  Height of a mobile 'hmRx'
-		  hmRx = FLOAT(H_AntRx)
-		  IF (hmRx .LT. 3.0) hmRx = 3.0
-		  Heff_Rx = hmRx
-		ELSE
-		  IF (Rx_TCA .LT. 0.0) THEN
-!			Eff. antenna height of receiver is only calculated,
-!			if receiver clearance angle is negativ.
-			IF (Distance .LT. 15.0) THEN
-				D1 = 1
-			  ELSE
-			    XX = (Distance-1.5D1) / PD
-				D1 = INT(XX)
-			END IF
-			HSUM = 0
-			NOH  = 0
-			XX = (Distance-1.0D0)/PD
-			DO I = D1, INT(XX)
-			  HSUM = HSUM + T_Prof(I+1)
-			  NOH  = NOH  + 1
-			END DO
-			Heff_Rx = FLOAT(HSUM)/FLOAT(NOH)
-			Heff_Rx = H_Rx_Ant_top - Heff_Rx
-		  END IF
+!		Height of a mobile 'hmRx'
+		hmRx = FLOAT(H_AntRx)
+		IF (hmRx .LT. 3.0) hmRx = 3.0
+		Heff_Rx = hmRx
+	  ELSE
+		IF (Rx_TCA .LT. 0.0) THEN
+!		  Eff. antenna height of receiver is only calculated,
+!		  if receiver clearance angle is negativ.
+		  HSUM = 0
+		  NOH  = 0
+		  DO I = D1, D2
+		    HSUM = HSUM + T_Prof(PN-I)
+		    NOH  = NOH  + 1
+		  END DO
+		  Heff_Rx = FLOAT(HSUM)/FLOAT(NOH)
+		  Heff_Rx = H_Rx_Ant_top - Heff_Rx
+		END IF
 	  END IF
 	END IF
 !
@@ -725,9 +676,9 @@
 !
 !
 !	*****************************************************************
-!	*																*
-!	*					Calculate distance over sea					*
-!	*																*
+!	*								
+!	*		Calculate distance over sea			
+!	*								
 !	*****************************************************************
 !
 !
@@ -792,9 +743,9 @@
 	END IF
 !
 !	*****************************************************************
-!	*																*
-!	*					Delta h calculation							*
-!	*																*
+!	*								
+!	*					Delta h calculation	
+!	*								
 !	*****************************************************************
 !
 	IF ((Distance .GT. 10.0) .AND. (D_sea_calculated .LT. Distance)) THEN
@@ -807,9 +758,9 @@
 !
 !
 !	*****************************************************************
-!	*																*
-!	*				Correction according to delta h					*
-!	*																*
+!	*								
+!	*				Correction according to delta h	
+!	*								
 !	*****************************************************************
 !
 	CALL Dh_orrection (Dh, Distance, Tx_frequency, Dh_corr)
@@ -818,9 +769,9 @@
 !
 !
 !	*****************************************************************
-!	*																*
-!	*			Calculate the field strength (from the figures):	*
-!	*																*
+!	*								
+!	*	Calculate the field strength (from the figures):	
+!	*								
 !	*****************************************************************
 !
 !	Get the land- and sea field strength for 1 kW:

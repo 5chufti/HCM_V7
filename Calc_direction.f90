@@ -1,45 +1,19 @@
 !
-!	Calc_direction.f90
+!	Calc_direction.f90									G.H.			13.04.2005
 !
 !	Subroutine to calculate (horizontal) direction.
 !
-	SUBROUTINE Calc_direction (LongA, LatA, LongB, LatB, Azi)
+	SUBROUTINE Calc_direction (LonA, LatA, LonB, LatB, Azi)
 !
 	IMPLICIT			NONE
 !
-	DOUBLE PRECISION	LongA, LatA, LongB, LatB, Azi, D, T
+!	lon, lat, azi in degrees 
+	DOUBLE PRECISION	LonA, LatA, LonB, LatB, Azi
 !
-	IF (LongA .EQ. LongB) THEN
-		IF (LatA .GE. LatB) THEN
-			Azi = 1.8D2
-		  ELSE
-			Azi = 0.0D0
-		END IF
-		RETURN
-	  ELSE
-		! Determine angle
-		T = DSIND(LatA) * DSIND(LatB) + DCOSD(LatA) * DCOSD(LatB) * DCOSD(LongB - LongA)
-		IF (T .GT.  1.0D0) T =  1.0D0
-		IF (T .LT. -1.0D0) T = -1.0D0
-		D = DACOSD(T)
-		T = (DSIND(LatB)-DSIND(LatA)*DCOSD(D))/(DCOSD(LatA)*DSIND(D))
-		IF (T .GT.  1.0D0) T =  1.0D0
-		IF (T .LT. -1.0D0) T = -1.0D0
-		Azi = DACOSD(T)
-		! Is difference between longitudes < 180 degrees?
-		IF (DABS(LongA - LongB) .LT. 1.8D2) THEN
-			IF (LongB .LT. LongA) THEN
-			  Azi = 3.6D2 - Azi
-			END IF
-		  ELSE
-			IF (LongB .GE. LongA) THEN
-				! Azi = Azi
-			  ELSE
-				Azi = 3.6D2 - Azi
-			END IF
-		END IF
-		RETURN
-	END IF
+	Azi = DATAN2D(DSIND(LonB-LonA) * DCOSD(LatB), DCOSD(LatA) * DSIND(LatB) &
+			- DSIND(LatA) * DCOSD(LatB) * DCOSD(LonB - LonA))
+	IF (Azi .LT. 0D0) Azi = Azi + 360D0
+	RETURN
 !
 	END SUBROUTINE Calc_direction
 !

@@ -1,6 +1,6 @@
 !
-!	Point_type.f90							P. Benner
-!											09.10.2003
+!	Point_type.f90										P. Benner		09.10.2003
+!											
 !
 !
 !	Subroutine to read the morphological type of a given point from the morpho-database.

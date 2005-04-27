@@ -1,7 +1,7 @@
 !	
-!	HCMMS_V7.F90					P.Benner Reg TP Krefeld
-!
-!	Version 7.00					23.02.2004
+!	HCMMS_V7.F90										P.Benner		23.02.2004
+!														G.H.			13.04.2005
+!	Version 7.00					
 !
 !	Harmonized Calculation Method for mobile services
 !
@@ -114,7 +114,7 @@
 !
 !	***************************************************************************
 !
-	Version = '7.00 '
+	Version = '7.00n'
 !
 	HCM_error = 0
 !
@@ -171,11 +171,11 @@
 	END IF
 !
 !	Test co-ordinates:
-	IF (Coo_Tx .EQ. Coo_Rx) THEN
-!	  Distance between Tx and Rx = 0. Calculations not possible.
-	  HCM_error = 1000   
-	  RETURN
-	END IF
+!	IF ((Coo_Tx .EQ. Coo_Rx) .AND. (C_mode .GE. 0)) THEN
+!	  Distance between Tx and Rx = 0. P-P Calculations not possible.
+!	  HCM_error = 1000   
+!	  RETURN
+!	END IF
 !
 !	Read all input data:      
 !	Get the longitude of transmitter 'LongTX':

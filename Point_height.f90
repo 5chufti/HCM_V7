@@ -1,6 +1,6 @@
 !
-!	Point_height.F90							P.Benner
-!												20.11.2003
+!	Point_height.F90									P.Benner		20.11.2003
+!												
 !
 !	Subroutine to read the height of a given point from the terrain-database.
 !
