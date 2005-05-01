@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			27.04.2005
+!														G.H.			30.04.2005
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -231,7 +231,7 @@
 !
 	CALL Calc_distance (LongTx, LatTx, LongRx, LatRx, Distance)
 !
-	IF (Distance .EQ. 0.0D0) THEN
+	IF (Distance .LE. 0.0D0) THEN
 !	  Distance between Tx and Rx = 0. Calculations not possible.
 	  HCM_error = 1000   
 	  RETURN
@@ -252,7 +252,7 @@
 !	Calculate new positions, if Tx or Rx or both are mobiles:
 !	Tx already calculated in HCM_MS_V7 subroutine !
 !	Get radius of the Rx service area:
-	IF (C_mode .GE. 0) THEN
+	IF ((C_mode .GE. 0) .AND. (C_mode .NE. 99)) THEN
 		READ (Rad_of_Rx_serv_area, '(F5.0)', IOSTAT=IOS) Rx_serv_area
 		IF (IOS .NE. 0) THEN
 		  HCM_error = 1029
@@ -267,7 +267,8 @@
 !		In case of CBR calculation, the position of the (mobile)
 !		Tx is set in subroutine CBR_Coordinates !
 	  ELSE
-		IF ((Tx_serv_area .GT. 0.0) .OR. (Rx_serv_area .GT. 0.0)) THEN
+		IF (((Tx_serv_area .GT. 0.0) .OR. (Rx_serv_area .GT. 0.0)) &
+				.AND. (C_mode .NE. 99)) THEN
 !		  Calculate new co-ordinates:
 		  CALL Position_of_mobile ( LongTx, LatTx, LongRx, LatRx, &
 					New_LongTx, New_LatTx, New_LongRx, New_LatRx, B_L )
@@ -356,7 +357,7 @@
 	ELSE
 !	Setting of the vertical angle:
 		IF ((C_mode .GE. 0) .AND. (Tx_serv_area .EQ. 0.0) .AND. &
-			(Rx_serv_area .EQ. 0.0)) THEN
+			(Rx_serv_area .EQ. 0.0) .AND. (C_mode .NE. 99)) THEN
 !			Normal point to point calculation
 			V_angle_Tx_Rx = ATAND ((H_Rx + H_AntRx - H_Tx + H_AntTx) / (1E3 * Distance))
 		ELSE
@@ -431,7 +432,7 @@
 !	First Fresnel zone is only calculated, if Tx and Rx are no mobiles
 !	and if it is a point to point calculation:
 	IF ((Tx_serv_area .EQ. 0.0) .AND. (Rx_serv_area .EQ. 0.0) .AND. &
-		(C_Mode .GE. 0)) THEN
+		(C_Mode .GE. 0) .AND. (C_mode .NE. 99)) THEN
 !	  First value = height of Tx, last value (PN) = height of Rx !
 !	  J is number of points between Rx and Tx
 	  J = PN - 2	
@@ -447,7 +448,7 @@
 !	  (If distance is less than 2 km, no addition is done !)
 !
 	  IF (Distance .GT. 2.0) THEN
-		I = DINT(1D0 / PD)
+		I = DNINT(1D0 / PD)
 		I1 = I
 		I2 = J - I
 		DO I = I1, I2
@@ -498,180 +499,104 @@
 	Tx_TCA_corr	= 0.0
 	Rx_TCA_corr	= 0.0
 !
-!	If transmitter is not a mobile, calculate the transmitter
-!	clearance angle 'Tx_TCA'
+!	calculate transmitter clearance angle 'Tx_TCA' according to proceeding table
 !
 	IF (Tx_serv_area .EQ. 0.0) THEN
 !	  Calculate Tx_TCA:
 		Tx_TCA = -90.0
 		IF (Distance .GE. 1.6D1) THEN
-			J = DINT(1.6D1 / PD)
+			J = DNINT(1.6D1 / PD)
 		ELSE
 			J = PN - 2
 		END IF
 		DO I = 1, J
-			x_TCA = (FLOAT(T_Prof(I+1))-H_Tx_Ant_top)/(DBLE(I)*PD*1D3)
+			x_TCA = (FLOAT(T_Prof(I+1))-H_Tx_Ant_top)/(SNGL(PD)*I*1E3)
 			x_TCA = ATAND (x_TCA)	! in degrees
 			IF (x_TCA .GT. Tx_TCA) Tx_TCA = x_TCA
 		END DO
 	END IF
+!	Calculate correction factor:
+	CALL TCA_correction_calculation (Tx_TCA, Tx_frequency, Tx_TCA_corr)
 !
-	IF (Tx_TCA .GT. 0.0) THEN
-!		Calculate correction factor:
-		CALL TCA_correction_calculation (Tx_TCA, Tx_frequency, Tx_TCA_corr)
-		IF (Distance .LT. 1.6D1) Tx_TCA_corr = Tx_TCA_corr * Distance / 16.0
-	END IF
-!
-!
-!	If receiver is not a mobile and no line calculations, then
-!	calculate the receiver clearance angle 'Rx_TCA'
+!	calculate receiver clearance angle 'Rx_TCA' according to proceeding table
 !
 	IF ((Rx_serv_area .EQ. 0.0) .AND. (C_Mode .GE. 0) .AND. (C_mode .NE. 99)) THEN
-!	  Calculate Rx_TCA and it's correction factor:
+!	  Calculate Rx_TCA:
 		Rx_TCA = -90.0
 		IF (Distance .GE. 1.6D1) THEN
-			J = DINT(1.6D1 / PD)
+			J = DNINT(1.6D1 / PD)
 		ELSE
 			J = PN - 2
 		END IF
 		DO I = 1, J
-			x_TCA = (FLOAT(T_Prof(PN-I))-H_Rx_Ant_top)/(DBLE(I)*PD*1D3)
+			x_TCA = (FLOAT(T_Prof(PN-I))-H_Rx_Ant_top)/(SNGL(PD)*I*1E3)
 			x_TCA = ATAND (x_TCA)	! in degrees
 			IF (x_TCA .GT. Rx_TCA) Rx_TCA = x_TCA
 		END DO
 !
 	ENDIF
-	IF (Rx_TCA .GT. 0.0) THEN
-!	  Calculate correction factor:
-		CALL TCA_correction_calculation (Rx_TCA, Rx_frequency, Rx_TCA_corr)
-		IF (Distance .LT. 1.6D1) Rx_TCA_corr = Rx_TCA_corr * Distance / 16.0
-	END IF
+!	Calculate correction factor:
+	CALL TCA_correction_calculation (Rx_TCA, Rx_frequency, Rx_TCA_corr)
 !
 !	Effective antenna heights:
 	Heff_Tx = 0.0
 	Heff_Rx = 0.0
 	IF (Distance .LT. 1.5D1) THEN
-	    D1 = INT(PN / 15)
+	    D1 = NINT(PN / 15)
 		D2 = PN - 1
 	ELSE
-		D1 = DINT(1D0 / PD)  
-		D2 = DINT(1.5D1 / PD)
+		D1 = DNINT(1D0 / PD)  
+		D2 = DNINT(1.5D1 / PD)
 	END IF
 !
 !	Transmitter:
 	IF (Tx_serv_area .GT. 0.0) THEN
 !		Height of a mobile 'hmTx'
-		hmTx = FLOAT(H_AntTx)
-		IF (hmTx .LT. 3.0) hmTx = 3.0
+		IF (H_AntTx .LT. 3) THEN
+			hmTx = 3.0
+		ELSE
+			hmTx = FLOAT(H_AntTx)
+		ENDIF	
 		Heff_Tx = hmTx
 	ELSE
-		IF (Tx_TCA .LT. 0.0) THEN
-!		  Eff. antenna height of transmitter is only calculated,
-!		  if transmitter clearance angle is negativ.
 		  HSUM = 0
 		  NOH  = 0
 		  DO I = D1, D2
 		    HSUM = HSUM + T_Prof(I+1)
 		    NOH  = NOH  + 1
 		  END DO
-		  Heff_Tx = FLOAT(HSUM)/FLOAT(NOH)
-		  Heff_Tx = H_Tx_Ant_top - Heff_Tx
+		  Heff_Tx = H_Tx_Ant_top - FLOAT(HSUM/NOH)
 		  IF (Heff_Tx .LT. 0.0) Heff_Tx = 0.0
-		END IF
 	END IF
 !
 !	Receiver: (only for point to point calculations)
 	IF ((C_Mode .GE. 0) .AND. (C_Mode .NE. 99)) THEN
 	  IF (Rx_serv_area .GT. 0) THEN
 !		Height of a mobile 'hmRx'
-		hmRx = FLOAT(H_AntRx)
-		IF (hmRx .LT. 3.0) hmRx = 3.0
+		IF (H_AntRx .LT. 3) THEN
+			hmRx = 3.0
+		ELSE
+			hmRx = FLOAT(H_AntRx)
+		ENDIF	
 		Heff_Rx = hmRx
 	  ELSE
-		IF (Rx_TCA .LT. 0.0) THEN
-!		  Eff. antenna height of receiver is only calculated,
-!		  if receiver clearance angle is negativ.
 		  HSUM = 0
 		  NOH  = 0
 		  DO I = D1, D2
 		    HSUM = HSUM + T_Prof(PN-I)
 		    NOH  = NOH  + 1
 		  END DO
-		  Heff_Rx = FLOAT(HSUM)/FLOAT(NOH)
-		  Heff_Rx = H_Rx_Ant_top - Heff_Rx
-		END IF
+		  Heff_Rx = H_Rx_Ant_top - FLOAT(HSUM/NOH)
 	  END IF
 	END IF
 !
 !
-!	Proceding table:
-	IF ((Tx_TCA .LT. 0.0) .AND. (Rx_TCA .LT. 0.0)) THEN
-	  Heff = Heff_Tx * Heff_Rx / 10.0
-	  kdh_use = .TRUE.
-	  Tx_TCA_corr = 0.0
-	  Rx_TCA_corr = 0.0
-	END IF
-	IF ((Tx_TCA .LT. 0.0) .AND. (Rx_TCA .GE. 0.0)) THEN
-	  Heff = Heff_Tx
-	  kdh_use = .FALSE.
-	  Tx_TCA_corr = 0.0
-	END IF
-	IF ((Tx_TCA .GE. 0.0) .AND. (Rx_TCA .LT. 0.0)) THEN
-	  Heff = Heff_Rx
-	  kdh_use = .FALSE.
-	  Rx_TCA_corr = 0.0
-	END IF
-	IF ((Tx_TCA .GE. 0.0) .AND. (Rx_TCA .GE. 0.0)) THEN
-	  Heff = 0.0
-	  kdh_use = .FALSE.
-	END IF
-	IF ((Tx_serv_area .GT. 0.0) .AND. (Rx_TCA .LT. 0.0)) THEN
-	  Heff = hmTx * Heff_Rx / 10.0
-	  kdh_use = .TRUE.
-	  Tx_TCA_corr = 0.0
-	  Rx_TCA_corr = 0.0
-	END IF
-	IF ((Tx_serv_area .GT. 0.0) .AND. (Rx_TCA .GE. 0.0)) THEN
-	  Heff = hmTx
-	  kdh_use = .FALSE.
-	  Rx_TCA_corr = 0.0
-	END IF
-	IF ((Tx_TCA .LT. 0.0) .AND. (Rx_serv_area .GT. 0)) THEN
-	  Heff = hmRx * Heff_Tx / 10.0
-	  kdh_use = .TRUE.
-	  Tx_TCA_corr = 0.0
-	  Rx_TCA_corr = 0.0
-	END IF
-	IF ((Tx_TCA .GE. 0.0) .AND. (Rx_serv_area .GT. 0)) THEN
-	  Heff = hmRx
-	  kdh_use = .FALSE.
-	  Rx_TCA_corr = 0.0
-	END IF
-	IF ((Tx_serv_area .GT. 0.0) .AND. (Rx_serv_area .GT. 0)) THEN
-	  Heff = hmTx * hmRx / 10.0
-	  kdh_use = .TRUE.
-	  Tx_TCA_corr = 0.0
-	  Rx_TCA_corr = 0.0
-	END IF
-	IF ((Tx_TCA .LT. 0.0) .AND. ((C_Mode .LT. 0) .OR. (C_Mode .EQ. 99))) THEN
-	  Heff = Heff_Tx * FLOAT(H_AntRx) / 10.0
-	  Heff_Rx = FLOAT(H_AntRx)
-	  kdh_use = .TRUE.
-	  Tx_TCA_corr = 0.0
-	  Rx_TCA_corr = 0.0
-	END IF
-	IF ((Tx_TCA .GE. 0.0) .AND. ((C_Mode .LT. 0) .OR. (C_Mode .EQ. 99))) THEN
-	  Heff = FLOAT(H_AntRx)
-	  kdh_use = .FALSE.
-	  Rx_TCA_corr = 0.0
-	END IF
-	IF ((Tx_serv_area .GT. 0.0) .AND. ((C_Mode .LT. 0) .OR. (C_Mode .EQ. 99))) THEN
-	  Heff = hmTx * FLOAT(H_AntRx) / 10.0
-	  Heff_Rx = FLOAT(H_AntRx)
-	  kdh_use = .TRUE.
-	  Tx_TCA_corr = 0.0
-	  Rx_TCA_corr = 0.0
-	END IF
+!	heff according to proceding table:
+
+
+needs implementation !!!!
+
+
 !
 !
 !
@@ -744,29 +669,18 @@
 !
 !	*****************************************************************
 !	*								
-!	*					Delta h calculation	
+!	*					calc Delta h correction factor	
 !	*								
 !	*****************************************************************
 !
 	IF ((Distance .GT. 10.0) .AND. (D_sea_calculated .LT. Distance)) THEN
 !		Calculate delta-h
 		CALL Dh_calculation ()
+		CALL Dh_orrection (Dh, Distance, Tx_frequency, Dh_corr)
 	  ELSE
 		Dh = 50.0
+		Dh_corr = 0.0
 	END IF
-!
-!
-!
-!	*****************************************************************
-!	*								
-!	*				Correction according to delta h	
-!	*								
-!	*****************************************************************
-!
-	CALL Dh_orrection (Dh, Distance, Tx_frequency, Dh_corr)
-	IF (.NOT. kdh_use) Dh_corr = 0.0
-!
-!
 !
 !	*****************************************************************
 !	*								

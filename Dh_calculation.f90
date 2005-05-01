@@ -1,6 +1,6 @@
 !
 !	Dh_calculation.f90									P. Benner		20.11.2003
-!														G.H.			18.04.2005
+!														G.H.			28.04.2005
 !
 !	Subroutine to calculate the terrain irregularity 'Dh'.
 !
@@ -32,17 +32,10 @@
 	INTEGER		I, J, K, L, N, S1, S2, S3
 !
 !	*******************************************************************
-!
-!	If distance is less than 10 km, Dh is set to 50 m (no calculation is required). 
-	IF (Distance .LT. 1.0D1) THEN
-!	  No DH calculations if the distance is less than 10 km.
-	  Dh = 50.0
-	  RETURN
-	END IF
 !	prepare usefull values
 	N = 0
-	I = DINT(4.5D0 / PD)
-	L = DINT(2.5D1 / PD)
+	I = DNINT(4.5D0 / PD)
+	L = DNINT(2.5D1 / PD)
 !	Starting number of profile point 'PStart' and ending number 'PStop'
 !
 	IF (Distance .LE. 5.0D1) THEN

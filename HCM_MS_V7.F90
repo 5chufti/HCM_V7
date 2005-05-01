@@ -1,6 +1,6 @@
 !	
 !	HCMMS_V7.F90										P.Benner		23.02.2004
-!														G.H.			13.04.2005
+!														G.H.			30.04.2005
 !	Version 7.00					
 !
 !	Harmonized Calculation Method for mobile services
@@ -114,7 +114,7 @@
 !
 !	***************************************************************************
 !
-	Version = '7.00n'
+	Version = '7.0rk'
 !
 	HCM_error = 0
 !
@@ -261,7 +261,7 @@
 			   (Tx_frequ(12:12) .EQ. 'm') .OR. &
 			   (Tx_frequ(12:12) .EQ. 'M') .OR. &
 			   (Tx_frequ(12:12) .EQ. 'g') .OR. &
-			   (Tx_frequ(12:12) .EQ. 'G'))) THEN
+			   (Tx_frequ(12:12) .EQ. 'G') )) THEN
 	  HCM_error = 1011
 !	  Error in transmitting frequency unit
 	  RETURN
@@ -401,7 +401,7 @@
 				 (Rx_frequ(12:12) .EQ. 'm') .OR. &
 				 (Rx_frequ(12:12) .EQ. 'M') .OR. &
 				 (Rx_frequ(12:12) .EQ. 'g') .OR. &
-				 (Rx_frequ(12:12) .EQ. 'G'))) THEN
+				 (Rx_frequ(12:12) .EQ. 'G') )) THEN
 		HCM_error = 1024
 !		Error in reception frequency unit
 		RETURN
@@ -421,9 +421,7 @@
 	IF (Type_of_Tx_ant .EQ. 'E') Tx_ant_type_corr = 0.0
 	IF (Type_of_Tx_ant .EQ. 'I') Tx_ant_type_corr = 2.1
 !
-	IF ((Type_of_Tx_ant .EQ. 'E') .OR. (Type_of_Tx_ant .EQ. 'I')) THEN
-		HCM_Error = 0
-	  ELSE
+	IF (.NOT. ((Type_of_Tx_ant .EQ. 'E') .OR. (Type_of_Tx_ant .EQ. 'I'))) THEN
 		HCM_Error = 1033
 !		Error in typ of Tx antenna (E/I)
 		RETURN
@@ -438,7 +436,7 @@
 		Time_percentage = 10
 	END IF      
 !
-!	Test point distance (if 0, set it to 100 m):
+!	Test point distance (if <30, set it to 100 m):
 	IF (PD .LT. 3.0D-2) PD = 1.0D-1
 !
 !	*****************************************************************
@@ -448,8 +446,7 @@
 !	*****************************************************************
 !
 !	Is C_mode in defined range? 
-	IF ((C_mode .LT. -8) .OR. (C_mode .GT. 9)) THEN
-	  IF (C_mode .NE. 99) THEN	! 99 = Testmodus point to point like line calculation.
+	IF ((C_mode .LT. -8) .OR. ((C_mode .GT. 9) .AND. (C_mode .NE. 99))) THEN
 		HCM_error = 1025
 !		C_mode is out of range
 		RETURN

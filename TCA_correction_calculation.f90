@@ -1,6 +1,6 @@
 !
 !	TCA_correction_calculation.f90						P. Benner		29.10.2003
-!														
+!														G.H.			28.04.2005
 !
 !	Subroutine to calculate the Terrain Clearance Angle (TCA) correction.
 !
@@ -58,7 +58,10 @@
 	  TCA_corr = TCA_c_600 + (TCA_c_2000 - TCA_c_600) * LOG10(Frequency/600.0) * &
 				 LOG10(2000.0/600.0)
 	END IF
-!
+!	Corrections for distances < 16km
+	IF (Distance .LT. 1.6D1) TCA_corr = TCA_corr * Distance / 16.0
+!	limit to neg. correction 
+	IF (TCA_corr .GE. 0.0) TCA_corr = 0.0
 	RETURN
 !
 	END SUBROUTINE TCA_correction_calculation
