@@ -186,16 +186,16 @@
 !	Include the interface definitions:
 	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
-	INTEGER				IOS, I, J, J1, D1, D2, HSUM, NOH
+	INTEGER				IOS, I, J, J1, D1, D2, HSUM
 	INTEGER*4			T_L, M_L, B_L, I1, I2
-	REAL				X, x_TCA, hmTx, hmRx, DS1, A1, A2, Ax
+	REAL				X, x_TCA, DS1, A1, A2, Ax
 	REAL				HDZ(10002), HDC(10002), HDF(10002)
 	REAL				A(11), Factor_of_path_over_sea
 	REAL				H_Tx_Ant_top, H_Rx_Ant_top
 	REAL				Land_FS_1kW, Sea_FS_1kW, DI1, DI2
 	DOUBLE PRECISION	LongTx, LatTx, LongRx, LatRx
 	DOUBLE PRECISION	New_LongTx, New_LatTx, New_LongRx, New_LatRx
-	LOGICAL				Free, kdh_use, null
+	LOGICAL				Free, null
 	CHARACTER*1			Point_Type
 !
 !	*****************************************************************
@@ -249,31 +249,14 @@
 !	Calculate the direction from Tx to Rx:
 	CALL Calc_direction (LongTx, LatTx, LongRx, LatRx, Dir_Tx_Rx)
 !
-!	Calculate new positions, if Tx or Rx or both are mobiles:
-!	Tx already calculated in HCM_MS_V7 subroutine !
-!	Get radius of the Rx service area:
-	IF ((C_mode .GE. 0) .AND. (C_mode .NE. 99)) THEN
-		READ (Rad_of_Rx_serv_area, '(F5.0)', IOSTAT=IOS) Rx_serv_area
-		IF (IOS .NE. 0) THEN
-		  HCM_error = 1029
-!		  Error in radius of Rx service area
-		  RETURN
-		END IF
-	  ELSE
-		Rx_serv_area = 0.0
-	END IF
-!
-	IF ((C_mode .LT. 0) .AND. (D_to_border .LT. 0)) THEN
-!		In case of CBR calculation, the position of the (mobile)
-!		Tx is set in subroutine CBR_Coordinates !
-	  ELSE
-		IF (((Tx_serv_area .GT. 0.0) .OR. (Rx_serv_area .GT. 0.0)) &
-				.AND. (C_mode .NE. 99)) THEN
+!	Calculate new positions, if Tx or Rx or both are mobiles and not CBR or '99':
+!	for CBR new positions are calculated in CBR_Coordinates !
+	IF ((C_mode .NE. 99) .AND. ((C_mode .GE. 0) .OR. (D_to_border .GE. 0)) &
+			.AND. ((Tx_serv_area .GT. 0.0) .OR. (Rx_serv_area .GT. 0.0))) THEN
 !		  Calculate new co-ordinates:
 		  CALL Position_of_mobile ( LongTx, LatTx, LongRx, LatRx, &
 					New_LongTx, New_LatTx, New_LongRx, New_LatRx, B_L )
 		  IF (HCM_Error .NE. 0) RETURN
-		END IF
 	END IF
 
 !
@@ -440,7 +423,7 @@
 !	  Calculation of ho(z); add all ho to hz (='HDZ'):
 !
 	  DO I = 1, J
-		HDZ(I) = FLOAT (T_Prof(I+1)) + ((PD * I) * (PD * (PN-1-I)) / 17.0)
+		HDZ(I) = FLOAT (T_Prof(I+1)) + PD*I * (Distance - PD*I) / 17.0
 	  END DO
 !
 !
@@ -448,9 +431,8 @@
 !	  (If distance is less than 2 km, no addition is done !)
 !
 	  IF (Distance .GT. 2.0) THEN
-		I = DNINT(1D0 / PD)
-		I1 = I
-		I2 = J - I
+		I1 = DNINT(1D0 / PD)
+		I2 = DNINT((Distance - 1D0) / PD)
 		DO I = I1, I2
 		  HDZ(I) = HDZ(I) + 10.0
 		END DO
@@ -463,7 +445,7 @@
 	  DO I = 1, J
 		HDC(I) = H_Tx_Ant_top - (H_Tx_Ant_top - H_Rx_Ant_top) * PD * I &
 					/ Distance - HDZ(I)
-		X = (PD * I) * (PD * (PN-1-I))
+		X = PD*I*(Distance-PD*I)
 		IF (X .LE. 0.0) THEN
 			HDF(I) = 0.0
 		  ELSE
@@ -499,8 +481,12 @@
 	Tx_TCA_corr	= 0.0
 	Rx_TCA_corr	= 0.0
 !
-!	calculate transmitter clearance angle 'Tx_TCA' according to proceeding table
+!	***********************************************************
+!	Calculate Terrain Clearance Angles and Correction factors
+!	limitation of corr.factors is done in TCA_correction_calculation
+!	***********************************************************
 !
+!	calculate transmitter clearance angle 'Tx_TCA' according to proceeding table
 	IF (Tx_serv_area .EQ. 0.0) THEN
 !	  Calculate Tx_TCA:
 		Tx_TCA = -90.0
@@ -510,7 +496,7 @@
 			J = PN - 2
 		END IF
 		DO I = 1, J
-			x_TCA = (FLOAT(T_Prof(I+1))-H_Tx_Ant_top)/(SNGL(PD)*I*1E3)
+			x_TCA = (FLOAT(T_Prof(1+I))-H_Tx_Ant_top)/(SNGL(PD)*I*1E3)
 			x_TCA = ATAND (x_TCA)	! in degrees
 			IF (x_TCA .GT. Tx_TCA) Tx_TCA = x_TCA
 		END DO
@@ -538,11 +524,16 @@
 !	Calculate correction factor:
 	CALL TCA_correction_calculation (Rx_TCA, Rx_frequency, Rx_TCA_corr)
 !
+!	************************************************
 !	Effective antenna heights:
+!	calculate effective antenna heights 
+!	and correct according to limits in table
+!	************************************************
+!
 	Heff_Tx = 0.0
 	Heff_Rx = 0.0
 	IF (Distance .LT. 1.5D1) THEN
-	    D1 = NINT(PN / 15)
+	    D1 = NINT(float(PN) / 15.0)
 		D2 = PN - 1
 	ELSE
 		D1 = DNINT(1D0 / PD)  
@@ -552,51 +543,39 @@
 !	Transmitter:
 	IF (Tx_serv_area .GT. 0.0) THEN
 !		Height of a mobile 'hmTx'
-		IF (H_AntTx .LT. 3) THEN
-			hmTx = 3.0
-		ELSE
-			hmTx = FLOAT(H_AntTx)
-		ENDIF	
-		Heff_Tx = hmTx
+		Heff_Tx = FLOAT(H_AntTx)
 	ELSE
 		  HSUM = 0
-		  NOH  = 0
 		  DO I = D1, D2
-		    HSUM = HSUM + T_Prof(I+1)
-		    NOH  = NOH  + 1
+		    HSUM = HSUM + T_Prof(1+I)
 		  END DO
-		  Heff_Tx = H_Tx_Ant_top - FLOAT(HSUM/NOH)
-		  IF (Heff_Tx .LT. 0.0) Heff_Tx = 0.0
+		  Heff_Tx = H_Tx_Ant_top - FLOAT(HSUM/(D2-D1+1))
 	END IF
+	IF (Heff_Tx .LT. 3.0) Heff_Tx = 3.0
 !
-!	Receiver: (only for point to point calculations)
+!	Receiver: 
 	IF ((C_Mode .GE. 0) .AND. (C_Mode .NE. 99)) THEN
+!	  for point to point calculations
 	  IF (Rx_serv_area .GT. 0) THEN
 !		Height of a mobile 'hmRx'
-		IF (H_AntRx .LT. 3) THEN
-			hmRx = 3.0
-		ELSE
-			hmRx = FLOAT(H_AntRx)
-		ENDIF	
-		Heff_Rx = hmRx
+		Heff_Rx = FLOAT(H_AntRx)
 	  ELSE
 		  HSUM = 0
-		  NOH  = 0
 		  DO I = D1, D2
 		    HSUM = HSUM + T_Prof(PN-I)
-		    NOH  = NOH  + 1
 		  END DO
-		  Heff_Rx = H_Rx_Ant_top - FLOAT(HSUM/NOH)
+		  Heff_Rx = H_Rx_Ant_top - FLOAT(HSUM/(D2-D1+1))
 	  END IF
+	ELSE
+!	for line calculations
+	  Heff_Rx = 10
 	END IF
+	IF (Heff_Rx .LT. 3.0) Heff_Rx = 3.0
 !
+!	heff for curves according to proceding table:
+!	value of 0.3m results from 3m/10, 3m is done as min in Heff_Xx calc.
 !
-!	heff according to proceding table:
-
-
-needs implementation !!!!
-
-
+	Heff = (Heff_Tx * Heff_Rx) / 10.0
 !
 !
 !

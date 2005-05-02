@@ -15,18 +15,20 @@
 !
 !
 !
-	SUBROUTINE TCA_correction_calculation (TCA, Frequency, TCA_Corr)
+	SUBROUTINE TCA_correction_calculation (TCAI, Frequency, TCAI_Corr)
 !
 	IMPLICIT			NONE
 !
+	INCLUDE				'HCM_MS_V7_definitions.F90'
+!
 	INTEGER*4			f_inf, f_sup
-	REAL				TCA, TCA_corr, TCA_c_100, TCA_c_600, TCA_c_2000
+	REAL				TCAI, TCAI_corr, TCA_c_100, TCA_c_600, TCA_c_2000
 	REAL				v100, v600, v2000
 	DOUBLE PRECISION	Frequency
 !
-	v100  = 0.6492624 * TCA	! = 37.2 * TCA (in rad) = 37.2 * PI / 180 * TCA (in degrees) 
-	v600  = 1.5917403 * TCA	! = 91.2 * TCA (in rad) = 91.2 * PI / 180 * TCA (in degrees)
-	v2000 =	2.9146999 * TCA	! = 167  * TCA (in rad) = 167  * PI / 180 * TCA (in degrees)
+	v100  = 0.6492624 * TCAI	! = 37.2 * TCA (in rad) = 37.2 * PI / 180 * TCA (in degrees) 
+	v600  = 1.5917403 * TCAI	! = 91.2 * TCA (in rad) = 91.2 * PI / 180 * TCA (in degrees)
+	v2000 =	2.9146999 * TCAI	! = 167  * TCA (in rad) = 167  * PI / 180 * TCA (in degrees)
 !
 	TCA_c_100  =  9.1 - (6.9 + 20.0 * LOG10(SQRT((v100  - 0.1)**2 + 1.0) + v100  - 0.1))
 	TCA_c_600  = 13.1 - (6.9 + 20.0 * LOG10(SQRT((v600  - 0.1)**2 + 1.0) + v600  - 0.1))
@@ -50,18 +52,18 @@
 	END IF
 !
 	IF ((f_inf .EQ. 100) .AND. (f_sup .EQ. 600)) THEN
-	  TCA_corr = TCA_c_100 + (TCA_c_600 - TCA_c_100) * LOG10(Frequency/100.0) * &
+	  TCAI_corr = TCA_c_100 + (TCA_c_600 - TCA_c_100) * LOG10(Frequency/100.0) * &
 				 LOG10(600.0/100.0)
 	END IF
 !
 	IF ((f_inf .EQ. 600) .AND. (f_sup .EQ. 2000)) THEN
-	  TCA_corr = TCA_c_600 + (TCA_c_2000 - TCA_c_600) * LOG10(Frequency/600.0) * &
+	  TCAI_corr = TCA_c_600 + (TCA_c_2000 - TCA_c_600) * LOG10(Frequency/600.0) * &
 				 LOG10(2000.0/600.0)
 	END IF
 !	Corrections for distances < 16km
-	IF (Distance .LT. 1.6D1) TCA_corr = TCA_corr * Distance / 16.0
+	IF (Distance .LT. 1.6D1) TCAI_corr = TCAI_corr * Distance / 16.0
 !	limit to neg. correction 
-	IF (TCA_corr .GE. 0.0) TCA_corr = 0.0
+	IF (TCAI_corr .GE. 0.0) TCAI_corr = 0.0
 	RETURN
 !
 	END SUBROUTINE TCA_correction_calculation

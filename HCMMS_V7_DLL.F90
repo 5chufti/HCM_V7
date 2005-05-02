@@ -1,6 +1,6 @@
 !
 !	HCMMS_V7_DLL.F90									P. Benner		08.01.2004
-!														G.H.			13.04.2005
+!														G.H.			02.05.2005
 !	DLL to the HCMMS_V7 subroutuine (Berlin 2003)
 !
 	SUBROUTINE HCMMS_V7_DLL ( I_C_mode, I_bor_dis, I_PD, I_Distance, I_H_Datab_Tx, &
@@ -274,7 +274,7 @@
 	I_Rx_TCA_corr      = Rx_TCA_corr	 ! RX clearance angle correction factor
 	I_D_sea_calculated = D_sea_calculated ! Distance over sea calculated
 	I_Rx_ant_corr      = Rx_ant_corr	 ! Correction according Rx antenna (H + V)
-	I_Tx_ant_type_corr = Tx_ant_type_corr ! Correction according antenna type (E/I) Rx
+	I_Rx_ant_type_corr = Rx_ant_type_corr ! Correction according antenna type (E/I) Rx
 	I_Delta_frequency  = Delta_frequency ! Frequency difference (kHz)
 	I_Corr_delta_f     = Corr_delta_f	 ! Correction factor according frequency difference
 	I_Calculated_FS    = Calculated_FS	 ! Calculated field strength

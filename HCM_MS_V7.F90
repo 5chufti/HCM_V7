@@ -406,6 +406,18 @@
 !		Error in reception frequency unit
 		RETURN
 	  END IF
+!	  Get radius of the Rx service area:
+	  IF (C_mode .NE. 99) THEN
+		READ (Rad_of_Rx_serv_area, '(F5.0)', IOSTAT=IOS) Rx_serv_area
+		IF (IOS .NE. 0) THEN
+		  HCM_error = 1029
+!		  Error in radius of Rx service area
+		  RETURN
+		END IF
+	  ELSE
+		Rx_serv_area = 0.0
+	  END IF
+
 	END IF
 !
 	READ (Max_power, '(F6.1)', IOSTAT=IOS) MaxPow
@@ -450,7 +462,6 @@
 		HCM_error = 1025
 !		C_mode is out of range
 		RETURN
-	  END IF
 	END IF
 !
 !
