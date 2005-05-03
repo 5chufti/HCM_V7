@@ -10,8 +10,8 @@
 !	lon, lat, azi in degrees 
 	DOUBLE PRECISION	LonA, LatA, LonB, LatB, Azi
 !
-	Azi = DATAN2D(DSIND(LonB-LonA) * DCOSD(LatB), DCOSD(LatA) * DSIND(LatB) &
-			- DSIND(LatA) * DCOSD(LatB) * DCOSD(LonB - LonA))
+	Azi = DATAN2D(DSIND(LonB-LonA) * DCOSD(LatB), & 
+			DCOSD(LatA) * DSIND(LatB) - DSIND(LatA) * DCOSD(LatB) * DCOSD(LonB - LonA))
 	IF (Azi .LT. 0D0) Azi = Azi + 360D0
 	RETURN
 !

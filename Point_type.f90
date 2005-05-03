@@ -1,6 +1,6 @@
 !
 !	Point_type.f90										P. Benner		09.10.2003
-!											
+!														G.H.			03.05.2005
 !
 !
 !	Subroutine to read the morphological type of a given point from the morpho-database.
@@ -41,20 +41,21 @@
 !
 !	**********************************************************************************
 !
-	SUBROUTINE Point_type (Long, Lat, M_Type, Error, Morpho_path, M_L)
+	SUBROUTINE Point_type (Long, Lat, M_Type, Error)
 !
 	IMPLICIT			NONE
+!
+	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
 	INTEGER(2)			M_Type, M1, M2, M3, M4
 	INTEGER(2)			M_F_3(101,101), M_F_6(51,101)
 	INTEGER(4)			Error, RESH, SLO, SLA, IOS, LOD, LAD, BH, BV, T, OLD_T
-	INTEGER(4)			P1X, P1Y, TO_FN_L, M_L
+	INTEGER(4)			P1X, P1Y, TO_FN_L
 	DOUBLE PRECISION	Long, Lat, LOR, LAR, LO_P1, LA_P1, RELLO, RELLA
 	CHARACTER(1)		M_3(20402), M_6(10302)
 	CHARACTER(4)		SUBDIR
 	CHARACTER(11)		FN, O_FN
 	CHARACTER(85)		TO_FN
-	CHARACTER(63)		Morpho_path
 !
 	EQUIVALENCE (M_F_3, M_3)
 	EQUIVALENCE (M_F_6, M_6) 

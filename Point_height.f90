@@ -1,6 +1,6 @@
 !
 !	Point_height.F90									P.Benner		20.11.2003
-!												
+!														G.H.			03.05.2005
 !
 !	Subroutine to read the height of a given point from the terrain-database.
 !
@@ -41,14 +41,16 @@
 !
 !	**********************************************************************************
 !
-	SUBROUTINE Point_height (Long, Lat, Height, Error, Topo_path, T_L)
+	SUBROUTINE Point_height (Long, Lat, Height, Error)
 !
 	IMPLICIT	NONE
+!
+	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
 	INTEGER(2)			Height, H1, H2, H3, H4
 	INTEGER(2)			H_F_3(101,101), H_F_6(51,101)
 	INTEGER(4)			Error, RESH, SLO, SLA, IOS, LOD, LAD, BH, BV, T, OLD_T
-	INTEGER(4)			P1X, P1Y, TO_FN_L, T_L
+	INTEGER(4)			P1X, P1Y, TO_FN_L
 	REAL				H_F
 	DOUBLE PRECISION	Long, Lat, LOR, LAR, LO_P1, LA_P1, RELLO, RELLA
 	DOUBLE PRECISION	LORR, LARR, H12, H34
@@ -56,7 +58,6 @@
 	CHARACTER(4)		SUBDIR
 	CHARACTER(11)		FN, O_FN
 	CHARACTER(85)		TO_FN
-	CHARACTER(63)		Topo_path
 !
 	EQUIVALENCE (H_F_3, H_3)
 	EQUIVALENCE (H_F_6, H_6) 

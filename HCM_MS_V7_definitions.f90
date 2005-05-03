@@ -2,6 +2,7 @@
 !	HCM_MS_V7_definitions.f90
 !
 	INTEGER*2			T_Prof(10002), M_Prof(10002), PN, H_Datab_Tx, H_Datab_Rx
+	INTEGER*2			T_L, M_L, B_L
 	INTEGER*4			HCM_error, Time_percentage, C_mode, D_to_border
 	INTEGER*4			H_AntTx, H_AntRx, H_Tx, H_Rx
 	REAL				Heff, TCA, TCA_corr
@@ -51,7 +52,7 @@
 						Rx_Elevation, MaxPow, &
 !
 !						Third all 2 byte variables (INTEGER*2)
-						T_Prof, M_Prof, PN, H_Datab_Tx, H_Datab_Rx
+						T_Prof, M_Prof, PN, H_Datab_Tx, H_Datab_Rx, T_L, M_L, B_L
 !
 !						All CHARACTER variables
 	COMMON	/CDATA/		Topo_path, Morpho_path, Border_path, Sea_temperature, &

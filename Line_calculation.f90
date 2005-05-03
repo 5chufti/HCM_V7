@@ -1,6 +1,6 @@
 !
 !	Line_calculation.f90								P.Benner		23.11.2004
-!														
+!														G.H.			03.05.2005
 !
 !	23.11.2004	Steps from 100 / 10 / 1 modified to 25 / 5 / 1
 !
@@ -33,8 +33,8 @@
 !	1049	Error in (border-) line data
 !            
 !
-	SUBROUTINE Line_calculation ( LongTx, LatTx, LongRx, LatRx, T_L, M_L, &
-								  B_L, H_Tx_Ant_top, H_Rx_Ant_top )                
+	SUBROUTINE Line_calculation ( LongTx, LatTx, LongRx, LatRx, &
+									H_Tx_Ant_top, H_Rx_Ant_top )                
 !
 	IMPLICIT NONE
 !
@@ -43,7 +43,6 @@
 	INTEGER				IOS, N_rec, N_List, Rec_N_list(3), N_cp
 	INTEGER				N_List1, Rec_N_list1(3), teststep
 	INTEGER				I, J, K, N_Start, N_Stop, Rec_N_x, Rec_x
-	INTEGER*4			T_L, M_L, B_L
 	DOUBLE PRECISION	N_Record(22), RB, PI, Lo, La
 	DOUBLE PRECISION	Co_cp(10000,2), LongTx, LatTx, LongRx, LatRx
 	REAL				FS_list(3), FS_list1(3), FS_x, H_Tx_Ant_top, H_Rx_Ant_top
@@ -233,7 +232,7 @@
 							  CBR_D, Tx_serv_area, Take_it)
 		IF (.NOT. Take_it) GOTO 100
 	  END IF
-	  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx, T_L, M_L, B_L, &
+	  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx,  &
 								H_Tx_Ant_top, H_Rx_Ant_top )
 	  IF (Info(7)) THEN
 !	    Distance between Tx and Rx is less than both service area radius.
@@ -295,7 +294,7 @@
 								  CBR_D, Tx_serv_area, Take_it)
 					IF (.NOT. Take_it) GOTO 110
 				  END IF
-				  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx, T_L, M_L, B_L, &
+				  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx, &
 											H_Tx_Ant_top, H_Rx_Ant_top )
 				  IF (Info(7)) THEN
 !				    Distance between Tx and Rx is less than both service area radius.
@@ -360,7 +359,7 @@
 								  CBR_D, Tx_serv_area, Take_it)
 					IF (.NOT. Take_it) GOTO 120
 				  END IF
-				  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx, T_L, M_L, B_L, &
+				  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx, &
 											H_Tx_Ant_top, H_Rx_Ant_top )
 				  IF (Info(7)) THEN
 !				    Distance between Tx and Rx is less than both service area radius.
@@ -400,7 +399,7 @@
 							  CBR_D, Tx_serv_area, Take_it)
 			IF (.NOT. Take_it) GOTO 130
 		  END IF
-		  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx, T_L, M_L, B_L, &
+		  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx, &
 									H_Tx_Ant_top, H_Rx_Ant_top )
 		  IF (Info(7)) THEN
 !		    Distance between Tx and Rx is less than both service area radius.
@@ -437,7 +436,7 @@
 							  CBR_D, Tx_serv_area, Take_it)
 	  IF (.NOT. Take_it) RETURN
 	END IF
-	CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx, T_L, M_L, B_L, &
+	CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx, &
 							  H_Tx_Ant_top, H_Rx_Ant_top )
 !
 	RETURN

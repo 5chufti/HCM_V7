@@ -1,6 +1,6 @@
 !
 !	Pofile.f90											P. Benner		20.11.2003
-!														G.H.			27.04.2005
+!														G.H.			02.05.2005
 !	This subroutine constructs a terrain- or morphological profile from point A to
 !	point B in steps of 100 m. The heights or morphological information are stored
 !	in 'Prof(i)'. The total number of points is in 'PN'. The first profile point
@@ -28,26 +28,27 @@
 !				 0 = No error
 !		   1 - 999 = reserved for Point_height or Point_Type -subroutine
 !	Negativ values = reserved for Point_height or Point_Type -subroutine
-!			  1000 = Distance greater than 1000 km
+!			  1000 = Distance 0 km
+!			  1028 = Distance greater than 1000 km
 !
 !	Called subroutines : Point_height, Point_type
 !
 !	**********************************************************************************
 !
-	SUBROUTINE PROFILE (LongA, LatA, LongB, LatB, PD, Prof, PN, Error, P_Type, &
-						Topo_path, Morpho_path, T_L, M_L)
+	SUBROUTINE PROFILE (LongA, LatA, LongB, LatB, Prof, Error, P_Type)
 !
 	IMPLICIT			NONE
 !
-	INTEGER(2)			PN, Prof(10002)
-	INTEGER(4)			Error, T_L, M_L
+	INCLUDE				'HCM_MS_V7_definitions.F90'
+!
+	INTEGER(2)			Prof(10002)
+	INTEGER(4)			Error
 	INTEGER(2)			I, PC
 	REAL				S
-	DOUBLE PRECISION	LongA, LatA, LongB, LatB, PD
+	DOUBLE PRECISION	LongA, LatA, LongB, LatB
 	DOUBLE PRECISION	SIDA, SILAB, COLAB, SILAA, COLAA, COLOA, SILOA, COLOB, SILOB
-	DOUBLE PRECISION	LAY, LOY, DD, DA, DIS, DC, DP, A, B, R, x, y, z
+	DOUBLE PRECISION	LAY, LOY, DD, DA, DIS, DC, DP, A, B, K, R, x, y, z
 	CHARACTER*1			P_Type
-	CHARACTER*63		Topo_path, Morpho_path
 !
 !	**********************************************************************************
 !
@@ -77,8 +78,8 @@
 	DP   = PD / R
 !
 !	how many points in profile?
-	S = MOD(SNGL(DIS),2.0)
-	IF ((S .GT. 0.0) .OR. (S .LT. 1.0)) THEN 
+	S = MOD(SNGL(DIS),SNGL(2.0 * PD))
+	IF ((S .GT. 0.0) .OR. (S .LT. PD)) THEN 
 		PN = DINT(DIS / PD) + 2
 	ELSE
 		PN = DINT(DIS / PD) + 1
@@ -90,9 +91,9 @@
 !	Calculate point #1 (TX):
 !
 	IF (P_Type .EQ. 'e') THEN
-		CALL Point_height (LongA, LatA, Prof(1), Error, Topo_path, T_L)
+		Prof(1) = H_Tx
 	  ELSE
-		CALL Point_type (LongA, LatA, Prof(1), Error, Morpho_path, M_L)
+		CALL Point_type (LongA, LatA, Prof(1), Error)
 	END IF
 	IF (Error .NE. 0) RETURN
 !
@@ -105,6 +106,7 @@
 		COLOA = DCOSD(LongA)
 		SILOB = DSIND(LongB)
 		COLOB = DCOSD(LongB)
+		K = DBLE(H_Rx - H_Tx) / DIS
 !
 !	Loop for waypoints
 	I = 1
@@ -126,9 +128,10 @@
 !	  get Information of new point:
 !
 		IF (P_Type .EQ. 'e') THEN 
-			CALL Point_height (LOY, LAY, Prof(PC), Error, Topo_path, T_L) 
+			CALL Point_height (LOY, LAY, Prof(PC), Error)
+			Prof(PC) = Prof(PC) - DNINT(DBLE(H_Tx) + K * DBLE(I) * PD)
 		ELSE
-			CALL Point_type (LOY, LAY, Prof(PC), Error, Morpho_path, M_L)
+			CALL Point_type (LOY, LAY, Prof(PC), Error)
 		END IF	
 		IF (Error .NE. 0) RETURN
 !
@@ -144,6 +147,7 @@
 		COLOA = DCOSD(LongB)
 		SILOB = DSIND(LongA)
 		COLOB = DCOSD(LongA)
+		K = DBLE(H_Tx - H_Rx) / DIS
 !
 !	Loop for waypoints
 	I = 1
@@ -165,9 +169,10 @@
 !	  get Information of new point:
 !
 		IF (P_Type .EQ. 'e') THEN 
-			CALL Point_height (LOY, LAY, Prof(PC), Error, Topo_path, T_L) 
+			CALL Point_height (LOY, LAY, Prof(PC), Error) 
+			Prof(PC) = Prof(PC) - DNINT(DBLE(H_Rx) + K * DBLE(I) * PD)
 		ELSE
-			CALL Point_type (LOY, LAY, Prof(PC), Error, Morpho_path, M_L)
+			CALL Point_type (LOY, LAY, Prof(PC), Error)
 		END IF	
 		IF (Error .NE. 0) RETURN
 !
@@ -176,9 +181,9 @@
 !
 !	calculate last point #PC+1 (RX):
 	IF (P_Type .EQ. 'e') THEN
-		CALL Point_height (LongB, LatB, Prof(PN), Error, Topo_path, T_L)
+		Prof(PN) = H_Rx
 	ELSE
-		CALL Point_type (LongB, LatB, Prof(PN), Error, Morpho_path, M_L)
+		CALL Point_type (LongB, LatB, Prof(PN), Error)
 	END IF
 	IF (Error .NE. 0) RETURN	
 !

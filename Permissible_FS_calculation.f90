@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		25.02.2004
-!														G.H.			17.04.2005
+!														G.H.			03.05.2005
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -217,8 +217,8 @@
 !
 !
 !	Delta frequency in kHz:
-	Delta_frequency = DABS(Tx_frequency - Rx_frequency) * 1.0D3
-!
+!	Delta_frequency = DABS(Tx_frequency  - Rx_frequency) * 1D3
+	Delta_frequency = DABS((DINT(Tx_frequency*1D6) - DINT(Rx_frequency*1D6))/1D3)
 !	Input value for correction factor according delta frequency ?
 	IF (Cor_fact_frequ_diff .NE. '    ') THEN
 	  Info(14) = .TRUE.

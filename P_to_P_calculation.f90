@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			30.04.2005
+!														G.H.			03.05.2005
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -178,8 +178,8 @@
 !
 !	**********************************************************************
 !
-	SUBROUTINE P_to_P_calculation ( LongTx, LatTx, LongRx, LatRx, T_L, M_L, &
-									B_L, H_Tx_Ant_top, H_Rx_Ant_top )
+	SUBROUTINE P_to_P_calculation ( LongTx, LatTx, LongRx, LatRx, &
+									H_Tx_Ant_top, H_Rx_Ant_top )
 !
 	IMPLICIT		   NONE
 !
@@ -187,7 +187,7 @@
 	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
 	INTEGER				IOS, I, J, J1, D1, D2, HSUM
-	INTEGER*4			T_L, M_L, B_L, I1, I2
+	INTEGER*4			I1, I2
 	REAL				X, x_TCA, DS1, A1, A2, Ax
 	REAL				HDZ(10002), HDC(10002), HDF(10002)
 	REAL				A(11), Factor_of_path_over_sea
@@ -203,21 +203,6 @@
 !	Interpolation factor for mixed path (<10%)
 	DATA A   /0.0,0.07,0.13,0.2,0.29,0.37,0.46,0.56,0.67,0.8,1.0/
 !
-!
-!	*****************************************************************
-!	*								
-!	*	Calculate the distance 'Distance' between point A and B	
-!	*								
-!	*****************************************************************
-!
-	Coo_Tx_new = Coo_Tx
-	Coo_Rx_new = Coo_Rx
-	New_LongTx = LongTx
-	New_LatTx  = LatTx
-	New_LongRx = LongRx
-	New_LatRx  = LatRx
-!
-!
 !	Clear all Info(i)'s for P_to_P_calculation subroutine
 !
 	Info(7)  = .FALSE.
@@ -229,53 +214,41 @@
 	Info(13) = .FALSE.
 	Info(16) = .FALSE.
 !
-	CALL Calc_distance (LongTx, LatTx, LongRx, LatRx, Distance)
-!
-	IF (Distance .LE. 0.0D0) THEN
-!	  Distance between Tx and Rx = 0. Calculations not possible.
-	  HCM_error = 1000   
-	  RETURN
-	END IF
-!
-	IF (Distance .GT. 1D3) THEN
-	  HCM_error = 1028
-!	  The distance is greater than 1000 km. Calculations not possible.
-	  RETURN
-	END IF
-!
-!	Calculate the direction from Rx to Tx:
-	CALL Calc_direction (LongRx, LatRx, LongTx, LatTx, Dir_Rx_Tx)
-!
-!	Calculate the direction from Tx to Rx:
-	CALL Calc_direction (LongTx, LatTx, LongRx, LatRx, Dir_Tx_Rx)
-!
 !	Calculate new positions, if Tx or Rx or both are mobiles and not CBR or '99':
 !	for CBR new positions are calculated in CBR_Coordinates !
 	IF ((C_mode .NE. 99) .AND. ((C_mode .GE. 0) .OR. (D_to_border .GE. 0)) &
 			.AND. ((Tx_serv_area .GT. 0.0) .OR. (Rx_serv_area .GT. 0.0))) THEN
 !		  Calculate new co-ordinates:
 		  CALL Position_of_mobile ( LongTx, LatTx, LongRx, LatRx, &
-					New_LongTx, New_LatTx, New_LongRx, New_LatRx, B_L )
+					New_LongTx, New_LatTx, New_LongRx, New_LatRx )
 		  IF (HCM_Error .NE. 0) RETURN
+	ELSE
+		Coo_Tx_new = Coo_Tx
+		Coo_Rx_new = Coo_Rx
+		New_LongTx = LongTx
+		New_LatTx  = LatTx
+		New_LongRx = LongRx
+		New_LatRx  = LatRx
 	END IF
 
 !
 	CALL CooConv (New_LongTx, New_LatTx, Coo_Tx_new)
 	CALL CooConv (New_LongRx, New_LatRx, Coo_Rx_new)
 !
-	IF (Info(7)) THEN
-!	  Calculated_FS = 999.9
-!	  Distance between Tx and Rx is less than both service area radius.
-	  RETURN
-	END IF
-!
 !	Calculate distance and directions again (with new co-ordinates):
 	CALL Calc_distance (New_LongTx, New_LatTx, New_LongRx, New_LatRx, Distance)
 !
-	IF (Distance .EQ. 0.0D0) THEN
+	IF (Distance .LE. 0.0D0) THEN
 	  Calculated_FS = 999.9
 !	  Distance between Tx and Rx = 0. Calculations not possible.
 	  HCM_error = 1000   
+	  RETURN
+	END IF
+!
+	IF (Distance .GT. 1D3) THEN
+	  Calculated_FS = -999.9
+!	  The distance is greater than 1000 km. Calculations not possible.
+	  HCM_error = 1028
 	  RETURN
 	END IF
 !
@@ -285,45 +258,11 @@
 !	Calculate the direction from Tx to Rx:
 	CALL Calc_direction (New_LongTx, New_LatTx, New_LongRx, New_LatRx, Dir_Tx_Rx)
 !
+!	Add Tx antenna height to height of Tx, add Rx antenna height
+!	to height of Rx:
 !
-!	Height of Rx
-	H_Rx = 0		! default value
-	H_Datab_Rx = 0	! default value
-!	If borderline calculations, no receiver height
-	IF ((C_mode .GE. 0) .AND. (Rx_serv_area .EQ. 0.0) .AND. (C_mode .NE. 99)) THEN
-	  CALL Point_height (LongRx, LatRx, H_Datab_Rx, HCM_Error, Topo_path, T_L)
-	  IF (HCM_Error .NE. 0) RETURN
-	  IF (H_Rx_input .EQ. '    ') THEN
-		  H_Rx = H_Datab_Rx
-		  Info(8) = .TRUE.
-!		  No height of Rx site is given, height is from the terrain database.
-		ELSE
-		  READ (H_Rx_input, '(I4)', IOSTAT=IOS) H_Rx
-		  IF (IOS .NE. 0) THEN
-			HCM_Error = 1030
-!			Error in input value Rx site height above sea level.
-			RETURN	
-		  END IF
-		  IF (H_Rx .NE. H_Datab_Rx) THEN
-			IF (ABS(H_Rx-H_Datab_Rx) .EQ. 1) THEN
-				Info(9) = .TRUE.
-!				Height of Rx site differs from height of terrain data.
-			  ELSE
-				IF (ABS(H_Rx-H_Datab_Rx) .LE. H_Rx/10) THEN
-					Info(9) = .TRUE.
-!					Height of Rx site differs from height of terrain data.
-				  ELSE
-					Info(10) = .TRUE.
-!					Rx site height differs more than 10%,
-!					calculated values may be (extremely) wrong!
-				END IF
-			END IF
-		  END IF
-	  END IF
-	END IF
-!
-!
-!	H_Rx = height of receiver site above sea level for all calculations.
+	H_Tx_Ant_top = FLOAT (H_Tx + H_AntTx)
+	H_Rx_Ant_top = FLOAT (H_Rx + H_AntRx)
 !
 !
 !	***************************************************************
@@ -342,7 +281,7 @@
 		IF ((C_mode .GE. 0) .AND. (Tx_serv_area .EQ. 0.0) .AND. &
 			(Rx_serv_area .EQ. 0.0) .AND. (C_mode .NE. 99)) THEN
 !			Normal point to point calculation
-			V_angle_Tx_Rx = ATAND ((H_Rx + H_AntRx - H_Tx + H_AntTx) / (1E3 * Distance))
+			V_angle_Tx_Rx = ATAND ((H_Rx_Ant_top - H_Tx_Ant_top) / (1E3 * Distance))
 		ELSE
 !			Calculation to co-ordination lines or mobiles
 			V_angle_Tx_Rx = 0D0
@@ -394,9 +333,8 @@
 !	*****************************************************************
 !
 	Point_Type = 'e'	! for elevation data
-	CALL PROFILE (New_LongTx, New_LatTx, New_LongRx, New_LatRx, PD, &
-			T_Prof, PN, HCM_Error, Point_Type, Topo_path, &
-			Morpho_path, T_L, M_L)
+	CALL PROFILE (New_LongTx, New_LatTx, New_LongRx, New_LatRx,  &
+			T_Prof, HCM_Error, Point_Type)
 	IF (HCM_Error .NE. 0) RETURN
 !
 !
@@ -405,12 +343,6 @@
 !	*Calculation the first Fresnel zone				
 !	*								
 !	*****************************************************************
-!
-!	Add Tx antenna height to height of Tx, add Rx antenna height
-!	to height of Rx:
-!
-	H_Tx_Ant_top = FLOAT (H_Tx + H_AntTx)
-	H_Rx_Ant_top = FLOAT (H_Rx + H_AntRx)
 !
 !	First Fresnel zone is only calculated, if Tx and Rx are no mobiles
 !	and if it is a point to point calculation:
@@ -482,7 +414,7 @@
 	Rx_TCA_corr	= 0.0
 !
 !	***********************************************************
-!	Calculate Terrain Clearance Angles and Correction factors
+!	Calculate Terrain Clearance Angles and TCA correction factors
 !	limitation of corr.factors is done in TCA_correction_calculation
 !	***********************************************************
 !
@@ -590,8 +522,8 @@
 		D_sea_calculated = 0.0
 !		Get the morphological profile:
 		Point_Type = 'm'
-		CALL PROFILE (New_LongTx, New_LatTx, New_LongRx, New_LatRx, PD, &
-			M_Prof, PN, HCM_Error, Point_Type, Topo_path, Morpho_path, T_L, M_L)
+		CALL PROFILE (New_LongTx, New_LatTx, New_LongRx, New_LatRx, &
+			M_Prof, HCM_Error, Point_Type)
 		IF (HCM_Error .EQ. 0) THEN
 			null = .FALSE.
 			DS1 = 0.0               
@@ -648,7 +580,7 @@
 !
 !	*****************************************************************
 !	*								
-!	*					calc Delta h correction factor	
+!	*	calc Delta h and Dh correction factor	
 !	*								
 !	*****************************************************************
 !

@@ -1,6 +1,6 @@
 !	
 !	HCMMS_V7.F90										P.Benner		23.02.2004
-!														G.H.			30.04.2005
+!														G.H.			03.05.2005
 !	Version 7.00					
 !
 !	Harmonized Calculation Method for mobile services
@@ -17,10 +17,6 @@
 !	and compiler depending!
 !				-----  please customize  -----
 !
-!
-!
-!	Subroutine HCM_MS_V7
-!
 	SUBROUTINE HCM_MS_V7
 !
 	IMPLICIT NONE
@@ -29,7 +25,7 @@
 !
 	DOUBLE PRECISION	CI, LongTx, LatTx, LongRx, LatRx
 	REAL				Perm_FS_in, H_Tx_Ant_top, H_Rx_Ant_top
-	INTEGER*4			I, IOS, IMR, T_L, M_L, B_L
+	INTEGER*4			I, IOS, IMR
 !
 !
 !	*************************************************************************
@@ -170,13 +166,6 @@
 		Border_path(B_L:B_L) = '\'
 	END IF
 !
-!	Test co-ordinates:
-!	IF ((Coo_Tx .EQ. Coo_Rx) .AND. (C_mode .GE. 0)) THEN
-!	  Distance between Tx and Rx = 0. P-P Calculations not possible.
-!	  HCM_error = 1000   
-!	  RETURN
-!	END IF
-!
 !	Read all input data:      
 !	Get the longitude of transmitter 'LongTX':
 	READ (Coo_Tx(1:3), '(F3.0)', IOSTAT = IOS) LongTx
@@ -288,36 +277,40 @@
 		  H_Tx = H_Datab_Tx
 		  Info(1) = .TRUE.
 !		  No height of Tx site is given, height is taken from the terrain database.
-		ELSE
+	    ELSE
 		  READ (H_Tx_input, '(I4)', IOSTAT=IOS) H_Tx
 		  IF (IOS .NE. 0) THEN
 			HCM_error = 1013
 !			Error in input value height of Tx site above sea level.
 			RETURN
 		  END IF
-		  IF (H_Tx .NE. H_Datab_Tx) THEN
-			IF (ABS(H_Tx-H_Datab_Tx) .EQ. 1) THEN
+		  IF ((H_Tx .NE. H_Datab_Tx) .AND. &
+			(ABS(H_Tx-H_Datab_Tx) .LE. H_Tx/10)) THEN
 				Info(2) = .TRUE.
-!				Height of Tx site differs from height of terrain database.
-			  ELSE
-				IF (ABS(H_Tx-H_Datab_Tx) .LE. H_Tx/10) THEN
-					Info(2) = .TRUE.
 !					Height of Tx site differs from height of terrain database.
-				  ELSE
-					Info(3) = .TRUE.
+			ELSE
+				Info(3) = .TRUE.
 !					Height of Tx site differs more than 10%,
 !					calculated values may be (extremely) wrong!
-				END IF
-			END IF
-		END IF
+		  END IF
 	  END IF
 	END IF
+!
+!	H_Rx = height of receiver site above sea level for all calculations.
+	H_Rx = 0		! default value
+	H_Datab_Rx = 0	! default value
 !
 !	Default receiver antenna height:
 	H_AntRx = 10
 !
 !	Read data for point to point calculations:
 	IF (C_mode .GE. 0) THEN
+!	  Test co-ordinates:
+	  IF (Coo_Tx .EQ. Coo_Rx) THEN
+!	    Distance between Tx and Rx = 0. P-P Calculations not possible.
+	    HCM_error = 1000   
+	    RETURN
+	  END IF
 !	  Get the longitude of receiver 'LongRx':
 	  READ (Coo_Rx(1:3), '(F3.0)', IOSTAT=IOS) LongRx
 	  IF (IOS .NE. 0) THEN
@@ -419,7 +412,40 @@
 	  END IF
 
 	END IF
-!
+!	Height of Rx
+!	If borderline calculations, no receiver height
+	IF ((Rx_serv_area .EQ. 0.0) .AND. (C_mode .NE. 99)) THEN
+	  CALL Point_height (LongRx, LatRx, H_Datab_Rx, HCM_Error, Topo_path, T_L)
+	  IF (HCM_Error .NE. 0) RETURN
+	  IF (H_Rx_input .EQ. '    ') THEN
+		  H_Rx = H_Datab_Rx
+		  Info(8) = .TRUE.
+!		  No height of Rx site is given, height is from the terrain database.
+		ELSE
+		  READ (H_Rx_input, '(I4)', IOSTAT=IOS) H_Rx
+		  IF (IOS .NE. 0) THEN
+			HCM_Error = 1030
+!			Error in input value Rx site height above sea level.
+			RETURN	
+		  END IF
+		  IF (H_Rx .NE. H_Datab_Rx) THEN
+			IF (ABS(H_Rx-H_Datab_Rx) .EQ. 1) THEN
+				Info(9) = .TRUE.
+!				Height of Rx site differs from height of terrain data.
+			  ELSE
+				IF (ABS(H_Rx-H_Datab_Rx) .LE. H_Rx/10) THEN
+					Info(9) = .TRUE.
+!					Height of Rx site differs from height of terrain data.
+				  ELSE
+					Info(10) = .TRUE.
+!					Rx site height differs more than 10%,
+!					calculated values may be (extremely) wrong!
+				END IF
+			END IF
+		  END IF
+	  END IF
+	END IF
+!	get power
 	READ (Max_power, '(F6.1)', IOSTAT=IOS) MaxPow
 	IF (IOS .NE. 0) THEN
 	  HCM_Error = 1034
@@ -727,12 +753,12 @@
 !
 	IF (C_mode .LT. 0) THEN
 !		(Border-) line calculation:   
-		CALL Line_calculation ( LongTx, LatTx, LongRx, LatRx, T_L, M_L, &
-								B_L, H_Tx_Ant_top, H_Rx_Ant_top )
+		CALL Line_calculation ( LongTx, LatTx, LongRx, LatRx, &
+								H_Tx_Ant_top, H_Rx_Ant_top )
 	  ELSE
 !		Point to point calculation:
-		CALL P_to_P_calculation ( LongTx, LatTx, LongRx, LatRx, T_L, M_L, &
-								  B_L, H_Tx_Ant_top, H_Rx_Ant_top )
+		CALL P_to_P_calculation ( LongTx, LatTx, LongRx, LatRx, &
+								  H_Tx_Ant_top, H_Rx_Ant_top )
 		CALL Permissble_FS_calculation ( H_Tx_Ant_top, H_Rx_Ant_top )
 	END IF
 !
