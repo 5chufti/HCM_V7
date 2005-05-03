@@ -12,8 +12,6 @@
 !	Desig_of_Tx_emmis	Designation of Tx emission
 !	Ant_typ_H_Rx		Type of antenna horizontal
 !	Ant_typ_V_Rx		Type of antenna vertical
-!	H_Tx_Ant_top		Height of Tx Antenna above sea level
-!	H_Rx_Ant_top		Height of Rx Antenna above sea level
 !	Distance			Distance between Tx and Rx points
 !	Dir_Rx_Tx			Direction Rx to Tx
 !	Azi_Rx_input		Azimuth of maximum radiation
@@ -69,7 +67,7 @@
 !
 !	**************************************************************
 !
-	SUBROUTINE Permissble_FS_calculation ( H_Tx_Ant_top, H_Rx_Ant_top )
+	SUBROUTINE Permissble_FS_calculation ( )
 !
 	IMPLICIT		NONE
 !
@@ -80,7 +78,7 @@
 !
 	LOGICAL			TX_TETRA, RX_TETRA, TX_DIG, RX_DIG, TXGSM
 !
-	REAL			H_Tx_Ant_top, H_Rx_Ant_top, DI1, DI2
+	REAL			DI1, DI2
 	REAL			B1, B2, CSXR, CSXT, DPN
 	REAL			CS1(7), CS2(7), CS3(7), CS4(7), CS5(7)
 	REAL			CS6(7), CS7(7), CS8(7), CS9(7), CS10(7)
@@ -700,7 +698,7 @@
 		((Ant_typ_V_Rx .EQ. '000ND00') .AND. (Ant_typ_H_Rx .EQ. '000ND00'))) THEN
 		Rx_ant_corr  = 0.0
 	ELSE
-		V_angle_Rx_Tx = ATAND ( (H_Tx_Ant_top - H_Rx_Ant_top) / (1000.0 * Distance) )
+		V_angle_Rx_Tx = ATAND ((H_Tx + H_AntTx - H_Rx + H_AntRx) / (1E3 * Distance))
 		READ (Ele_Rx_input, *, IOSTAT=IOS) Rx_Elevation
 		IF (IOS .NE. 0) THEN
 		  HCM_Error = 1042

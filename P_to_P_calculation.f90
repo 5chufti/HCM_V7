@@ -178,8 +178,7 @@
 !
 !	**********************************************************************
 !
-	SUBROUTINE P_to_P_calculation ( LongTx, LatTx, LongRx, LatRx, &
-									H_Tx_Ant_top, H_Rx_Ant_top )
+	SUBROUTINE P_to_P_calculation ( LongTx, LatTx, LongRx, LatRx)
 !
 	IMPLICIT		   NONE
 !
@@ -191,7 +190,6 @@
 	REAL				X, x_TCA, DS1, A1, A2, Ax
 	REAL				HDZ(10002), HDC(10002), HDF(10002)
 	REAL				A(11), Factor_of_path_over_sea
-	REAL				H_Tx_Ant_top, H_Rx_Ant_top
 	REAL				Land_FS_1kW, Sea_FS_1kW, DI1, DI2
 	DOUBLE PRECISION	LongTx, LatTx, LongRx, LatRx
 	DOUBLE PRECISION	New_LongTx, New_LatTx, New_LongRx, New_LatRx
@@ -258,13 +256,6 @@
 !	Calculate the direction from Tx to Rx:
 	CALL Calc_direction (New_LongTx, New_LatTx, New_LongRx, New_LatRx, Dir_Tx_Rx)
 !
-!	Add Tx antenna height to height of Tx, add Rx antenna height
-!	to height of Rx:
-!
-	H_Tx_Ant_top = FLOAT (H_Tx + H_AntTx)
-	H_Rx_Ant_top = FLOAT (H_Rx + H_AntRx)
-!
-!
 !	***************************************************************
 !	*							      
 !	*             Free space field strength calculation           
@@ -281,7 +272,7 @@
 		IF ((C_mode .GE. 0) .AND. (Tx_serv_area .EQ. 0.0) .AND. &
 			(Rx_serv_area .EQ. 0.0) .AND. (C_mode .NE. 99)) THEN
 !			Normal point to point calculation
-			V_angle_Tx_Rx = ATAND ((H_Rx_Ant_top - H_Tx_Ant_top) / (1E3 * Distance))
+			V_angle_Tx_Rx = ATAND ((H_Rx + H_AntRx - H_Tx + H_AntTx) / (1E3 * Distance))
 		ELSE
 !			Calculation to co-ordination lines or mobiles
 			V_angle_Tx_Rx = 0D0
@@ -375,8 +366,7 @@
 !	  Calculate all differences 'HDD':
 !
 	  DO I = 1, J
-		HDC(I) = H_Tx_Ant_top - (H_Tx_Ant_top - H_Rx_Ant_top) * PD * I &
-					/ Distance - HDZ(I)
+		HDC(I) = H_AntRx * PD * I / Distance - HDZ(I)
 		X = PD*I*(Distance-PD*I)
 		IF (X .LE. 0.0) THEN
 			HDF(I) = 0.0
@@ -428,7 +418,7 @@
 			J = PN - 2
 		END IF
 		DO I = 1, J
-			x_TCA = (FLOAT(T_Prof(1+I))-H_Tx_Ant_top)/(SNGL(PD)*I*1E3)
+			x_TCA = (FLOAT(T_Prof(1+I))-H_AntTx)/(SNGL(PD)*I*1E3)
 			x_TCA = ATAND (x_TCA)	! in degrees
 			IF (x_TCA .GT. Tx_TCA) Tx_TCA = x_TCA
 		END DO
@@ -447,7 +437,7 @@
 			J = PN - 2
 		END IF
 		DO I = 1, J
-			x_TCA = (FLOAT(T_Prof(PN-I))-H_Rx_Ant_top)/(SNGL(PD)*I*1E3)
+			x_TCA = (FLOAT(T_Prof(PN-I))-H_AntRx)/(SNGL(PD)*I*1E3)
 			x_TCA = ATAND (x_TCA)	! in degrees
 			IF (x_TCA .GT. Rx_TCA) Rx_TCA = x_TCA
 		END DO
@@ -481,7 +471,7 @@
 		  DO I = D1, D2
 		    HSUM = HSUM + T_Prof(1+I)
 		  END DO
-		  Heff_Tx = H_Tx_Ant_top - FLOAT(HSUM/(D2-D1+1))
+		  Heff_Tx = H_AntTx - FLOAT(HSUM/(D2-D1+1))
 	END IF
 	IF (Heff_Tx .LT. 3.0) Heff_Tx = 3.0
 !
@@ -496,7 +486,7 @@
 		  DO I = D1, D2
 		    HSUM = HSUM + T_Prof(PN-I)
 		  END DO
-		  Heff_Rx = H_Rx_Ant_top - FLOAT(HSUM/(D2-D1+1))
+		  Heff_Rx = H_AntRx - FLOAT(HSUM/(D2-D1+1))
 	  END IF
 	ELSE
 !	for line calculations

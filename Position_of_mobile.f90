@@ -148,7 +148,7 @@
 		  CALL Calc_direction (LongRx, LatRx, New_LongTx, New_LatTx, YDi) 
 		  Dir_Rx_Tx = YDI
 		  CALL Calc_Rx_pos ( New_LongTx, New_LatTx, LongRx, LatRx, &
-							 New_LongRx, New_LatRx, B_L )
+							 New_LongRx, New_LatRx)
 	    ELSE
 !		  Rx service area is bigger, calculate new Rx co-ordinates:
 		  CALL Calc_Rx_pos ( LongTx, LatTx, LongRx, LatRx, New_LongRx, &
@@ -214,10 +214,12 @@
 !
 !	*****************************************************************************************
 !
-	SUBROUTINE TestCut (Path Dir, Long, Lat, ServiceArea, N_Cut, &
+	SUBROUTINE TestCut (Path, Dir, Long, Lat, ServiceArea, N_Cut, &
      					Error, Country)
 !
 	IMPLICIT			NONE
+!	Include the interface definitions:
+	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
 	CHARACTER*3			Country
 	CHARACTER*7			BORFIL
@@ -315,6 +317,8 @@
 				N_Lat, LongX, LatX, ServiceArea, PATH, Country)
 !
 	IMPLICIT			NONE
+!	Include the interface definitions:
+	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
 	CHARACTER*3			Country
 	CHARACTER*7			BORFIL
@@ -380,6 +384,8 @@
 	SUBROUTINE New_coordinates (LONG, LAT, DIR, D, N_LONG, N_LAT)
 !
 	IMPLICIT			NONE
+!	Include the interface definitions:
+	INCLUDE				'HCM_MS_V7_definitions.F90'
 !	
 	REAL				D
 !
@@ -483,7 +489,6 @@
 	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
 	INTEGER				N_Cut
-	INTEGER*4			B_L
 !
 	REAL				DP1
 !
@@ -496,7 +501,7 @@
 !	First: Determine, if in direction of Tx, the Rx circle is cut:
 	DP1 = Distance
 	IF (DP1 .GT. Rx_serv_area) DP1 = Rx_serv_area
-	CALL TestCut (Dir_Rx_Tx, LongRx, LatRx, DP1, N_Cut, &
+	CALL TestCut (Border_path, Dir_Rx_Tx, LongRx, LatRx, DP1, N_Cut, &
     				HCM_error, Land_to)
 !	If the number of (border-) line cuts (N_Cut) is odd, than the line is cutted
 !	(point is ouitside the closed line); if the number of cuts is even,

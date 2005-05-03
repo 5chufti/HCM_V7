@@ -24,7 +24,7 @@
 	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
 	DOUBLE PRECISION	CI, LongTx, LatTx, LongRx, LatRx
-	REAL				Perm_FS_in, H_Tx_Ant_top, H_Rx_Ant_top
+	REAL				Perm_FS_in
 	INTEGER*4			I, IOS, IMR
 !
 !
@@ -110,7 +110,7 @@
 !
 !	***************************************************************************
 !
-	Version = '7.0rk'
+	Version = '7.ß01'
 !
 	HCM_error = 0
 !
@@ -269,7 +269,7 @@
 	H_Tx = 0	! default value
 	IF (Tx_serv_area .EQ. 0.0) THEN
 !	  Height of Tx site above sea level:
-	  CALL Point_height (LongTx, LatTx, H_Datab_Tx, HCM_error, Topo_path, T_L)
+	  CALL Point_height (LongTx, LatTx, H_Datab_Tx, HCM_error)
 
 	  IF (HCM_error .NE. 0) RETURN
 !
@@ -415,7 +415,7 @@
 !	Height of Rx
 !	If borderline calculations, no receiver height
 	IF ((Rx_serv_area .EQ. 0.0) .AND. (C_mode .NE. 99)) THEN
-	  CALL Point_height (LongRx, LatRx, H_Datab_Rx, HCM_Error, Topo_path, T_L)
+	  CALL Point_height (LongRx, LatRx, H_Datab_Rx, HCM_Error)
 	  IF (HCM_Error .NE. 0) RETURN
 	  IF (H_Rx_input .EQ. '    ') THEN
 		  H_Rx = H_Datab_Rx
@@ -753,13 +753,11 @@
 !
 	IF (C_mode .LT. 0) THEN
 !		(Border-) line calculation:   
-		CALL Line_calculation ( LongTx, LatTx, LongRx, LatRx, &
-								H_Tx_Ant_top, H_Rx_Ant_top )
+		CALL Line_calculation ( LongTx, LatTx, LongRx, LatRx)
 	  ELSE
 !		Point to point calculation:
-		CALL P_to_P_calculation ( LongTx, LatTx, LongRx, LatRx, &
-								  H_Tx_Ant_top, H_Rx_Ant_top )
-		CALL Permissble_FS_calculation ( H_Tx_Ant_top, H_Rx_Ant_top )
+		CALL P_to_P_calculation ( LongTx, LatTx, LongRx, LatRx)
+		CALL Permissble_FS_calculation ()
 	END IF
 !
 	IF (HCM_error .NE. 0) RETURN

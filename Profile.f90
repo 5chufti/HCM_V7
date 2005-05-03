@@ -1,6 +1,6 @@
 !
 !	Pofile.f90											P. Benner		20.11.2003
-!														G.H.			02.05.2005
+!														G.H.			03.05.2005
 !	This subroutine constructs a terrain- or morphological profile from point A to
 !	point B in steps of 100 m. The heights or morphological information are stored
 !	in 'Prof(i)'. The total number of points is in 'PN'. The first profile point
@@ -91,7 +91,8 @@
 !	Calculate point #1 (TX):
 !
 	IF (P_Type .EQ. 'e') THEN
-		Prof(1) = H_Tx
+!			CALL Point_height (LongA, LatA, Prof(1), Error)
+		Prof(1) = 0
 	  ELSE
 		CALL Point_type (LongA, LatA, Prof(1), Error)
 	END IF
@@ -181,7 +182,8 @@
 !
 !	calculate last point #PC+1 (RX):
 	IF (P_Type .EQ. 'e') THEN
-		Prof(PN) = H_Rx
+!			CALL Point_height (LongB, LatB, Prof(PN), Error)
+		Prof(PN) = 0
 	ELSE
 		CALL Point_type (LongB, LatB, Prof(PN), Error)
 	END IF
