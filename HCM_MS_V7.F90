@@ -1,6 +1,6 @@
 !	
 !	HCMMS_V7.F90										P.Benner		23.02.2004
-!														G.H.			03.05.2005
+!														G.H.			04.05.2005
 !	Version 7.00					
 !
 !	Harmonized Calculation Method for mobile services
@@ -731,7 +731,7 @@
 		  RETURN
 		END IF      
 !		Input value of maximum cross border range is used
-		CBR_D = FLOAT(IMR)
+		CBR_D = REAL(IMR)
 		Info(6) = .TRUE.
 	  ELSE
 !		No Agreement frequency and CBR is missing

@@ -1,6 +1,6 @@
 !
 !	Point_type.f90										P. Benner		09.10.2003
-!														G.H.			03.05.2005
+!														G.H.			04.05.2005
 !
 !
 !	Subroutine to read the morphological type of a given point from the morpho-database.
@@ -293,7 +293,7 @@
 	LOR = RELLO * 3.6D3
 	LAR = RELLA * 3.6D3
 !      
-	IF (LOR .LT. FLOAT(RESH)/2.0) THEN
+	IF (LOR .LT. REAL(RESH)/2.0) THEN
 		! take point 1 or 3
 		IF (LAR .LT. 1.5) THEN
 			! take point 1

@@ -1,6 +1,6 @@
 !
 !	Position_of_mobile.f90								P. Benner		24.08.2004
-!														G.H.			03.05.2005
+!														G.H.			04.05.2005
 !
 !	Subroutine to calculate the new position of Tx (New_LongTx, New_LatTx)
 !	and/or Rx (New_LongRx, New_latRx) if at least one is a mobile and
@@ -455,7 +455,7 @@
 !	If the number of (border-) line cuts (N_Cut) is odd, than the line is cutted
 !	(point is ouitside the closed line); if the number of cuts is even,
 !	than the point is inside the closed line:	
-	IF (FLOAT(N_Cut/2) .EQ. FLOAT(N_Cut)/2.0) THEN
+	IF (REAL(N_Cut/2) .EQ. REAL(N_Cut)/2.0) THEN
 		CutTx = .FALSE.
 	  ELSE
 		CutTx = .TRUE.

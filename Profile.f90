@@ -1,6 +1,6 @@
 !
 !	Pofile.f90											P. Benner		20.11.2003
-!														G.H.			03.05.2005
+!														G.H.			04.05.2005
 !	This subroutine constructs a terrain- or morphological profile from point A to
 !	point B in steps of 100 m. The heights or morphological information are stored
 !	in 'Prof(i)'. The total number of points is in 'PN'. The first profile point
@@ -43,8 +43,7 @@
 !
 	INTEGER(2)			Prof(10002)
 	INTEGER(4)			Error
-	INTEGER(2)			I, PC
-	REAL				S
+	INTEGER(2)			PC
 	DOUBLE PRECISION	LongA, LatA, LongB, LatB
 	DOUBLE PRECISION	SIDA, SILAB, COLAB, SILAA, COLAA, COLOA, SILOA, COLOB, SILOB
 	DOUBLE PRECISION	LAY, LOY, DD, DA, DIS, DC, DP, A, B, K, R, x, y, z
@@ -58,9 +57,6 @@
 !	Max. distance = 1000km; distance between two points = 100m
 !	-> number of points are 10.000 + 2 for Tx site and Rx site
 !	
-!	calculate avg. earthradius at given mean latitude  360/2*Pi = 57,295779513082321
-	R = (6.378137D3 - 2.1385D1 * DSIND((LatA + LatB) / 2D0)) / 5.7295779513082321D1
-!
 !	Calculate the total distance 'DIS' in km:
 	CALL Calc_distance (LongA, LatA, LongB, LatB, DIS) 
 !
@@ -70,21 +66,23 @@
 	  RETURN
 	END IF
 !
+!	calculate avg. earthradius at given mean latitude  360/2*Pi = 57,295779513082321
+	R = (6.378137D3 - 2.1385D1 * DSIND((LatA + LatB) / 2D0)) / 5.7295779513082321D1
+!
 !	'DA' distance in degrees,
 	DA = DIS / R
 	SIDA  = DSIND(DA)
 !
-!	Distance 'DP' between two points in degrees:
-	DP   = PD / R
+!	adjust PD to Distance
+	PN = DNINT(DIS / PD)
+	PD = DIS / DBLE(PN)
 !
-!	how many points in profile?
-	S = MOD(SNGL(DIS),SNGL(2.0 * PD))
-	IF ((S .GT. 0.0) .OR. (S .LT. PD)) THEN 
-		PN = DINT(DIS / PD) + 2
-	ELSE
-		PN = DINT(DIS / PD) + 1
-	ENDIF		
-
+!	Distance 'DP' between two points in degrees:
+	DP   = DA / DBLE(PN)
+!
+!	number of points in profile
+	PN = PN + 1
+!
 !	Direction 'DC' to ending point in degrees:
 	CALL Calc_Direction (LongA,LatA,LongB,LatB,DC)
 !
@@ -98,7 +96,7 @@
 	END IF
 	IF (Error .NE. 0) RETURN
 !
-!	first part of profile (TX to middle)
+!	first part of profile (TX to center)
 		SILAA = DSIND(LatA)
 		COLAA = DCOSD(LatA)
 		SILAB = DSIND(LatB)
@@ -110,11 +108,10 @@
 		K = DBLE(H_Rx - H_Tx) / DIS
 !
 !	Loop for waypoints
-	I = 1
 !	Loop starts with #2, because point #1 is S.
-	DO PC = 2, INT(PN/2), 1
+	DO PC = 2, NINT(REAL(PN)/2.0), 1
 !	Distance 'DD' between starting point and new point in degrees:
-		DD = I * DP
+		DD = DBLE(PC-1) * DP
 !	vector to new point
 		A = DSIND(DA - DD) / SIDA
 		B = DSIND(DD) / SIDA
@@ -130,16 +127,14 @@
 !
 		IF (P_Type .EQ. 'e') THEN 
 			CALL Point_height (LOY, LAY, Prof(PC), Error)
-			Prof(PC) = Prof(PC) - DNINT(DBLE(H_Tx) + K * DBLE(I) * PD)
+			Prof(PC) = Prof(PC) - DNINT(DBLE(H_Tx) + K * DBLE(PC-1) * PD)
 		ELSE
 			CALL Point_type (LOY, LAY, Prof(PC), Error)
 		END IF	
 		IF (Error .NE. 0) RETURN
-!
-	I = I + 1
 	END DO
 !
-!	second part of profile RX to middle
+!	second part of profile RX to center
 		SILAA = DSIND(LatB)
 		COLAA = DCOSD(LatB)
 		SILAB = DSIND(LatA)
@@ -151,11 +146,10 @@
 		K = DBLE(H_Tx - H_Rx) / DIS
 !
 !	Loop for waypoints
-	I = 1
 !	Loop starts with #PN-1, because point #PN is RX.
-	DO PC = (PN - 1), INT(PC/2), -1
+	DO PC = (PN - 1), NINT(REAL(PN)/2.0), -1
 !	Distance 'DD' between starting point and new point in degrees:
-		DD = I * DP
+		DD = DBLE(PC-1) * DP
 !	vector to new point
 		A = DSIND(DA - DD) / SIDA
 		B = DSIND(DD) / SIDA
@@ -171,13 +165,11 @@
 !
 		IF (P_Type .EQ. 'e') THEN 
 			CALL Point_height (LOY, LAY, Prof(PC), Error) 
-			Prof(PC) = Prof(PC) - DNINT(DBLE(H_Rx) + K * DBLE(I) * PD)
+			Prof(PC) = Prof(PC) - DNINT(DBLE(H_Rx) + K * DBLE(PC-1) * PD)
 		ELSE
 			CALL Point_type (LOY, LAY, Prof(PC), Error)
 		END IF	
 		IF (Error .NE. 0) RETURN
-!
-	I = I + 1
 	END DO
 !
 !	calculate last point #PC+1 (RX):

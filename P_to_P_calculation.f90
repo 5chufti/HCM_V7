@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			03.05.2005
+!														G.H.			04.05.2005
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -346,7 +346,7 @@
 !	  Calculation of ho(z); add all ho to hz (='HDZ'):
 !
 	  DO I = 1, J
-		HDZ(I) = FLOAT (T_Prof(I+1)) + PD*I * (Distance - PD*I) / 17.0
+		HDZ(I) = REAL (T_Prof(I+1)) + PD*I*(Distance - PD*I) / 17.0
 	  END DO
 !
 !
@@ -418,7 +418,7 @@
 			J = PN - 2
 		END IF
 		DO I = 1, J
-			x_TCA = (FLOAT(T_Prof(1+I))-H_AntTx)/(SNGL(PD)*I*1E3)
+			x_TCA = (REAL(T_Prof(1+I))-H_AntTx)/(SNGL(PD)*REAL(I)*1E3)
 			x_TCA = ATAND (x_TCA)	! in degrees
 			IF (x_TCA .GT. Tx_TCA) Tx_TCA = x_TCA
 		END DO
@@ -437,7 +437,7 @@
 			J = PN - 2
 		END IF
 		DO I = 1, J
-			x_TCA = (FLOAT(T_Prof(PN-I))-H_AntRx)/(SNGL(PD)*I*1E3)
+			x_TCA = (REAL(T_Prof(PN-I))-H_AntRx)/(SNGL(PD)*REAL(I)*1E3)
 			x_TCA = ATAND (x_TCA)	! in degrees
 			IF (x_TCA .GT. Rx_TCA) Rx_TCA = x_TCA
 		END DO
@@ -455,7 +455,7 @@
 	Heff_Tx = 0.0
 	Heff_Rx = 0.0
 	IF (Distance .LT. 1.5D1) THEN
-	    D1 = NINT(float(PN) / 15.0)
+	    D1 = NINT(REAL(PN) / 15.0)
 		D2 = PN - 1
 	ELSE
 		D1 = DNINT(1D0 / PD)  
@@ -465,13 +465,13 @@
 !	Transmitter:
 	IF (Tx_serv_area .GT. 0.0) THEN
 !		Height of a mobile 'hmTx'
-		Heff_Tx = FLOAT(H_AntTx)
+		Heff_Tx = REAL(H_AntTx)
 	ELSE
 		  HSUM = 0
 		  DO I = D1, D2
 		    HSUM = HSUM + T_Prof(1+I)
 		  END DO
-		  Heff_Tx = H_AntTx - FLOAT(HSUM/(D2-D1+1))
+		  Heff_Tx = H_AntTx - REAL(HSUM)/REAL(D2-D1+1)
 	END IF
 	IF (Heff_Tx .LT. 3.0) Heff_Tx = 3.0
 !
@@ -480,17 +480,17 @@
 !	  for point to point calculations
 	  IF (Rx_serv_area .GT. 0) THEN
 !		Height of a mobile 'hmRx'
-		Heff_Rx = FLOAT(H_AntRx)
+		Heff_Rx = REAL(H_AntRx)
 	  ELSE
 		  HSUM = 0
 		  DO I = D1, D2
 		    HSUM = HSUM + T_Prof(PN-I)
 		  END DO
-		  Heff_Rx = H_AntRx - FLOAT(HSUM/(D2-D1+1))
+		  Heff_Rx = REAL(H_AntRx) - REAL(HSUM)/REAL(D2-D1+1)
 	  END IF
 	ELSE
 !	for line calculations
-	  Heff_Rx = 10
+	  Heff_Rx = 10.0
 	END IF
 	IF (Heff_Rx .LT. 3.0) Heff_Rx = 3.0
 !
@@ -530,7 +530,7 @@
 					END IF
 				  ELSE                
 					IF (null) THEN
-					  DS1 = FLOAT(J1) * PD
+					  DS1 = REAL(J1) * PD
 					  D_sea_calculated = D_sea_calculated + DS1
 					  DS1 = 0.0
 					  J1 = 0 
@@ -539,7 +539,7 @@
 				END IF
 			  END DO                 
 			  IF (null) THEN
-				DS1 = FLOAT(J1) * PD 
+				DS1 = REAL(J1) * PD 
 				D_sea_calculated = D_sea_calculated + DS1
 				null = .FALSE.
 			  END IF
