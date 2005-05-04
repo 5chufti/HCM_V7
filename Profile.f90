@@ -46,7 +46,7 @@
 	INTEGER(2)			PC
 	DOUBLE PRECISION	LongA, LatA, LongB, LatB
 	DOUBLE PRECISION	SIDA, SILAB, COLAB, SILAA, COLAA, COLOA, SILOA, COLOB, SILOB
-	DOUBLE PRECISION	LAY, LOY, DD, DA, DIS, DC, DP, A, B, K, R, x, y, z
+	DOUBLE PRECISION	LAY, LOY, DD, DA, DIS, DP, A, B, K, R, x, y, z
 	CHARACTER*1			P_Type
 !
 !	**********************************************************************************
@@ -82,9 +82,6 @@
 !
 !	number of points in profile
 	PN = PN + 1
-!
-!	Direction 'DC' to ending point in degrees:
-	CALL Calc_Direction (LongA,LatA,LongB,LatB,DC)
 !
 !	Calculate point #1 (TX):
 !
@@ -147,7 +144,7 @@
 !
 !	Loop for waypoints
 !	Loop starts with #PN-1, because point #PN is RX.
-	DO PC = (PN - 1), NINT(REAL(PN)/2.0), -1
+	DO PC = (PN - 1), PC, -1
 !	Distance 'DD' between starting point and new point in degrees:
 		DD = DBLE(PC-1) * DP
 !	vector to new point

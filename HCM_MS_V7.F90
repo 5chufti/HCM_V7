@@ -410,14 +410,12 @@
 	  ELSE
 		Rx_serv_area = 0.0
 	  END IF
-
-	END IF
 !	Height of Rx
-!	If borderline calculations, no receiver height
-	IF ((Rx_serv_area .EQ. 0.0) .AND. (C_mode .NE. 99)) THEN
-	  CALL Point_height (LongRx, LatRx, H_Datab_Rx, HCM_Error)
-	  IF (HCM_Error .NE. 0) RETURN
-	  IF (H_Rx_input .EQ. '    ') THEN
+!	If borderline calculations, receiver terrain 0m
+	  IF ((Rx_serv_area .EQ. 0.0) .AND. (C_mode .NE. 99)) THEN
+	    CALL Point_height (LongRx, LatRx, H_Datab_Rx, HCM_Error)
+	    IF (HCM_Error .NE. 0) RETURN
+	    IF (H_Rx_input .EQ. '    ') THEN
 		  H_Rx = H_Datab_Rx
 		  Info(8) = .TRUE.
 !		  No height of Rx site is given, height is from the terrain database.
@@ -432,18 +430,20 @@
 			IF (ABS(H_Rx-H_Datab_Rx) .EQ. 1) THEN
 				Info(9) = .TRUE.
 !				Height of Rx site differs from height of terrain data.
-			  ELSE
+			ELSE
 				IF (ABS(H_Rx-H_Datab_Rx) .LE. H_Rx/10) THEN
 					Info(9) = .TRUE.
 !					Height of Rx site differs from height of terrain data.
-				  ELSE
+				ELSE
 					Info(10) = .TRUE.
 !					Rx site height differs more than 10%,
 !					calculated values may be (extremely) wrong!
 				END IF
 			END IF
 		  END IF
+	    END IF
 	  END IF
+!
 	END IF
 !	get power
 	READ (Max_power, '(F6.1)', IOSTAT=IOS) MaxPow

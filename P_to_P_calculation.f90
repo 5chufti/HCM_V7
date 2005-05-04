@@ -422,9 +422,9 @@
 			x_TCA = ATAND (x_TCA)	! in degrees
 			IF (x_TCA .GT. Tx_TCA) Tx_TCA = x_TCA
 		END DO
-	END IF
 !	Calculate correction factor:
 	CALL TCA_correction_calculation (Tx_TCA, Tx_frequency, Tx_TCA_corr)
+	END IF
 !
 !	calculate receiver clearance angle 'Rx_TCA' according to proceeding table
 !
@@ -441,10 +441,9 @@
 			x_TCA = ATAND (x_TCA)	! in degrees
 			IF (x_TCA .GT. Rx_TCA) Rx_TCA = x_TCA
 		END DO
-!
-	ENDIF
 !	Calculate correction factor:
 	CALL TCA_correction_calculation (Rx_TCA, Rx_frequency, Rx_TCA_corr)
+	ENDIF
 !
 !	************************************************
 !	Effective antenna heights:
