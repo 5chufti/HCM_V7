@@ -75,7 +75,7 @@
 !
 !	adjust PD to Distance
 	PN = DNINT(DIS / PD)
-	PD = DIS / DBLE(PN)
+!	PD = DIS / DBLE(PN)
 !
 !	Distance 'DP' between two points in degrees:
 	DP   = DA / DBLE(PN)

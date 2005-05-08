@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			04.05.2005
+!														G.H.			05.05.2005
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -191,7 +191,7 @@
 	REAL				HDZ(10002), HDC(10002), HDF(10002)
 	REAL				A(11), Factor_of_path_over_sea
 	REAL				Land_FS_1kW, Sea_FS_1kW, DI1, DI2
-	DOUBLE PRECISION	LongTx, LatTx, LongRx, LatRx
+	DOUBLE PRECISION	LongTx, LatTx, LongRx, LatRx ,CI
 	DOUBLE PRECISION	New_LongTx, New_LatTx, New_LongRx, New_LatRx
 	LOGICAL				Free, null
 	CHARACTER*1			Point_Type
@@ -212,26 +212,111 @@
 	Info(13) = .FALSE.
 	Info(16) = .FALSE.
 !
+	Calculated_FS = -999.9
 !	Calculate new positions, if Tx or Rx or both are mobiles and not CBR or '99':
 !	for CBR new positions are calculated in CBR_Coordinates !
 	IF ((C_mode .NE. 99) .AND. ((C_mode .GE. 0) .OR. (D_to_border .GE. 0)) &
 			.AND. ((Tx_serv_area .GT. 0.0) .OR. (Rx_serv_area .GT. 0.0))) THEN
-!		  Calculate new co-ordinates:
-		  CALL Position_of_mobile ( LongTx, LatTx, LongRx, LatRx, &
+!		Calculate new co-ordinates:
+		CALL Position_of_mobile ( LongTx, LatTx, LongRx, LatRx, &
 					New_LongTx, New_LatTx, New_LongRx, New_LatRx )
-		  IF (HCM_Error .NE. 0) RETURN
+		IF (HCM_Error .NE. 0) RETURN
 	ELSE
-		Coo_Tx_new = Coo_Tx
-		Coo_Rx_new = Coo_Rx
 		New_LongTx = LongTx
 		New_LatTx  = LatTx
 		New_LongRx = LongRx
 		New_LatRx  = LatRx
 	END IF
-
 !
 	CALL CooConv (New_LongTx, New_LatTx, Coo_Tx_new)
 	CALL CooConv (New_LongRx, New_LatRx, Coo_Rx_new)
+!
+!	GOTO 10
+!-------------------------------------------------------------------
+!	Get the longitude of transmitter 'LongTX':
+	READ (Coo_Tx_new(1:3), '(F3.0)', IOSTAT = IOS) New_LongTx
+	READ (Coo_Tx_new(5:6), '(F2.0)', IOSTAT = IOS) CI
+	New_LongTx = New_LongTx + CI / 6.0D1
+	READ (Coo_Tx_new(7:8), '(F2.0)', IOSTAT = IOS) CI
+	New_LongTx = New_LongTx + CI / 3.6D3
+	IF ((Coo_Tx_new(4:4) .EQ. 'W') .OR. (Coo_Tx_new(4:4) .EQ. 'w')) New_LongTx = 3.6D2 - New_LongTx
+!
+!	Get the latitude of transmitter 'LatTx':
+	READ (Coo_Tx_new(9:10),  '(F2.0)', IOSTAT = IOS) New_LatTx
+	READ (Coo_Tx_new(12:13), '(F2.0)', IOSTAT = IOS) CI
+	New_LatTx = New_LatTx + CI / 6.0D1
+	READ (Coo_Tx_new(14:15), '(F2.0)', IOSTAT = IOS) CI
+	New_LatTx = New_LatTx + CI / 3.6D3
+!
+!   Get the longitude of receiver 'LongRx':
+	READ (Coo_Rx_new(1:3), '(F3.0)', IOSTAT=IOS) New_LongRx
+	READ (Coo_Rx_new(5:6), '(F2.0)', IOSTAT=IOS) CI
+	New_LongRx = New_LongRx + CI / 6.0D1
+	READ (Coo_Rx_new(7:8), '(F2.0)', IOSTAT=IOS) CI
+	New_LongRx = New_LongRx + CI / 3.6D3
+	IF ((Coo_Rx_new(4:4) .EQ. 'W') .OR. (Coo_Rx_New(4:4) .EQ. 'w')) New_LongRx = 3.6D2 - New_LongRx
+!
+!	Get the latitude of receiver 'LATB':
+	READ (Coo_Rx_new(9:10),  '(F2.0)', IOSTAT=IOS) New_LatRx
+	READ (Coo_Rx_new(12:13), '(F2.0)', IOSTAT=IOS) CI
+	New_LatRx = New_LatRx + CI / 6.0D1
+	READ (Coo_Rx_new(14:15), '(F2.0)', IOSTAT=IOS) CI
+	New_LatRx = New_LatRx + CI / 3.6D3
+!
+!------------------------------------------------------------------------
+!	Checking of Tx site height:
+!		Height of Tx site above sea level:
+10	CALL Point_height (New_LongTx, New_LatTx, H_Datab_Tx, HCM_error)
+
+	IF (HCM_error .NE. 0) RETURN
+!
+	IF (H_Tx_input .EQ. '    ') THEN
+		H_Tx = H_Datab_Tx
+		Info(1) = .TRUE.
+!		No height of Tx site is given, height is taken from the terrain database.
+	ELSE
+		READ (H_Tx_input, '(I4)', IOSTAT=IOS) H_Tx
+		IF (IOS .NE. 0) THEN
+			HCM_error = 1013
+!			Error in input value height of Tx site above sea level.
+			RETURN
+		END IF
+		IF ((H_Tx .NE. H_Datab_Tx) .AND. &
+			(ABS(H_Tx-H_Datab_Tx) .LE. H_Tx/10)) THEN
+			Info(2) = .TRUE.
+!			Height of Tx site differs from height of terrain database.
+		ELSE
+			Info(3) = .TRUE.
+!			Height of Tx site differs more than 10%,
+!			calculated values may be (extremely) wrong!
+		END IF
+	END IF
+!	Checking Rx site height
+!		Height of Rx above sealevel
+	CALL Point_height (New_LongRx, New_LatRx, H_Datab_Rx, HCM_Error)
+	IF (HCM_Error .NE. 0) RETURN
+	IF (H_Rx_input .EQ. '    ') THEN
+		H_Rx = H_Datab_Rx
+		Info(8) = .TRUE.
+!		No height of Rx site is given, height is from the terrain database.
+	ELSE
+		READ (H_Rx_input, '(I4)', IOSTAT=IOS) H_Rx
+		IF (IOS .NE. 0) THEN
+			HCM_Error = 1030
+!			Error in input value Rx site height above sea level.
+			RETURN	
+		END IF
+		IF ((H_Rx .NE. H_Datab_Rx) .AND. &
+			(ABS(H_Rx-H_Datab_Rx) .LE. H_Rx/10)) THEN
+				Info(9) = .TRUE.
+!				Height of Rx site differs from height of terrain data.
+			ELSE
+				Info(10) = .TRUE.
+!				Rx site height differs more than 10%,
+!				calculated values may be (extremely) wrong!
+		END IF
+	END IF
+!
 !
 !	Calculate distance and directions again (with new co-ordinates):
 	CALL Calc_distance (New_LongTx, New_LatTx, New_LongRx, New_LatRx, Distance)

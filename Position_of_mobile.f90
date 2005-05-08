@@ -1,6 +1,6 @@
 !
 !	Position_of_mobile.f90								P. Benner		24.08.2004
-!														G.H.			04.05.2005
+!														G.H.			05.05.2005
 !
 !	Subroutine to calculate the new position of Tx (New_LongTx, New_LatTx)
 !	and/or Rx (New_LongRx, New_latRx) if at least one is a mobile and
@@ -384,13 +384,11 @@
 	SUBROUTINE New_coordinates (LONG, LAT, DIR, D, N_LONG, N_LAT)
 !
 	IMPLICIT			NONE
-!	Include the interface definitions:
-	INCLUDE				'HCM_MS_V7_definitions.F90'
 !	
 	REAL				D
 !
 	DOUBLE PRECISION	LONG, LAT, N_LONG, N_LAT
-	DOUBLE PRECISION	DP, T, T1, T2, DIR    
+	DOUBLE PRECISION	DP, T, T1, T2, DIR, R    
 !
 	IF (D .EQ. 0.0D0) THEN
 	  N_LONG = LONG
@@ -398,8 +396,11 @@
 	  RETURN
 	END IF
 !
+!	calculate avg. earthradius at given mean latitude  360/2*Pi = 57,295779513082321
+	R = (6.378137D3 - 2.1385D1 * DSIND((LAT + N_LAT) / 2D0)) / 5.7295779513082321D1
+!
 !	Distance 'DP' in degrees:
-	DP = DBLE(D) / 1.112D2
+	DP = DBLE(D) / R	!1.112D2
 !
 !	New co-ordinates:
 	T1 = DCOSD(LAT) * DSIND(DP)
@@ -444,8 +445,6 @@
 	DOUBLE PRECISION	LongTx, LatTx, LongRx, LatRx
 	DOUBLE PRECISION	New_LongTx, New_LatTx
 !
-	LOGICAL				CutTx
-!
 !
 !	First: Determine, if in direction of Rx, the Tx circle is cut:
 	DP1 = Distance
@@ -455,26 +454,19 @@
 !	If the number of (border-) line cuts (N_Cut) is odd, than the line is cutted
 !	(point is ouitside the closed line); if the number of cuts is even,
 !	than the point is inside the closed line:	
-	IF (REAL(N_Cut/2) .EQ. REAL(N_Cut)/2.0) THEN
-		CutTx = .FALSE.
-	  ELSE
-		CutTx = .TRUE.
-	END IF
-!
 !	Second: If not cutted, use circle point, if cutted, test all distances
 !	from Rx to line point and select the shortest distance:
-	IF (CutTx) THEN
-!		The border line is cut by the Tx service area:
-		CALL NearestLinePoint (LongRx, LatRx, New_LongTx, New_LatTx, &
-    				LongTx, LatTx, Tx_serv_area, Border_path, Land_from)
-	  ELSE
+!	IF (REAL(N_Cut/2) .EQ. REAL(N_Cut)/2.0) THEN
+	IF (MOD(N_Cut,2) .EQ. 0) THEN 
 !		The border line is not cut by the Tx service area:
 !		Calculate the new Tx co-ordinates:
 		CALL New_coordinates (LongTx, LatTx, Dir_Tx_Rx, DP1, &
 								New_LongTx, New_LatTx)
+	  ELSE
+!		The border line is cut by the Tx service area:
+		CALL NearestLinePoint (LongRx, LatRx, New_LongTx, New_LatTx, &
+    				LongTx, LatTx, Tx_serv_area, Border_path, Land_from)
 	END IF
-!
-	RETURN
 !
 	END SUBROUTINE Calc_Tx_pos
 !
@@ -495,8 +487,6 @@
 	DOUBLE PRECISION	LongTx, LatTx, LongRx, LatRx
 	DOUBLE PRECISION	New_LongRx, New_LatRx
 !
-	LOGICAL				CutRx
-!
 !
 !	First: Determine, if in direction of Tx, the Rx circle is cut:
 	DP1 = Distance
@@ -506,23 +496,18 @@
 !	If the number of (border-) line cuts (N_Cut) is odd, than the line is cutted
 !	(point is ouitside the closed line); if the number of cuts is even,
 !	than the point is inside the closed line:	
-	IF (FLOAT(N_Cut/2) .EQ. FLOAT(N_Cut)/2.0) THEN
-		CutRx = .FALSE.
-	  ELSE
-		CutRx = .TRUE.
-	END IF
-!
 !	Second: If not cutted, use circle point, if cutted, test all distances
 !	from Tx to line point and select the shortest distance:
-	IF (CutRx) THEN
-!		The border line is cut by the Rx service area:
-		CALL NearestLinePoint (LongTx, LatTx, New_LongRx, New_LatRx, &
-     					LongRx, LatRx, Rx_serv_area, Border_path, Land_to)
-	  ELSE
+!	IF (FLOAT(N_Cut/2) .EQ. FLOAT(N_Cut)/2.0) THEN
+	IF (MOD(N_Cut,2) .EQ. 0) THEN 
 !		The border line is not cut by the Rx service area:
 !		Calculate the new Rx co-ordinates:
 		CALL New_coordinates (LongRx, LatRx, Dir_Rx_Tx, DP1, &
 								New_LongRx, New_LatRx)
+	  ELSE
+!		The border line is cut by the Rx service area:
+		CALL NearestLinePoint (LongTx, LatTx, New_LongRx, New_LatRx, &
+     					LongRx, LatRx, Rx_serv_area, Border_path, Land_to)
 	END IF
 !
 	RETURN

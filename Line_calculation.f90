@@ -1,6 +1,6 @@
 !
 !	Line_calculation.f90								P.Benner		23.11.2004
-!														G.H.			03.05.2005
+!														G.H.			07.05.2005
 !
 !	23.11.2004	Steps from 100 / 10 / 1 modified to 25 / 5 / 1
 !
@@ -66,6 +66,8 @@
 !
 	Rx_serv_area = 0.0
 !
+!	Default receiver antenna height:
+	H_AntRx = 10
 !
 !	Select line data
 !
@@ -159,60 +161,57 @@
 !	  Selected line data not available
 	  RETURN
 	END IF                            
-!
-!!!
+	GOTO 80
+!-----------------------------------------------------------------------
 !	Testroutine to calculate to each point:
-!	GOTO 80
-!	Calculated_FS = -999.9	! default setting
-!	FS_x = -999.9
-!	DO J = 1, 40000000
-!	  READ (3, REC=J, IOSTAT=IOS) C_Record
-!!	  End of file reached (or non existing record) ?
-!	  IF ((IOS .LT. 0) .OR. (IOS .EQ. 36)) EXIT ! end of file reached
-!	  IF (IOS .NE. 0) THEN   
-!		HCM_Error = 1049
-!!		Error in line data
-!		CLOSE (UNIT = 3)
-!		RETURN
-!	  END IF
-!!
-!!	  Calculate to all 10 points inside this record
-!	  DO K = 1, 19, 2
-!		  LongRx = N_Record(K)   * RB
-!		  LatRx  = N_Record(K+1) * RB
-!		  Lo = LongTx
-!		  La = LatTx
-!		  IF (CBR) THEN
-!		    CALL CBR_Coordinates (LongRx, LatRx, Lo, La, &
-!							  CBR_D, Tx_serv_area, Take_it)
-!			IF (.NOT. Take_it) GOTO 70
-!		  END IF
-!		  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx)
-!		  IF (Info(7)) THEN
-!!		    Distance between Tx and Rx is less than both service area radius.
-!		    RETURN
-!		  END IF
-!		  IF (HCM_Error .EQ. 1028) GOTO 70	! Distance > 1000 km
-!		  IF (HCM_Error .NE. 0) RETURN
-!!		  Find maximun of field strength:
-!		  IF (Calculated_FS .GE. FS_x) THEN
-!			FS_x = Calculated_FS
-!			Rec_x = K
-!			Rec_N_x = J
-!		  END IF
-!70		  CONTINUE
-!	  END DO	! K
-!!
-!	END DO	! J
-!	GOTO 140
-!!	End of testroutine
-!!!
+	FS_x = -999.9
+	DO J = 1, 30000
+	  READ (3, REC=J, IOSTAT=IOS) C_Record
+!	  End of file reached (or non existing record) ?
+	  IF ((IOS .LT. 0) .OR. (IOS .EQ. 36)) EXIT ! end of file reached
+	  IF (IOS .NE. 0) THEN   
+		HCM_Error = 1049
+!		Error in line data
+		CLOSE (UNIT = 3)
+		RETURN
+	  END IF
+!
+!	  Calculate to all 10 points inside this record
+	  DO K = 1, 19, 2
+		  LongRx = N_Record(K)   * RB
+		  LatRx  = N_Record(K+1) * RB
+		  Lo = LongTx
+		  La = LatTx
+		  IF (CBR) THEN
+		    CALL CBR_Coordinates (LongRx, LatRx, Lo, La, &
+							  CBR_D, Tx_serv_area, Take_it)
+			IF (.NOT. Take_it) GOTO 70
+		  END IF
+		  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx)
+		  IF (Info(7)) THEN
+!		    Distance between Tx and Rx is less than both service area radius.
+		    RETURN
+		  END IF
+		  IF (HCM_Error .EQ. 1028) GOTO 70	! Distance > 1000 km
+		  IF (HCM_Error .NE. 0) RETURN
+!		  Find maximun of field strength:
+		  IF (Calculated_FS .GE. FS_x) THEN
+			FS_x = Calculated_FS
+			Rec_x = K
+			Rec_N_x = J
+		  END IF
+70		  CONTINUE
+	  END DO	! K
+!
+	END DO	! J
+	GOTO 140
+!	End of testroutine
+!-------------------------------------------------------------------------
 !	1st: calculate to every 25th centerpoint:
 !	Use 1st list:
 80	teststep = 25
-90	N_rec = 1	! record number in file
-	N_List = 0	! number of stored record numbers and field strength
-	Calculated_FS = -999.9	! default setting
+	N_rec = 13	! record number in file
+90	N_List = 0	! number of stored record numbers and field strength
 	IOS = 0
 !
 	DO WHILE (IOS .EQ. 0)
@@ -249,10 +248,12 @@
 	IF (N_List .EQ. 0) THEN
 	  IF (teststep .EQ. 25) THEN
 	    teststep = 5
+		N_rec = 3
 		GOTO 90
 	  END IF
 	  IF (teststep .EQ. 5) THEN
 	    teststep = 1
+		N_rec = 1
 	    GOTO 90
 	  END IF
 	END IF     
@@ -262,18 +263,10 @@
 !		of stored record-numbers:
 !		Use 2nd list:
 		N_List1 = 0	! number of stored records and field strength
-		Calculated_FS = -999.9	! default setting
 		IF (N_List .GT. 0) THEN
 		  DO I = 1, N_List
 			J = Rec_N_list(I)
-			IF (J .EQ. 1) THEN
-				N_Start = 1
-				N_Stop  = 11
-			  ELSE
-				N_Start = J - 10
-				N_Stop  = J + 10
-			END IF
-			DO J = N_Start, N_Stop, 5
+			DO J = (J-10),(J+10), 5
 			  IF (J .EQ. Rec_N_list(I)) THEN
 !				  This calculation is already done in the previous step!
 				  Calculated_FS = FS_list(I)
@@ -330,14 +323,7 @@
 		IF (N_List1 .GT. 0) THEN
 		  DO I = 1, N_List1
 			J = Rec_N_list1(I)
-			IF (J .EQ. 1) THEN
-				N_Start = 1
-				N_Stop  = 3
-			  ELSE
-				N_Start = J - 2
-				N_Stop  = J + 2
-			END IF
-			DO J = N_Start, N_Stop
+			DO J = (J-2),(J+2)
 			  IF (J .EQ. Rec_N_list1(I)) THEN
 !				  This calculation is already done in the previous step!
 				  Calculated_FS = FS_list1(I)
@@ -375,7 +361,6 @@
 	END IF
 !
 !	4th: calculate to all points inside the stored records:
-	Calculated_FS = -999.9	! default setting
 	FS_x = -999.9
 	IF (N_List .GT. 0) THEN
 	  DO I = 1, N_List
@@ -497,7 +482,7 @@
 	END SUBROUTINE Test_cut1
 !
 !	************************* CBR_Coordinates *******************
-!	*	used by	:																
+!	*	used by	:	Line_calculation															
 !	*	uses	:	Calc_Direction, Calc_Distance,
 !	*				New_coordinates, Test_cut1															
 !	*************************************************************

@@ -265,41 +265,6 @@
 	  RETURN
 	END IF
 !
-!	Checking of Tx site height not for mobiles:
-	H_Tx = 0	! default value
-	IF (Tx_serv_area .EQ. 0.0) THEN
-!	  Height of Tx site above sea level:
-	  CALL Point_height (LongTx, LatTx, H_Datab_Tx, HCM_error)
-
-	  IF (HCM_error .NE. 0) RETURN
-!
-	  IF (H_Tx_input .EQ. '    ') THEN
-		  H_Tx = H_Datab_Tx
-		  Info(1) = .TRUE.
-!		  No height of Tx site is given, height is taken from the terrain database.
-	    ELSE
-		  READ (H_Tx_input, '(I4)', IOSTAT=IOS) H_Tx
-		  IF (IOS .NE. 0) THEN
-			HCM_error = 1013
-!			Error in input value height of Tx site above sea level.
-			RETURN
-		  END IF
-		  IF ((H_Tx .NE. H_Datab_Tx) .AND. &
-			(ABS(H_Tx-H_Datab_Tx) .LE. H_Tx/10)) THEN
-				Info(2) = .TRUE.
-!					Height of Tx site differs from height of terrain database.
-			ELSE
-				Info(3) = .TRUE.
-!					Height of Tx site differs more than 10%,
-!					calculated values may be (extremely) wrong!
-		  END IF
-	  END IF
-	END IF
-!
-!	H_Rx = height of receiver site above sea level for all calculations.
-	H_Rx = 0		! default value
-	H_Datab_Rx = 0	! default value
-!
 !	Default receiver antenna height:
 	H_AntRx = 10
 !
@@ -410,41 +375,8 @@
 	  ELSE
 		Rx_serv_area = 0.0
 	  END IF
-!	Height of Rx
-!	If borderline calculations, receiver terrain 0m
-	  IF ((Rx_serv_area .EQ. 0.0) .AND. (C_mode .NE. 99)) THEN
-	    CALL Point_height (LongRx, LatRx, H_Datab_Rx, HCM_Error)
-	    IF (HCM_Error .NE. 0) RETURN
-	    IF (H_Rx_input .EQ. '    ') THEN
-		  H_Rx = H_Datab_Rx
-		  Info(8) = .TRUE.
-!		  No height of Rx site is given, height is from the terrain database.
-		ELSE
-		  READ (H_Rx_input, '(I4)', IOSTAT=IOS) H_Rx
-		  IF (IOS .NE. 0) THEN
-			HCM_Error = 1030
-!			Error in input value Rx site height above sea level.
-			RETURN	
-		  END IF
-		  IF (H_Rx .NE. H_Datab_Rx) THEN
-			IF (ABS(H_Rx-H_Datab_Rx) .EQ. 1) THEN
-				Info(9) = .TRUE.
-!				Height of Rx site differs from height of terrain data.
-			ELSE
-				IF (ABS(H_Rx-H_Datab_Rx) .LE. H_Rx/10) THEN
-					Info(9) = .TRUE.
-!					Height of Rx site differs from height of terrain data.
-				ELSE
-					Info(10) = .TRUE.
-!					Rx site height differs more than 10%,
-!					calculated values may be (extremely) wrong!
-				END IF
-			END IF
-		  END IF
-	    END IF
-	  END IF
-!
 	END IF
+!
 !	get power
 	READ (Max_power, '(F6.1)', IOSTAT=IOS) MaxPow
 	IF (IOS .NE. 0) THEN
