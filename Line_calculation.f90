@@ -45,7 +45,7 @@
 !
 	INTEGER				IOS, N_rec, N_List, Rec_N_list(3), N_cp
 	INTEGER				N_List1, Rec_N_list1(3), teststep
-	INTEGER				I, J, K, N_Start, N_Stop, Rec_N_x, Rec_x
+	INTEGER				I, J, K, Rec_N_x, Rec_x
 	DOUBLE PRECISION	N_Record(22), RB, PI, Lo, La
 	DOUBLE PRECISION	Co_cp(10000,2), LongTx, LatTx, LongRx, LatRx
 	REAL				FS_list(3), FS_list1(3), FS_x
