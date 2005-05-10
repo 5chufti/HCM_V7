@@ -1,6 +1,6 @@
 !
 !	Pofile.f90											P. Benner		20.11.2003
-!														G.H.			04.05.2005
+!														G.H.			10.05.2005
 !	This subroutine constructs a terrain- or morphological profile from point A to
 !	point B in steps of 100 m. The heights or morphological information are stored
 !	in 'Prof(i)'. The total number of points is in 'PN'. The first profile point
@@ -46,7 +46,7 @@
 	INTEGER(2)			PC
 	DOUBLE PRECISION	LongA, LatA, LongB, LatB
 	DOUBLE PRECISION	SIDA, SILAB, COLAB, SILAA, COLAA, COLOA, SILOA, COLOB, SILOB
-	DOUBLE PRECISION	LAY, LOY, DD, DA, DIS, DP, A, B, K, R, x, y, z
+	DOUBLE PRECISION	LAY, LOY, DD, DA, DIS, DP, A, B, K, x, y, z
 	CHARACTER*1			P_Type
 !
 !	**********************************************************************************
@@ -67,10 +67,10 @@
 	END IF
 !
 !	calculate avg. earthradius at given mean latitude  360/2*Pi = 57,295779513082321
-	R = (6.378137D3 - 2.1385D1 * DSIND((LatA + LatB) / 2D0)) / 5.7295779513082321D1
+!	R = (6.378137D3 - 2.1385D1 * DSIND((LatA + LatB) / 2D0)) / 5.7295779513082321D1
 !
 !	'DA' distance in degrees,
-	DA = DIS / R
+	DA = DIS / 1.112D2
 	SIDA  = DSIND(DA)
 !
 !	adjust PD to Distance

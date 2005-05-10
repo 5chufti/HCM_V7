@@ -1,6 +1,6 @@
 !
 !	Position_of_mobile.f90								P. Benner		24.08.2004
-!														G.H.			05.05.2005
+!														G.H.			10.05.2005
 !
 !	Subroutine to calculate the new position of Tx (New_LongTx, New_LatTx)
 !	and/or Rx (New_LongRx, New_latRx) if at least one is a mobile and
@@ -388,7 +388,7 @@
 	REAL				D
 !
 	DOUBLE PRECISION	LONG, LAT, N_LONG, N_LAT
-	DOUBLE PRECISION	DP, T, T1, T2, DIR, R    
+	DOUBLE PRECISION	DP, T, T1, T2, DIR   
 !
 	IF (D .EQ. 0.0D0) THEN
 	  N_LONG = LONG
@@ -396,11 +396,8 @@
 	  RETURN
 	END IF
 !
-!	calculate avg. earthradius at given mean latitude  360/2*Pi = 57,295779513082321
-	R = (6.378137D3 - 2.1385D1 * DSIND((LAT + N_LAT) / 2D0)) / 5.7295779513082321D1
-!
 !	Distance 'DP' in degrees:
-	DP = DBLE(D) / R	!1.112D2
+	DP = DBLE(D) / 1.112D2
 !
 !	New co-ordinates:
 	T1 = DCOSD(LAT) * DSIND(DP)
