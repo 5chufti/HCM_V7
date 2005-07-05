@@ -11,8 +11,8 @@
 	REAL				Heff_Tx, Heff_Rx, Land_FS, Sea_FS
 	REAL				Tx_ant_corr, Rx_ant_corr, Tx_ant_type_corr, Rx_ant_type_corr
 	REAL				Perm_FS_from_table, Corr_delta_f, Channel_sp_Rx, Channel_sp_Tx
-	REAL				Power_to_Rx, Free_space_FS, Tx_serv_area, Rx_serv_area
-	REAL				Tx_Azimuth, Tx_Elevation, Rx_Azimuth, Rx_Elevation, MaxPow
+	REAL				Power_to_Rx, Free_space_FS, Tx_serv_area, Rx_serv_area, MaxPow
+	DOUBLE PRECISION	Tx_Azimuth, Tx_Elevation, Rx_Azimuth, Rx_Elevation
 	DOUBLE PRECISION	Tx_frequency, Distance, PD
 	DOUBLE PRECISION	D_sea_calculated, Dir_Tx_Rx, Dir_Rx_Tx, Rx_frequency
 	DOUBLE PRECISION	V_angle_Tx_Rx, V_angle_Rx_Tx, H_diff_angle_Tx_Rx, V_diff_angle_Tx_Rx
@@ -37,7 +37,8 @@
 						Dir_Tx_Rx, Dir_Rx_Tx, D_sea_calculated, V_angle_Tx_Rx, &
 						V_angle_Rx_Tx, H_diff_angle_Tx_Rx, V_diff_angle_Tx_Rx, &
 						H_diff_angle_Rx_Tx, V_diff_angle_Rx_Tx, Delta_frequency, &
-						Rx_frequency, &
+						Rx_frequency, Tx_Azimuth, Tx_Elevation, Rx_Azimuth, &
+						Rx_Elevation, &
 !
 !						Second all 4 byte variables (REAL, INTEGER, LOGICAL)
 						D_to_border, HCM_error, Time_percentage,  &
@@ -48,8 +49,7 @@
 						Tx_ant_type_corr, Rx_ant_type_corr, Perm_FS_from_table, &
 						Corr_delta_f, Channel_sp_Rx, Channel_sp_Tx, Power_to_Rx, &
 						Free_space_FS, H_AntRx, H_Tx, H_Rx, Tx_serv_area, Heff, &
-						Rx_serv_area, Tx_Azimuth, Tx_Elevation, Rx_Azimuth, &
-						Rx_Elevation, MaxPow, &
+						Rx_serv_area,  MaxPow, &
 !
 !						Third all 2 byte variables (INTEGER*2)
 						T_Prof, M_Prof, PN, H_Datab_Tx, H_Datab_Rx, T_L, M_L, B_L

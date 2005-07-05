@@ -1,6 +1,6 @@
 !	
 !	HCMMS_V7.F90										P.Benner		23.02.2004
-!														G.H.			04.05.2005
+!														G.H.			04.07.2005
 !	Version 7.00					
 !
 !	Harmonized Calculation Method for mobile services
@@ -110,7 +110,7 @@
 !
 !	***************************************************************************
 !
-	Version = '7.ß01'
+	Version = '7.ß02'
 !
 	HCM_error = 0
 !

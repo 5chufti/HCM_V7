@@ -1,6 +1,6 @@
 !
 !	Point_type.f90										P. Benner		09.10.2003
-!														G.H.			04.05.2005
+!														G.H.			05.07.2005
 !
 !
 !	Subroutine to read the morphological type of a given point from the morpho-database.
@@ -98,6 +98,8 @@
 !                   West                 East
 !
 !
+	OLD_T = 0
+	O_FN = "           "
 	TO_FN = " "
 	TO_FN(1:M_L) = Morpho_path(1:M_L)
 	TO_FN_L = M_L

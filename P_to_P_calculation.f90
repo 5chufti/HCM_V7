@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			05.05.2005
+!														G.H.			05.07.2005
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).

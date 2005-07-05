@@ -1,6 +1,6 @@
 !
 !	Point_height.F90									P.Benner		20.11.2003
-!														G.H.			03.05.2005
+!														G.H.			05.07.2005
 !
 !	Subroutine to read the height of a given point from the terrain-database.
 !
@@ -101,6 +101,8 @@
 !
 !
 !
+	OLD_T = 0
+	O_FN = "           "
 	TO_FN = " "
 	TO_FN(1:T_L) = Topo_path(1:T_L)
 	TO_FN_L = T_L
