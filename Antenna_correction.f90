@@ -28,8 +28,8 @@
 !
 !   because p1=(0/0) lot of terms drop: sin(0)=0,cos(0)=1
 !
-	vda = SNGL(DASIND(DSIND(d) * DCOSD(b)))
-	hda = SNGL(DSIGN(d,b))
+	vda = ASIND(DSIND(d) * DCOSD(b))
+	hda = SIGN(d,b)
 	RETURN
 !
 	END SUBROUTINE Ctransf
@@ -42,23 +42,23 @@
 !
 	IMPLICIT	NONE
 !
-	CHARACTER*7 hCod, vCod
-	INTEGER		Error
-	REAL		hda, vda, a, vdc, vfe, vbe, hb, vb, h, k
-	REAL		delv, w, w1, w2, vae, va0, ra
+	CHARACTER*7			hCod, vCod
+	INTEGER				Error
+	REAL				a, vdc, vfe, vbe, hb, vb, h, k
+	REAL				delv, w, w1, w2, vae, va0, ra, hda, vda
 !
 	vdc = -1.0 * vda
 !
 !	simple case, only horizontal diagram relevant
 !
-	IF (VDA .EQ. 0.0) THEN
+	IF (VDA .EQ. 0.0 .OR. vCod(4:5) .EQ. 'ND') THEN
 		CALL Antenna (hCod, hda, a, Error)
 		GOTO	10
 	ENDIF
 !
 !	other simple case, only vertical diagram relevant
 !
-	IF (HDA .EQ. 0.0) THEN
+	IF (HDA .EQ. 0.0 .OR. hCod(4:5) .EQ. 'ND') THEN
 		CALL Antenna (vCod, vdc, a, Error)
 		GOTO	10
 	ENDIF

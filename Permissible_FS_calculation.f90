@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		25.02.2004
-!														G.H.			03.05.2005
+!														G.H.			07.07.2005
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -78,7 +78,6 @@
 !
 	LOGICAL			TX_TETRA, RX_TETRA, TX_DIG, RX_DIG, TXGSM
 !
-	REAL			DI1, DI2
 	REAL			B1, B2, CSXR, CSXT, DPN
 	REAL			CS1(7), CS2(7), CS3(7), CS4(7), CS5(7)
 	REAL			CS6(7), CS7(7), CS8(7), CS9(7), CS10(7)
@@ -694,7 +693,7 @@
 !
 !	Calculation of antenna correction factors "Rx_ant_corr" and "Rx_ant_type_corr":
 !
-	IF ((C_mode .LT. 0) .OR. (C_mode .EQ. 99) .OR. &
+	IF ((C_mode .EQ. 99) .OR. &
 		((Ant_typ_V_Rx .EQ. '000ND00') .AND. (Ant_typ_H_Rx .EQ. '000ND00'))) THEN
 		Rx_ant_corr  = 0.0
 	ELSE
@@ -711,8 +710,8 @@
 !		  Error in Rx azimuth
 		  RETURN
 		END IF
-		CALL Ctransf (Dir_Rx_Tx,Rx_Azimuth,V_angle_Rx_Tx,Rx_Elevation,DI1,DI2)
-		CALL Antenna_correction (DI1, DI2, Ant_typ_H_Rx, Ant_typ_V_Rx, Rx_ant_corr, HCM_Error)
+		CALL Ctransf (Dir_Rx_Tx,Rx_Azimuth,V_angle_Rx_Tx,Rx_Elevation,H_diff_angle_Rx_Tx,V_diff_angle_Rx_Tx)
+		CALL Antenna_correction (H_diff_angle_Rx_Tx, V_diff_angle_Rx_Tx, Ant_typ_H_Rx, Ant_typ_V_Rx, Rx_ant_corr, HCM_Error)
 		IF (HCM_Error .NE. 0) RETURN
 	END IF
 !

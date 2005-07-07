@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			05.07.2005
+!														G.H.			07.07.2005
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -190,7 +190,7 @@
 	REAL				X, x_TCA, DS1, A1, A2, Ax
 	REAL				HDZ(10002), HDC(10002), HDF(10002)
 	REAL				A(11), Factor_of_path_over_sea
-	REAL				Land_FS_1kW, Sea_FS_1kW, DI1, DI2
+	REAL				Land_FS_1kW, Sea_FS_1kW
 	DOUBLE PRECISION	LongTx, LatTx, LongRx, LatRx ,CI
 	DOUBLE PRECISION	New_LongTx, New_LatTx, New_LongRx, New_LatRx
 	LOGICAL				Free, null
@@ -354,14 +354,14 @@
 		Tx_ant_corr   = 0.0
 	ELSE
 !	Setting of the vertical angle:
-		IF ((C_mode .GE. 0) .AND. (Tx_serv_area .EQ. 0.0) .AND. &
-			(Rx_serv_area .EQ. 0.0) .AND. (C_mode .NE. 99)) THEN
+!		IF ((C_mode .GE. 0) .AND. (Tx_serv_area .EQ. 0.0) .AND. &
+!			(Rx_serv_area .EQ. 0.0) .AND. (C_mode .NE. 99)) THEN
 !			Normal point to point calculation
 			V_angle_Tx_Rx = ATAND ((H_Rx + H_AntRx - H_Tx + H_AntTx) / (1E3 * Distance))
-		ELSE
+!		ELSE
 !			Calculation to co-ordination lines or mobiles
-			V_angle_Tx_Rx = 0D0
-		END IF
+!			V_angle_Tx_Rx = 0D0
+!		END IF
 		READ (Ele_Tx_input, '(F5.1)', IOSTAT=IOS) Tx_Elevation
 		IF (IOS .NE. 0) THEN
 			HCM_Error = 1031
@@ -374,8 +374,8 @@
 !			Error in Tx azimuth.
 			RETURN
 		END IF
-		CALL Ctransf (Dir_Tx_Rx, Tx_Azimuth, V_angle_Tx_Rx, Tx_Elevation, DI1, DI2)
-		CALL Antenna_correction (DI1, DI2, Ant_typ_H_Tx, Ant_typ_V_Tx, Tx_ant_corr, HCM_Error)
+		CALL Ctransf (Dir_Tx_Rx, Tx_Azimuth, V_angle_Tx_Rx, Tx_Elevation, H_diff_angle_Tx_Rx, V_diff_angle_Tx_Rx)
+		CALL Antenna_correction (H_diff_angle_Tx_Rx, V_diff_angle_Tx_Rx, Ant_typ_H_Tx, Ant_typ_V_Tx, Tx_ant_corr, HCM_Error)
 		IF (HCM_Error .NE. 0) RETURN
 	END IF
 !

@@ -12,11 +12,10 @@
 	REAL				Tx_ant_corr, Rx_ant_corr, Tx_ant_type_corr, Rx_ant_type_corr
 	REAL				Perm_FS_from_table, Corr_delta_f, Channel_sp_Rx, Channel_sp_Tx
 	REAL				Power_to_Rx, Free_space_FS, Tx_serv_area, Rx_serv_area, MaxPow
+	REAL				H_diff_angle_Rx_Tx, V_diff_angle_Rx_Tx, H_diff_angle_Tx_Rx, V_diff_angle_Tx_Rx
 	DOUBLE PRECISION	Tx_Azimuth, Tx_Elevation, Rx_Azimuth, Rx_Elevation
-	DOUBLE PRECISION	Tx_frequency, Distance, PD
-	DOUBLE PRECISION	D_sea_calculated, Dir_Tx_Rx, Dir_Rx_Tx, Rx_frequency
-	DOUBLE PRECISION	V_angle_Tx_Rx, V_angle_Rx_Tx, H_diff_angle_Tx_Rx, V_diff_angle_Tx_Rx
-	DOUBLE PRECISION	H_diff_angle_Rx_Tx, V_diff_angle_Rx_Tx, Delta_frequency
+	DOUBLE PRECISION	Tx_frequency, Distance, PD, V_angle_Tx_Rx, V_angle_Rx_Tx
+	DOUBLE PRECISION	D_sea_calculated, Dir_Tx_Rx, Dir_Rx_Tx, Rx_frequency, Delta_frequency
 	CHARACTER*1			Sea_temperature, Type_of_Tx_ant, Type_of_Rx_ant, Chan_occup
 	CHARACTER*3			Land_from, Land_to, Max_CBR_D_input
 	CHARACTER*4			H_Tx_input, H_Rx_input, H_Tx_ant, H_Rx_ant, Rx_ant_gain
@@ -35,8 +34,7 @@
 !						First all 8 byte variables (DOUBLE PRECISION)
 	COMMON	/NDATA/		Tx_frequency, Distance, PD, &
 						Dir_Tx_Rx, Dir_Rx_Tx, D_sea_calculated, V_angle_Tx_Rx, &
-						V_angle_Rx_Tx, H_diff_angle_Tx_Rx, V_diff_angle_Tx_Rx, &
-						H_diff_angle_Rx_Tx, V_diff_angle_Rx_Tx, Delta_frequency, &
+						V_angle_Rx_Tx, V_diff_angle_Rx_Tx, Delta_frequency, &
 						Rx_frequency, Tx_Azimuth, Tx_Elevation, Rx_Azimuth, &
 						Rx_Elevation, &
 !
@@ -44,6 +42,7 @@
 						D_to_border, HCM_error, Time_percentage,  &
 						TCA, TCA_corr, Dh, Dh_corr, C_mode, H_AntTx, &
 						Calculated_FS, Perm_FS, Prot_margin, ERP_ref_Tx, CBR_D, &
+						H_diff_angle_Tx_Rx, V_diff_angle_Tx_Rx, H_diff_angle_Rx_Tx, &
 						Tx_TCA, Rx_TCA, Tx_TCA_corr, Rx_TCA_corr, Heff_Tx, &
 						Heff_Rx, Land_FS, Sea_FS, Info, Tx_ant_corr, Rx_ant_corr, &
 						Tx_ant_type_corr, Rx_ant_type_corr, Perm_FS_from_table, &
