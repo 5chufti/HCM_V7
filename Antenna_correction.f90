@@ -30,13 +30,13 @@
 !
 !
 !    lat2 = asin(Sin(lat1) * Cos(dist) + Cos(lat1) * Sin(dist) * Cos(dir))
-!    lon2 = acos((cos(dist) - sin(lat1) * sin(lat2)) / (cos(lat1) * cos(lat2)))
+!    dlon=atan2(sin(tc)*sin(d)*cos(lat1),cos(d)-sin(lat1)*sin(lat))
+!    lon=mod( lon1-dlon +pi,2*pi )-pi
 !
 !   because p1=(0/0) lot of terms drop: sin(0)=0,cos(0)=1
 !
-	vda = ASIND(DSIND(d) * DCOSD(b))
-	hda = ACOSD(DCOSD(d) / DCOSD(dble(vda)))
-	hda = SIGN(hda,b)
+	vda = DASIND(DSIND(d) * DCOSD(b))
+	hda = DATAN2D(DSIND(d) * DSIND(b), DCOSD(d))
 	RETURN
 !
 	END SUBROUTINE Ctransf
