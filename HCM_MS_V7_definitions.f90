@@ -5,6 +5,7 @@
 	INTEGER*2			T_L, M_L, B_L
 	INTEGER*4			HCM_error, Time_percentage, C_mode, D_to_border
 	INTEGER*4			H_AntTx, H_AntRx, H_Tx, H_Rx
+!
 	REAL				Heff, TCA, TCA_corr
 	REAL				Dh, Dh_corr, Calculated_FS, Perm_FS, Prot_margin
 	REAL				ERP_ref_Tx, CBR_D, Tx_TCA, Rx_TCA, Tx_TCA_corr, Rx_TCA_corr
@@ -13,9 +14,13 @@
 	REAL				Perm_FS_from_table, Corr_delta_f, Channel_sp_Rx, Channel_sp_Tx
 	REAL				Power_to_Rx, Free_space_FS, Tx_serv_area, Rx_serv_area, MaxPow
 	REAL				H_diff_angle_Rx_Tx, V_diff_angle_Rx_Tx, H_diff_angle_Tx_Rx, V_diff_angle_Tx_Rx
-	DOUBLE PRECISION	Tx_Azimuth, Tx_Elevation, Rx_Azimuth, Rx_Elevation
-	DOUBLE PRECISION	Tx_frequency, Distance, PD, V_angle_Tx_Rx, V_angle_Rx_Tx
-	DOUBLE PRECISION	D_sea_calculated, Dir_Tx_Rx, Dir_Rx_Tx, Rx_frequency, Delta_frequency
+!
+	DOUBLE PRECISION	Tx_frequency, Distance, PD
+	DOUBLE PRECISION	Dir_Tx_Rx, Dir_Rx_Tx, D_sea_calculated, V_angle_Tx_Rx
+	DOUBLE PRECISION	V_angle_Rx_Tx, Delta_frequency
+	DOUBLE PRECISION	Rx_frequency, Tx_Azimuth, Tx_Elevation, Rx_Azimuth
+	DOUBLE PRECISION	Rx_Elevation
+!
 	CHARACTER*1			Sea_temperature, Type_of_Tx_ant, Type_of_Rx_ant, Chan_occup
 	CHARACTER*3			Land_from, Land_to, Max_CBR_D_input
 	CHARACTER*4			H_Tx_input, H_Rx_input, H_Tx_ant, H_Rx_ant, Rx_ant_gain
@@ -34,34 +39,42 @@
 !						First all 8 byte variables (DOUBLE PRECISION)
 	COMMON	/NDATA/		Tx_frequency, Distance, PD, &
 						Dir_Tx_Rx, Dir_Rx_Tx, D_sea_calculated, V_angle_Tx_Rx, &
-						V_angle_Rx_Tx, V_diff_angle_Rx_Tx, Delta_frequency, &
+						V_angle_Rx_Tx, Delta_frequency, &
 						Rx_frequency, Tx_Azimuth, Tx_Elevation, Rx_Azimuth, &
 						Rx_Elevation, &
 !
 !						Second all 4 byte variables (REAL, INTEGER, LOGICAL)
-						D_to_border, HCM_error, Time_percentage,  &
-						TCA, TCA_corr, Dh, Dh_corr, C_mode, H_AntTx, &
-						Calculated_FS, Perm_FS, Prot_margin, ERP_ref_Tx, CBR_D, &
-						H_diff_angle_Tx_Rx, V_diff_angle_Tx_Rx, H_diff_angle_Rx_Tx, &
-						Tx_TCA, Rx_TCA, Tx_TCA_corr, Rx_TCA_corr, Heff_Tx, &
-						Heff_Rx, Land_FS, Sea_FS, Info, Tx_ant_corr, Rx_ant_corr, &
-						Tx_ant_type_corr, Rx_ant_type_corr, Perm_FS_from_table, &
-						Corr_delta_f, Channel_sp_Rx, Channel_sp_Tx, Power_to_Rx, &
-						Free_space_FS, H_AntRx, H_Tx, H_Rx, Tx_serv_area, Heff, &
-						Rx_serv_area,  MaxPow, &
+						Heff, TCA, TCA_corr, &
+						Dh, Dh_corr, Calculated_FS, Perm_FS, Prot_margin, &
+						ERP_ref_Tx, CBR_D, Tx_TCA, Rx_TCA, Tx_TCA_corr, Rx_TCA_corr, &
+						Heff_Tx, Heff_Rx, Land_FS, Sea_FS, &
+						Tx_ant_corr, Rx_ant_corr, Tx_ant_type_corr, Rx_ant_type_corr, &
+						Perm_FS_from_table, Corr_delta_f, Channel_sp_Rx, Channel_sp_Tx, &
+						Power_to_Rx, Free_space_FS, Tx_serv_area, Rx_serv_area, MaxPow, &
+						H_diff_angle_Rx_Tx, V_diff_angle_Rx_Tx, H_diff_angle_Tx_Rx, V_diff_angle_Tx_Rx, &
+!
+						HCM_error, Time_percentage, C_mode, D_to_border, &
+						H_AntTx, H_AntRx, H_Tx, H_Rx, &
+!
+						Info, &
 !
 !						Third all 2 byte variables (INTEGER*2)
-						T_Prof, M_Prof, PN, H_Datab_Tx, H_Datab_Rx, T_L, M_L, B_L
+
+						T_Prof, M_Prof, PN, H_Datab_Tx, H_Datab_Rx, &
+						T_L, M_L, B_L
 !
 !						All CHARACTER variables
-	COMMON	/CDATA/		Topo_path, Morpho_path, Border_path, Sea_temperature, &
-						Coo_Tx, Coo_Rx, H_Tx_input, H_Rx_input, Ant_typ_H_Tx, &
-						Ant_typ_V_Tx, Ant_typ_H_Rx, Ant_typ_V_Rx, Azi_Tx_input, &
-						Ele_Tx_input, Azi_Rx_input, Ele_Rx_input, H_Tx_ant, &
-						H_Rx_ant, Max_power, Type_of_Tx_ant, Type_of_Rx_ant, &
-						Tx_frequ, Rx_frequ, Chan_occup, D_sea_input, Land_to, &
-						Rad_of_Tx_serv_area, Rad_of_Rx_serv_area, Land_from, &
-						Perm_FS_input, Desig_of_Tx_emis, Desig_of_Rx_emis, &
-						Rx_ant_gain, Depol_loss, Cor_fact_frequ_diff, &
-						Max_CBR_D_input, Version, Coo_Tx_new, Coo_Rx_new
+	COMMON	/CDATA/		Sea_temperature, Type_of_Tx_ant, Type_of_Rx_ant, Chan_occup, &
+						Land_from, Land_to, Max_CBR_D_input, &
+						H_Tx_input, H_Rx_input, H_Tx_ant, H_Rx_ant, Rx_ant_gain, &
+						Depol_loss, Cor_fact_frequ_diff, &
+						Azi_Tx_input, Ele_Tx_input, Azi_Rx_input, Ele_Rx_input, &
+						D_sea_input, Rad_of_Tx_serv_area, Rad_of_Rx_serv_area, &
+						Perm_FS_input, Version, &
+						Max_power, &
+						Ant_typ_H_Tx, Ant_typ_V_Tx, Ant_typ_H_Rx, Ant_typ_V_Rx, &
+						Desig_of_Tx_emis, Desig_of_Rx_emis, &
+						Tx_frequ, Rx_frequ, &
+						Coo_Tx, Coo_Rx, Coo_Tx_new, Coo_Rx_new, &
+						Topo_path, Morpho_path, Border_path
 !

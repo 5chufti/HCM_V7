@@ -1,6 +1,6 @@
 !
 !	Antenna_correction.f90
-!														G.H.			07.07.2005
+!														G.H.			12.07.2005
 !
 !	Subroutine to calculate the corrected H_diff_angle, V_diff_angle
 !
@@ -19,17 +19,24 @@
 !	calc bearing
 	b = DATAN2D(DSIND(azi - aziM) * DCOSD(ele), &
 		DCOSD(eleM) * DSIND(ele) - DSIND(eleM) * DCOSD(ele) * DCOSD(azi - aziM))
-!	new point    
-!		sin(lat2) = cos(hdng1)*cos(lat1)*sin(alpha) + sin(lat1)*cos(alpha)
 !
-!		                     Cos (alpha) - Sin(lat1) * Sin(lat2)
-!		cos(long2-long1) =   ----------------------------------
-!		                           Cos (lat1) * Cos(lat2)
+! new point [long2,lat2] from [long1,lat1] with [dist,dir] (all in radians)
+!
+!    sin(lat2) = cos(dir)*cos(lat1)*sin(dist) + sin(lat1)*cos(dist)
+!
+!                            Cos (dist) - Sin(lat1) * Sin(lat2)
+!    cos(long2-long1) =   ----------------------------------
+!                                  Cos (lat1) * Cos(lat2)
+!
+!
+!    lat2 = asin(Sin(lat1) * Cos(dist) + Cos(lat1) * Sin(dist) * Cos(dir))
+!    lon2 = acos((cos(dist) - sin(lat1) * sin(lat2)) / (cos(lat1) * cos(lat2)))
 !
 !   because p1=(0/0) lot of terms drop: sin(0)=0,cos(0)=1
 !
 	vda = ASIND(DSIND(d) * DCOSD(b))
-	hda = SIGN(d,b)
+	hda = ACOSD(DCOSD(d) / DCOSD(dble(vda)))
+	hda = SIGN(hda,b)
 	RETURN
 !
 	END SUBROUTINE Ctransf
