@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			07.07.2005
+!														G.H.			30.08.2005
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -203,6 +203,9 @@
 !
 !	Clear all Info(i)'s for P_to_P_calculation subroutine
 !
+	Info(1)  = .FALSE.
+	Info(2)  = .FALSE.
+	Info(3)  = .FALSE.
 	Info(7)  = .FALSE.
 	Info(8)  = .FALSE.
 	Info(9)  = .FALSE.
@@ -281,14 +284,15 @@
 !			Error in input value height of Tx site above sea level.
 			RETURN
 		END IF
-		IF ((H_Tx .NE. H_Datab_Tx) .AND. &
-			(ABS(H_Tx-H_Datab_Tx) .LE. H_Tx/10)) THEN
-			Info(2) = .TRUE.
-!			Height of Tx site differs from height of terrain database.
-		ELSE
-			Info(3) = .TRUE.
-!			Height of Tx site differs more than 10%,
-!			calculated values may be (extremely) wrong!
+		IF (H_Tx .NE. H_Datab_Tx) THEN
+			IF (ABS(H_Tx-H_Datab_Tx) .LE. H_Tx/10) THEN
+				Info(2) = .TRUE.
+!				Height of Tx site differs from height of terrain database.
+			ELSE
+				Info(3) = .TRUE.
+!				Height of Tx site differs more than 10%,
+!				calculated values may be (extremely) wrong!
+			END IF
 		END IF
 	END IF
 !	Checking Rx site height
@@ -306,14 +310,15 @@
 !			Error in input value Rx site height above sea level.
 			RETURN	
 		END IF
-		IF ((H_Rx .NE. H_Datab_Rx) .AND. &
-			(ABS(H_Rx-H_Datab_Rx) .LE. H_Rx/10)) THEN
+		IF (H_Rx .NE. H_Datab_Rx) THEN
+			IF (ABS(H_Rx-H_Datab_Rx) .LE. H_Rx/10) THEN
 				Info(9) = .TRUE.
 !				Height of Rx site differs from height of terrain data.
 			ELSE
 				Info(10) = .TRUE.
 !				Rx site height differs more than 10%,
 !				calculated values may be (extremely) wrong!
+			END IF
 		END IF
 	END IF
 !
