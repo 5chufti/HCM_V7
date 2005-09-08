@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		25.02.2004
-!														G.H.			07.07.2005
+!														G.H.			08.09.2005
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -699,13 +699,13 @@
 	ELSE
 		V_angle_Rx_Tx = ATAND ((H_Tx + H_AntTx - H_Rx + H_AntRx) / (1E3 * Distance))
 		READ (Ele_Rx_input, *, IOSTAT=IOS) Rx_Elevation
-		IF (IOS .NE. 0) THEN
+		IF ((IOS .NE. 0) .AND. (Ant_typ_V_Rx .NE. '000ND00')) THEN
 		  HCM_Error = 1042
 !		  Error in Rx elevation
 		  RETURN
 		END IF
 		READ (Azi_Rx_input, *, IOSTAT=IOS) Rx_Azimuth
-		IF (IOS .NE. 0) THEN
+		IF ((IOS .NE. 0) .AND. (Ant_typ_H_Rx .NE. '000ND00')) THEN
 		  HCM_Error = 1043
 !		  Error in Rx azimuth
 		  RETURN
