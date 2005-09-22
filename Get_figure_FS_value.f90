@@ -1,5 +1,6 @@
 !
 !	Get_figure_FS_value.f90								P.Benner		06.10.2003
+!														G.H.			22.09.2005
 !												
 !
 !	SUBROUTINE Get_figure_FS_value (Figure_frequency, Time_percentage, Sea_temperature, &
@@ -2010,26 +2011,19 @@
 	Sea_figure_FS  = 0.0
 !
 !	Test input values:
-	IF ((Figure_frequency .EQ. 100) .OR. (Figure_frequency .EQ. 600) .OR. &
-		(Figure_frequency .EQ. 2000)) THEN
-!		OK.
-	  ELSE
+	IF ((Figure_frequency .NE. 100) .AND. (Figure_frequency .NE. 600) .AND. &
+		(Figure_frequency .NE. 2000)) THEN
 		Error = 2000	! Wrong Figure_frequency
 		RETURN
 	END IF
 !
-	IF ((Time_percentage .EQ. 1) .OR. (Time_percentage .EQ. 10) .OR. &
-		(Time_percentage .EQ. 50)) THEN
-!		OK.
-	  ELSE
+	IF ((Time_percentage .NE. 1) .AND. (Time_percentage .NE. 10) .AND. &
+		(Time_percentage .NE. 50)) THEN
 		Error = 2001	! Wrong Time_percentage
 		RETURN
 	END IF
 !
-	IF ((Sea_temperature .EQ. "C") .OR. (Sea_temperature .EQ. "W") .OR. &
-		(Sea_temperature .EQ. "c") .OR. (Sea_temperature .EQ. "w")) THEN
-!		OK.
-	  ELSE
+	IF ((Sea_temperature .NE. "C") .AND. (Sea_temperature .NE. "W")) THEN
 		Error = 2002	! Wrong Sea_temperature
 		RETURN
 	END IF
@@ -2108,22 +2102,22 @@
 	  FXX = F04
 	END IF
 	IF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 10) .AND. &
-		((Sea_temperature .EQ. "C") .OR. (Sea_temperature .EQ. "c"))) THEN
+		(Sea_temperature .EQ. "C")) THEN
 !	  Use FIGURE5
 	  FXX = F05
 	END IF
 	IF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 1) .AND. &
-		((Sea_temperature .EQ. "C") .OR. (Sea_temperature .EQ. "c"))) THEN
+		(Sea_temperature .EQ. "C")) THEN
 !	  Use FIGURE6
 	  FXX = F06
 	END IF
 	IF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 10) .AND. &
-		((Sea_temperature .EQ. "W") .OR. (Sea_temperature .EQ. "w"))) THEN
+		(Sea_temperature .EQ. "W")) THEN
 !	  Use FIGURE7
 	  FXX = F07
 	END IF
 	IF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 1) .AND. &
-		((Sea_temperature .EQ. "W") .OR. (Sea_temperature .EQ. "w"))) THEN
+		(Sea_temperature .EQ. "W")) THEN
 !	  Use FIGURE8
 	  FXX = F08
 	END IF
@@ -2132,22 +2126,22 @@
 	  FXX = F12
 	END IF
 	IF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 10) .AND. &
-		((Sea_temperature .EQ. "C") .OR. (Sea_temperature .EQ. "c"))) THEN
+		(Sea_temperature .EQ. "C")) THEN
 !	  Use FIGURE13
 	  FXX = F13
 	END IF
 	IF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 1) .AND. &
-		((Sea_temperature .EQ. "C") .OR. (Sea_temperature .EQ. "c"))) THEN
+		(Sea_temperature .EQ. "C")) THEN
 !	  Use FIGURE14
 	  FXX = F14
 	END IF
 	IF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 10) .AND. &
-		((Sea_temperature .EQ. "W") .OR. (Sea_temperature .EQ. "w"))) THEN
+		(Sea_temperature .EQ. "W")) THEN
 !	  Use FIGURE15
 	  FXX = F15
 	END IF
 	IF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 1) .AND. &
-		((Sea_temperature .EQ. "W") .OR. (Sea_temperature .EQ. "w"))) THEN
+		(Sea_temperature .EQ. "W")) THEN
 !	  Use FIGURE16
 	  FXX = F16
 	END IF
@@ -2156,22 +2150,22 @@
 	  FXX = F20
 	END IF
 	IF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 10) .AND. &
-		((Sea_temperature .EQ. "C") .OR. (Sea_temperature .EQ. "c"))) THEN
+		(Sea_temperature .EQ. "C")) THEN
 !	  Use FIGURE21
 	  FXX = F21
 	END IF
 	IF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 1) .AND. &
-		((Sea_temperature .EQ. "C") .OR. (Sea_temperature .EQ. "c"))) THEN
+		(Sea_temperature .EQ. "C")) THEN
 !	  Use FIGURE22
 	  FXX = F22
 	END IF
 	IF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 10) .AND. &
-		((Sea_temperature .EQ. "W") .OR. (Sea_temperature .EQ. "w"))) THEN
+		(Sea_temperature .EQ. "W")) THEN
 !	  Use FIGURE23
 	  FXX = F23
 	END IF
 	IF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 1) .AND. &
-		((Sea_temperature .EQ. "W") .OR. (Sea_temperature .EQ. "w"))) THEN
+		(Sea_temperature .EQ. "W")) THEN
 !	  Use FIGURE24
 	  FXX = F24
 	END IF

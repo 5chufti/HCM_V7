@@ -1,6 +1,6 @@
 !
 !	Point_type.f90										P. Benner		09.10.2003
-!														G.H.			05.07.2005
+!														G.H.			22.09.2005
 !
 !
 !	Subroutine to read the morphological type of a given point from the morpho-database.
@@ -25,6 +25,7 @@
 !		300 latitude is not in range of 0.0 - 90.0
 !
 !	Morpho-data location: Morpho_path\Subdir\
+!			where subdir is first 4 char of filename
 !
 !	Morpho_Path e.g. = D:\MORPHO
 !
@@ -50,12 +51,10 @@
 	INTEGER(2)			M_Type, M1, M2, M3, M4
 	INTEGER(2)			M_F_3(101,101), M_F_6(51,101)
 	INTEGER(4)			Error, RESH, SLO, SLA, IOS, LOD, LAD, BH, BV, T, OLD_T
-	INTEGER(4)			P1X, P1Y, TO_FN_L
+	INTEGER(4)			P1X, P1Y
 	DOUBLE PRECISION	Long, Lat, LOR, LAR, LO_P1, LA_P1, RELLO, RELLA
 	CHARACTER(1)		M_3(20402), M_6(10302)
-	CHARACTER(4)		SUBDIR
 	CHARACTER(11)		FN, O_FN
-	CHARACTER(85)		TO_FN
 !
 	EQUIVALENCE (M_F_3, M_3)
 	EQUIVALENCE (M_F_6, M_6) 
@@ -99,20 +98,8 @@
 !
 !
 	OLD_T = 0
-	O_FN = "           "
-	TO_FN = " "
-	TO_FN(1:M_L) = Morpho_path(1:M_L)
-	TO_FN_L = M_L
+	O_FN = ""
 !
-!	Lentght of Morpho_path = TO_FN_L
-!
-!  
-!	Filename "FN", subdirectory "SUBDIR":
-	FN     = 'e009n50.63m'
-	SUBDIR = 'e009'
-!
-!
-!   
 !	Longitude in range of -180.0  to 180.0 
 	IF (Long .GT. 1.8D2) Long = Long - 3.6D2
 	IF (DABS(Long) .GT. 1.8D2) THEN
@@ -134,26 +121,20 @@
 !
 	WRITE (FN(2:4), '(I3.3)', IOSTAT=IOS) LOD
 	IF (Long .GE. 0.0D0) THEN
-		FN(1:1) = 'e'                     
+		FN(1:1) = 'E'                     
 	  ELSE
-		FN(1:1) = 'w'                     
+		FN(1:1) = 'W'                     
 	END IF
 	IF (IOS.NE. 0) THEN
 	  ERROR = 200
 	  RETURN
 	END IF
 !
-	SUBDIR = FN(1:4)
-!   
-	TO_FN(TO_FN_L+1:TO_FN_L+4) = SUBDIR
-	TO_FN(TO_FN_L+5:TO_FN_L+5) = '\'
-	TO_FN_L = TO_FN_L + 5
-!
 	WRITE (FN(6:7), '(I2.2)', IOSTAT=IOS) LAD
 	IF (Lat .GE. 0.0D0) THEN
-		FN(5:5) = 'n'
+		FN(5:5) = 'N'
 	  ELSE
-		FN(5:5) = 's'
+		FN(5:5) = 'S'
 	END IF
 	IF (IOS.NE. 0) THEN
 	  ERROR = 210
@@ -162,14 +143,11 @@
 !
 	IF (LAD .LT. 50) THEN 
 		RESH = 3  
-		FN(9:9) = '3'
+		FN(8:11) = '.33M'
 	  ELSE
 		RESH = 6
-		FN(9:9) = '6'
+		FN(8:11) = '.63M'
 	END IF
-!
-	TO_FN(TO_FN_L+1:TO_FN_L+11) = FN
-	TO_FN_L = TO_FN_L + 11
 !
 !	Remaining value behind the decimalpoint in degrees:
 	LOR = DABS(Long - DBLE(DINT(Long)))
@@ -212,13 +190,13 @@
 !   
 !	Data not present and file not open:
 	IF (RESH .EQ. 3) THEN
-		OPEN (UNIT=2, FILE=TO_FN(1:TO_FN_L), ACCESS='DIRECT', &
-				RECL=20402, STATUS='OLD', IOSTAT=IOS, &
+		OPEN (UNIT=2, FILE=TRIM(Morpho_path) // '\' // FN(1:4) // '\' // FN,  &
+				ACCESS='DIRECT',RECL=20402, STATUS='OLD', IOSTAT=IOS, &
 				MODE='READ')
 	  ELSE
-		OPEN (UNIT=2, FILE=TO_FN(1:TO_FN_L), ACCESS='DIRECT', &
-			RECL=10302, STATUS='OLD', IOSTAT=IOS, &
-			MODE='READ')
+		OPEN (UNIT=2, FILE=TRIM(Morpho_path) // '\' // FN(1:4) // '\' // FN, &
+				ACCESS='DIRECT',RECL=10302, STATUS='OLD', IOSTAT=IOS, &
+				MODE='READ')
 	END IF
 	IF (IOS .NE. 0) THEN
 	  ERROR = 36

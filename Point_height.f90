@@ -1,6 +1,6 @@
 !
 !	Point_height.F90									P.Benner		20.11.2003
-!														G.H.			05.07.2005
+!														G.H.			22.09.2005
 !
 !	Subroutine to read the height of a given point from the terrain-database.
 !
@@ -25,6 +25,7 @@
 !		400 height is missing (-9999)
 !
 !	Terrain-data location: Topo_path\Subdir\
+!		where Subdir is first 4 char of filename
 !
 !	Topo_Path e.g. = D:\TOPO
 !
@@ -50,14 +51,12 @@
 	INTEGER(2)			Height, H1, H2, H3, H4
 	INTEGER(2)			H_F_3(101,101), H_F_6(51,101)
 	INTEGER(4)			Error, RESH, SLO, SLA, IOS, LOD, LAD, BH, BV, T, OLD_T
-	INTEGER(4)			P1X, P1Y, TO_FN_L
+	INTEGER(4)			P1X, P1Y
 	REAL				H_F
 	DOUBLE PRECISION	Long, Lat, LOR, LAR, LO_P1, LA_P1, RELLO, RELLA
 	DOUBLE PRECISION	LORR, LARR, H12, H34
 	CHARACTER(1)		H_3(20402), H_6(10302)
-	CHARACTER(4)		SUBDIR
 	CHARACTER(11)		FN, O_FN
-	CHARACTER(85)		TO_FN
 !
 	EQUIVALENCE (H_F_3, H_3)
 	EQUIVALENCE (H_F_6, H_6) 
@@ -102,19 +101,7 @@
 !
 !
 	OLD_T = 0
-	O_FN = "           "
-	TO_FN = " "
-	TO_FN(1:T_L) = Topo_path(1:T_L)
-	TO_FN_L = T_L
-!
-!	Lentght of Topo_path = TO_FN_L
-!
-!  
-!	Filename "FN", subdirectory "SUBDIR":
-	FN     = 'e009n50.63e'
-	SUBDIR = 'e009'
-!
-!
+	O_FN = ""
 !   
 !	Longitude in range of -180.0  to 180.0 
 	IF (Long .GT. 1.8D2) Long = Long - 3.6D2
@@ -137,26 +124,20 @@
 !
 	WRITE (FN(2:4), '(I3.3)', IOSTAT=IOS) LOD
 	IF (Long .GE. 0.0D0) THEN
-		FN(1:1) = 'e'                     
+		FN(1:1) = 'E'                     
 	  ELSE
-		FN(1:1) = 'w'                     
+		FN(1:1) = 'W'                     
 	END IF
 	IF (IOS.NE. 0) THEN
 	  ERROR = 200
 	  RETURN
 	END IF
 !
-	SUBDIR = FN(1:4)
-!   
-	TO_FN(TO_FN_L+1:TO_FN_L+4) = SUBDIR
-	TO_FN(TO_FN_L+5:TO_FN_L+5) = '\'
-	TO_FN_L = TO_FN_L + 5
-!
 	WRITE (FN(6:7), '(I2.2)', IOSTAT=IOS) LAD
 	IF (Lat .GE. 0.0D0) THEN
-		FN(5:5) = 'n'
+		FN(5:5) = 'N'
 	  ELSE
-		FN(5:5) = 's'
+		FN(5:5) = 'S'
 	END IF
 	IF (IOS.NE. 0) THEN
 	  ERROR = 210
@@ -165,14 +146,11 @@
 !
 	IF (LAD .LT. 50) THEN 
 		RESH = 3  
-		FN(9:9) = '3'
+		FN(8:11) = '.33E'
 	  ELSE
 		RESH = 6
-		FN(9:9) = '6'
+		FN(8:11) = '.63E'
 	END IF
-!
-	TO_FN(TO_FN_L+1:TO_FN_L+11) = FN
-	TO_FN_L = TO_FN_L + 11
 !
 !	Remaining value behind the decimalpoint in degrees:
 	LOR = DABS(Long - DBLE(DINT(Long)))
@@ -215,12 +193,12 @@
 !   
 !	Data not present and file not open:
 	IF (RESH .EQ. 3) THEN
-		OPEN (UNIT=1, FILE=TO_FN(1:TO_FN_L), ACCESS='DIRECT', &
-				RECL=20402, STATUS='OLD', IOSTAT=IOS, &
+		OPEN (UNIT=1, FILE=TRIM(Topo_path) // '\' // FN(1:4) // '\' // FN,  &
+				ACCESS='DIRECT',RECL=20402, STATUS='OLD', IOSTAT=IOS, &
 				MODE='READ')
 	  ELSE
-		OPEN (UNIT=1, FILE=TO_FN(1:TO_FN_L), ACCESS='DIRECT', &
-			RECL=10302, STATUS='OLD', IOSTAT=IOS, &
+		OPEN (UNIT=1, FILE=TRIM(Topo_path) // '\' // FN(1:4) // '\' // FN,  &
+			ACCESS='DIRECT',RECL=10302, STATUS='OLD', IOSTAT=IOS, &
 			MODE='READ')
 	END IF
 	IF (IOS .NE. 0) THEN

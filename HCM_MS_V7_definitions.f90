@@ -2,7 +2,6 @@
 !	HCM_MS_V7_definitions.f90
 !
 	INTEGER*2			T_Prof(10002), M_Prof(10002), PN, H_Datab_Tx, H_Datab_Rx
-	INTEGER*2			T_L, M_L, B_L
 	INTEGER*4			HCM_error, Time_percentage, C_mode, D_to_border
 	INTEGER*4			H_AntTx, H_AntRx, H_Tx, H_Rx
 !
@@ -34,6 +33,7 @@
 	CHARACTER*12		Tx_frequ, Rx_frequ
 	CHARACTER*15		Coo_Tx, Coo_Rx, Coo_Tx_new, Coo_Rx_new
 	CHARACTER*63		Topo_path, Morpho_path, Border_path
+!
 	LOGICAL*4			Info(20)
 !
 !						First all 8 byte variables (DOUBLE PRECISION)
@@ -60,8 +60,7 @@
 !
 !						Third all 2 byte variables (INTEGER*2)
 
-						T_Prof, M_Prof, PN, H_Datab_Tx, H_Datab_Rx, &
-						T_L, M_L, B_L
+						T_Prof, M_Prof, PN, H_Datab_Tx, H_Datab_Rx
 !
 !						All CHARACTER variables
 	COMMON	/CDATA/		Sea_temperature, Type_of_Tx_ant, Type_of_Rx_ant, Chan_occup, &
@@ -77,4 +76,3 @@
 						Tx_frequ, Rx_frequ, &
 						Coo_Tx, Coo_Rx, Coo_Tx_new, Coo_Rx_new, &
 						Topo_path, Morpho_path, Border_path
-!

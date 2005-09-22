@@ -1,6 +1,6 @@
 !
 !	HCMMS_V7_DLL.F90									P. Benner		08.01.2004
-!														G.H.			03.05.2005
+!														G.H.			22.09.2005
 !	DLL to the HCMMS_V7 subroutuine (Berlin 2003)
 !
 	SUBROUTINE HCMMS_V7_DLL ( I_C_mode, I_bor_dis, I_PD, I_Distance, I_H_Datab_Tx, &
@@ -33,8 +33,7 @@
 	REAL				I_Corr_delta_f, I_Calculated_FS, I_Perm_FS
 	REAL				I_CBR_D, I_ERP_ref_Tx, I_Prot_margin
 	INTEGER				I, J, IOS
-	INTEGER				I_C_mode, I_bor_dis, DB_LEN
-	CHARACTER*128		DEBUG_DIR
+	INTEGER				I_C_mode, I_bor_dis
 	CHARACTER*(*)		I_str
 	LOGICAL				DEBUG
 !
@@ -48,23 +47,6 @@
 	IF (J .LT. 432) THEN
 	  I_HCM_error = 3000
 	  RETURN
-	END IF
-!
-	DEBUG = .FALSE.
-	IF (J .GT. 432) THEN
-	  IF ((I_str(433:433) .EQ. CHAR(0)) .OR. (I_str(433:433) .EQ. " ")) THEN
-!		  Do nothing, no valid directory
-	    ELSE
-		  IF (J .LE. 560) THEN
-			  DB_LEN = J - 432
-			  DEBUG_DIR(1:DB_LEN) = I_str(433:J)
-			ELSE
-			  DEBUG_DIR = I_str(433:560)
-			  DB_LEN = 128
-		  END IF 
-		  OPEN (UNIT = 12, FILE = DEBUG_DIR(1:DB_LEN) // "\\INPUT.TXT", IOSTAT=IOS)
-		  IF (IOS .EQ. 0) DEBUG = .TRUE.
-	  END IF
 	END IF
 !
 !	Geogr. cooordinates of TX
@@ -157,17 +139,11 @@
 !	Input value: correction factor according frequency difference
 	Cor_fact_frequ_diff = I_str(175:178)
 !
-!	Calculation mode
-	C_mode  = I_C_mode
-!
 !	Country of Rx or country to calculate to
 	Land_to = I_str(179:181)
 !
 !	Country of Tx
 	Land_from = I_str(182:184)
-!
-!	Distance to the border line
-	D_to_border  = I_bor_dis
 !
 !	Input value: maximum crossborder range
 	Max_CBR_D_input = I_str(185:187)
@@ -181,13 +157,21 @@
 !	Morpho - path
 	Morpho_path = I_str(314:376)
 !
+!	Calculation mode
+	C_mode  = I_C_mode
 !
-	I_str(377:432) = ' '
+!	Distance to the border line
+	D_to_border  = I_bor_dis
 !
 !	Distance between two profile points
 	PD  = I_PD
 !
-	IF (DEBUG) THEN
+	DEBUG = .FALSE.
+	OPEN (UNIT = 12, FILE = TRIM(I_str(433:)) // "\\DEBUG.TXT", IOSTAT=IOS)
+	IF (IOS .EQ. 0) THEN
+		DEBUG = .TRUE.
+!
+		WRITE (12,*) '********** INPUT - Values **********'
 		WRITE (12,*) '  Coo_Tx              = ',Coo_Tx
 		WRITE (12,*) '  Coo_Rx              = ',Coo_Rx
 		WRITE (12,*) '  H_Tx_input          = ',H_Tx_input
@@ -227,7 +211,7 @@
 		WRITE (12,*) '  Border_path         = ',Border_path
 		WRITE (12,*) '  Morpho_path         = ',Morpho_path
 		WRITE (12,*) '  PD                  = ',PD
-		CLOSE (UNIT = 12)	
+!		CLOSE (UNIT = 12)	
 	END IF
 !
 !	***********************************************************************
@@ -241,13 +225,8 @@
 !	Set output values:
 !
 	I_str(377:382) = Version		! Version number
-	I_Distance     = Distance		! Distance
-	I_H_Datab_Tx   = H_Datab_Tx		! Heigth of TX above sea level (terrain database)
-	I_H_Datab_Rx   = H_Datab_Rx		! Heigth of RX above sea level (terrain database)
-	I_HCM_error    = HCM_error		! Error value
 !
-!	Info
-	J = 383
+	J = 383							! INFO Values
 	DO I = 1, 20
 	  IF (Info(I)) THEN
 		  I_str(J:J) = "T"
@@ -257,6 +236,13 @@
 	  J = J + 1
 	END DO
 !
+	I_str(403:417)     = Coo_Tx_new		 ! Calculated co-ordinates of the transmitter
+	I_str(418:432)     = Coo_Rx_new		 ! Calculated co-ordinates of the receiver
+!
+	I_Distance         = Distance		! Distance
+	I_H_Datab_Tx       = H_Datab_Tx		! Heigth of TX above sea level (terrain database)
+	I_H_Datab_Rx       = H_Datab_Rx		! Heigth of RX above sea level (terrain database)
+	I_HCM_error        = HCM_error		! Error value
 	I_Heff             = Heff			 ! Effective antenna height
 	I_Dh               = Dh				 ! Terrain irregularity
 	I_Dh_corr          = Dh_corr		 ! Correction factor according terrain irregularity
@@ -282,12 +268,11 @@
 	I_CBR_D            = CBR_D			 ! Maximum range of harmful interference
 	I_ERP_ref_Tx       = ERP_ref_Tx		 ! Power of the reference transmitter
 	I_Prot_margin      = Prot_margin	 ! Protection margin (EP - EC)
-	I_str(403:417) = Coo_Tx_new			 ! Calculated co-ordinates of the transmitter
-	I_str(418:432) = Coo_Rx_new			 ! Calculated co-ordinates of the receiver
 !
 !
 	IF (DEBUG) THEN
-		OPEN (UNIT = 12, FILE = DEBUG_DIR(1:DB_LEN) // "\\OUTPUT.TXT")
+!		OPEN (UNIT = 12, FILE = TRIM(I_str(433:)) // "\\OUTPUT.TXT")
+		WRITE (12,*) '********** OUTPUT - Values **********'
 		WRITE (12,*) '  Version = ',Version
 		WRITE (12,*) '  Distance   = ',Distance
 		WRITE (12,*) '  H_Datab_Tx    = ',H_Datab_Tx

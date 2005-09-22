@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		25.02.2004
-!														G.H.			08.09.2005
+!														G.H.			22.09.2005
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -78,13 +78,13 @@
 !
 	LOGICAL			TX_TETRA, RX_TETRA, TX_DIG, RX_DIG, TXGSM
 !
-	REAL			B1, B2, CSXR, CSXT, DPN
+	REAL			B1, B2, CSXR, CSXT, GANT, DPN
 	REAL			CS1(7), CS2(7), CS3(7), CS4(7), CS5(7)
 	REAL			CS6(7), CS7(7), CS8(7), CS9(7), CS10(7)
 	REAL			CS11(7), CS12(7), CS13(7), CS14(7), CS15(7) 
 	REAL			CS16(7), CS17(7), CS18(7), CS19(7), CS20(7)
 	REAL			CS21(7), CS22(7), CS23(7), CS24(7), CS25(7)
-	REAL			CS26(7), CS27(7), CS28(7), CSXX(7), X1, GANT
+	REAL			CS26(7), CS27(7), CS28(7), CSXX(7), X1
 	CHARACTER*4		DRX, DTX
 !
 !
@@ -245,9 +245,6 @@
 	END IF
 !
 !	Bandwidth of Rx:   
-	IF (Desig_of_Rx_emis(2:2) .EQ. 'k') Desig_of_Rx_emis(2:2) = 'K'
-	IF (Desig_of_Rx_emis(3:3) .EQ. 'k') Desig_of_Rx_emis(3:3) = 'K'
-	IF (Desig_of_Rx_emis(4:4) .EQ. 'k') Desig_of_Rx_emis(4:4) = 'K'
 	I = INDEX(Desig_of_Rx_emis(1:4),'K')
 	IF (I .LT. 2) THEN
 	  HCM_Error = 1040
@@ -266,9 +263,6 @@
 	END IF
 !
 !	Bandwidth of TX:   
-	IF (Desig_of_Tx_emis(2:2) .EQ. 'k') Desig_of_Tx_emis(2:2) = 'K'
-	IF (Desig_of_Tx_emis(3:3) .EQ. 'k') Desig_of_Tx_emis(3:3) = 'K'
-	IF (Desig_of_Tx_emis(4:4) .EQ. 'k') Desig_of_Tx_emis(4:4) = 'K'
 	I = INDEX(Desig_of_Tx_emis(1:4),'K')
 	IF (I .LT. 2) THEN
 	  HCM_Error = 1041
@@ -717,20 +711,17 @@
 !
 	Perm_FS = Perm_FS + Rx_ant_corr
 !
-	IF (Type_of_Rx_ant .EQ. 'e') Type_of_Rx_ant = 'E'
-	IF (Type_of_Rx_ant .EQ. 'i') Type_of_Rx_ant = 'I'
-	IF (Type_of_Rx_ant .EQ. 'E') Rx_ant_type_corr = 0.0 
-	IF (Type_of_Rx_ant .EQ. 'I') Rx_ant_type_corr = 2.1
-!
-	IF ((Type_of_Rx_ant .EQ. 'E') .OR. (Type_of_Rx_ant .EQ. 'I')) THEN
-!		O.k.
-	  ELSE
+	IF (Type_of_Rx_ant .EQ. 'E') THEN
+		Rx_ant_type_corr = 0.0
+	ELSEIF (Type_of_Rx_ant .EQ. 'I') THEN
+		Rx_ant_type_corr = 2.1
+	ELSE
 		HCM_Error = 1044
-!		Error in Rx type of antenna ("E" or "I")
+!		Error in typ of Rx antenna (E/I)
 		RETURN
-	END IF 
-	Perm_FS = Perm_FS + Rx_ant_type_corr
+	END IF
 !
+	Perm_FS = Perm_FS + Rx_ant_type_corr
 !
 !	Gain of Rx-antenna:
 !
@@ -742,7 +733,6 @@
 	END IF
 !
 	Perm_FS = Perm_FS - GANT
-!
 !
 !	Depolarisation loss:
 !

@@ -1,6 +1,6 @@
 !
 !	Position_of_mobile.f90								P. Benner		24.08.2004
-!														G.H.			10.05.2005
+!														G.H.			22.09.2005
 !
 !	Subroutine to calculate the new position of Tx (New_LongTx, New_LatTx)
 !	and/or Rx (New_LongRx, New_latRx) if at least one is a mobile and
@@ -57,8 +57,7 @@
 !	  Determine, if in direction of Rx, the Tx circle is cut:
 	  DP1 = Distance
 	  IF (DP1 .GT. Tx_serv_area) DP1 = Tx_serv_area
-	  CALL TestCut (Border_path, Dir_Tx_Rx, LongTx, LatTx, DP1, N_Cut, &
-     				HCM_error, Land_from)
+	  CALL TestCut (Dir_Tx_Rx, LongTx, LatTx, DP1, N_Cut, HCM_error, Land_from)
 	  IF (HCM_error .NE. 0) THEN
 		HCM_error = 1036
 !		The 'xxx.ALL' borderline file for Tx is missing
@@ -71,8 +70,7 @@
 !	  Determine, if in direction of Tx, the Rx circle is cut:
 	  DP1 = Distance
 	  IF (DP1 .GT. Rx_serv_area) DP1 = Rx_serv_area
-	  CALL TestCut (Border_path, Dir_Rx_Tx, LongRx, LatRx, DP1, N_Cut, &
-     				HCM_error, Land_to)
+	  CALL TestCut (Dir_Rx_Tx, LongRx, LatRx, DP1, N_Cut, HCM_error, Land_to)
 	  IF (HCM_error .NE. 0) THEN
 		HCM_error = 1037
 !		The 'xxx.ALL' borderline file for Rx is missing
@@ -94,8 +92,7 @@
 				DP1 = Distance
 			  END IF
 !			  Calculate the new Rx co-ordinates:
-			  CALL New_coordinates (LongRx, LatRx, Dir_Rx_Tx, DP1, &
-								    New_LongRx, New_LatRx)
+			  CALL New_coordinates (LongRx, LatRx, Dir_Rx_Tx, DP1, New_LongRx, New_LatRx)
 			  New_LongTx = New_LongRx
 			  New_LatTx  = New_LatRx
 		    ELSE
@@ -104,8 +101,7 @@
 				DP1 = Distance
 			  END IF
 !			  Calculate the new Tx co-ordinates:
-			  CALL New_coordinates (LongTx, LatTx, Dir_Tx_Rx, DP1, &
-								    New_LongTx, New_LatTx)
+			  CALL New_coordinates (LongTx, LatTx, Dir_Tx_Rx, DP1, New_LongTx, New_LatTx)
 			  New_LongRx = New_LongTx
 			  New_LatRx  = New_LatTx
 		  END IF
@@ -113,13 +109,11 @@
 !		  Calculate new positions:
 		  IF (Tx_serv_area .GT. 0.0) THEN
 !			Calculate the new Tx co-ordinates:
-			CALL New_coordinates (LongTx, LatTx, Dir_Tx_Rx, Tx_serv_area, &
-								  New_LongTx, New_LatTx)
+			CALL New_coordinates (LongTx, LatTx, Dir_Tx_Rx, Tx_serv_area, New_LongTx, New_LatTx)
 		  END IF
 		  IF (Rx_serv_area .GT. 0.0) THEN
 !			Calculate the new Rx co-ordinates:
-			CALL New_coordinates (LongRx, LatRx, Dir_Rx_Tx, Rx_serv_area, &
-								  New_LongRx, New_LatRx)
+			CALL New_coordinates (LongRx, LatRx, Dir_Rx_Tx, Rx_serv_area, New_LongRx, New_LatRx)
 		  END IF
 	  END IF
 	  RETURN
@@ -135,8 +129,7 @@
 !	  Calculate the bigger service area first!
 	  IF (Tx_serv_area .GT. Rx_serv_area) THEN
 !		  Tx service area is bigger, calculate new Tx co-ordinates:
-		  CALL Calc_Tx_pos ( LongTx, LatTx, LongRx, LatRx, New_LongTx, &
-							 New_LatTx)
+		  CALL Calc_Tx_pos ( LongTx, LatTx, LongRx, LatRx, New_LongTx, New_LatTx)
 !		  Now calculate new Rx Position (Rx is a mobile too):
 !		  Calculate the distance from new Tx point to Rx:
 		  CALL Calc_distance (New_LongTx, New_LatTx, LongRx, LatRx, XDi)
@@ -151,8 +144,7 @@
 							 New_LongRx, New_LatRx)
 	    ELSE
 !		  Rx service area is bigger, calculate new Rx co-ordinates:
-		  CALL Calc_Rx_pos ( LongTx, LatTx, LongRx, LatRx, New_LongRx, &
-							 New_LatRx )
+		  CALL Calc_Rx_pos ( LongTx, LatTx, LongRx, LatRx, New_LongRx, New_LatRx )
 !		  Now calculate new Tx Position (Tx is a mobile too):
 !		  Calculate the distance from new Rx point to Tx:
 		  CALL Calc_distance (New_LongRx, New_LatRx, LongTx, LatTx, XDi)
@@ -163,8 +155,7 @@
 !		  Calculate the direction from the new Rx point to Tx:
 		  CALL Calc_direction (New_LongRx, New_LatRx, LongTx, LatTx, YDi) 
 		  Dir_Rx_Tx = YDI
-		  CALL Calc_Tx_pos ( LongTx, LatTx, New_LongRx, New_LatRx, &
-							 New_LongTx, New_LatTx )
+		  CALL Calc_Tx_pos ( LongTx, LatTx, New_LongRx, New_LatRx, New_LongTx, New_LatTx )
 	  END IF
 !	  Calculate the distance from new Rx point to the new Tx point:
 	  CALL Calc_distance (New_LongRx, New_LatRx, New_LongTx, New_LatTx, XDi)
@@ -179,8 +170,7 @@
 !	Only one station is a mobile: 
 !	If Tx is a mobile:
 	ELSEIF (Tx_serv_area .GT. 0.0) THEN
-	  CALL Calc_Tx_pos ( LongTx, LatTx, LongRx, LatRx, New_LongTx, &
-						 New_LatTx )
+	  CALL Calc_Tx_pos ( LongTx, LatTx, LongRx, LatRx, New_LongTx, New_LatTx )
 !	  Calculate the distance from new Tx point to Rx:
 	  CALL Calc_distance (New_LongTx, New_LatTx, LongRx, LatRx, XDi)
 	  Distance = XDi
@@ -193,8 +183,7 @@
 !
 !	If Rx is a mobile:
 	ELSEIF (Rx_serv_area .GT. 0.0) THEN
-	  CALL Calc_Rx_pos ( LongTx, LatTx, LongRx, LatRx, New_LongRx, &
-						 New_LatRx )
+	  CALL Calc_Rx_pos ( LongTx, LatTx, LongRx, LatRx, New_LongRx, New_LatRx )
 !	  Calculate the distance from new Rx point to Tx:
 	  CALL Calc_distance (New_LongRx, New_LatRx, LongTx, LatTx, XDi)
 	  Distance = XDi
@@ -214,16 +203,13 @@
 !
 !	*****************************************************************************************
 !
-	SUBROUTINE TestCut (Path, Dir, Long, Lat, ServiceArea, N_Cut, &
-     					Error, Country)
+	SUBROUTINE TestCut (Dir, Long, Lat, ServiceArea, N_Cut, Error, Country)
 !
 	IMPLICIT			NONE
 !	Include the interface definitions:
 	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
 	CHARACTER*3			Country
-	CHARACTER*7			BORFIL
-	CHARACTER*63		Path
 	CHARACTER*176		BREC
 !
 	INTEGER				N_Cut, I, T, IOS
@@ -248,12 +234,8 @@
 	BX = N_Long
 	BY = N_Lat
 !
-	BORFIL = 'xxx.ALL'
-	BORFIL(1:3) = Country
-	IF (BORFIL(2:2) .EQ. ' ') BORFIL(2:2) = '_'
-	IF (BORFIL(3:3) .EQ. ' ') BORFIL(3:3) = '_'
-	OPEN (UNIT=14, FILE=Path(1:B_L)//BORFIL, STATUS='OLD', &
-          ACCESS='DIRECT',RECL=176, MODE='READ', IOSTAT=IOS)
+	OPEN (UNIT=14, FILE=TRIM(Border_path) // '\' // Country // '.ALL', &
+          STATUS='OLD', ACCESS='DIRECT',RECL=176, MODE='READ', IOSTAT=IOS)
 	IF (IOS .NE. 0) THEN
 	  Error = 1
 	  RETURN
@@ -314,15 +296,13 @@
 !	********************************************************************************
 !
 	SUBROUTINE NearestLinePoint (Long, Lat, N_Long, & 
-				N_Lat, LongX, LatX, ServiceArea, PATH, Country)
+				N_Lat, LongX, LatX, ServiceArea, Country)
 !
 	IMPLICIT			NONE
 !	Include the interface definitions:
 	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
 	CHARACTER*3			Country
-	CHARACTER*7			BORFIL
-	CHARACTER*63		PATH
 	CHARACTER*176		BREC
 !
 	INTEGER				IOS, T, J
@@ -337,12 +317,8 @@
 	B = 1.8D2 / PI
 	MAXDI = 1.0D7
 !
-	BORFIL = 'xxx.ALL'
-	BORFIL(1:3) = Country
-	IF (BORFIL(2:2) .EQ. ' ') BORFIL(2:2) = '_'
-	IF (BORFIL(3:3) .EQ. ' ') BORFIL(3:3) = '_'
-	OPEN (UNIT=14, FILE=PATH(1:B_L)//BORFIL, STATUS='OLD', &
-          ACCESS='DIRECT',RECL=176, MODE='READ', IOSTAT=IOS)
+	OPEN (UNIT=14, FILE=TRIM(Border_path) // '\' // Country // '.ALL', &
+		STATUS='OLD', ACCESS='DIRECT',RECL=176, MODE='READ', IOSTAT=IOS)
 	IF (IOS .NE. 0) RETURN
 !
 !	Calculate whole borderline
@@ -446,8 +422,7 @@
 !	First: Determine, if in direction of Rx, the Tx circle is cut:
 	DP1 = Distance
 	IF (DP1 .GT. Tx_serv_area) DP1 = Tx_serv_area
-	CALL TestCut (Border_path, Dir_Tx_Rx, LongTx, LatTx, DP1, N_Cut, &
-    			  HCM_error, Land_from)
+	CALL TestCut (Dir_Tx_Rx, LongTx, LatTx, DP1, N_Cut, HCM_error, Land_from)
 !	If the number of (border-) line cuts (N_Cut) is odd, than the line is cutted
 !	(point is ouitside the closed line); if the number of cuts is even,
 !	than the point is inside the closed line:	
@@ -457,20 +432,18 @@
 	IF (MOD(N_Cut,2) .EQ. 0) THEN 
 !		The border line is not cut by the Tx service area:
 !		Calculate the new Tx co-ordinates:
-		CALL New_coordinates (LongTx, LatTx, Dir_Tx_Rx, DP1, &
-								New_LongTx, New_LatTx)
+		CALL New_coordinates (LongTx, LatTx, Dir_Tx_Rx, DP1, New_LongTx, New_LatTx)
 	  ELSE
 !		The border line is cut by the Tx service area:
 		CALL NearestLinePoint (LongRx, LatRx, New_LongTx, New_LatTx, &
-    				LongTx, LatTx, Tx_serv_area, Border_path, Land_from)
+    				LongTx, LatTx, Tx_serv_area, Land_from)
 	END IF
 !
 	END SUBROUTINE Calc_Tx_pos
 !
 !	*********************************************************************************
 !
-	SUBROUTINE Calc_Rx_pos ( LongTx, LatTx, LongRx, LatRx, New_LongRx, &
-							 New_LatRx)
+	SUBROUTINE Calc_Rx_pos ( LongTx, LatTx, LongRx, LatRx, New_LongRx, New_LatRx)
 !
 	IMPLICIT	NONE
 !
@@ -488,8 +461,7 @@
 !	First: Determine, if in direction of Tx, the Rx circle is cut:
 	DP1 = Distance
 	IF (DP1 .GT. Rx_serv_area) DP1 = Rx_serv_area
-	CALL TestCut (Border_path, Dir_Rx_Tx, LongRx, LatRx, DP1, N_Cut, &
-    				HCM_error, Land_to)
+	CALL TestCut (Dir_Rx_Tx, LongRx, LatRx, DP1, N_Cut, HCM_error, Land_to)
 !	If the number of (border-) line cuts (N_Cut) is odd, than the line is cutted
 !	(point is ouitside the closed line); if the number of cuts is even,
 !	than the point is inside the closed line:	
@@ -499,12 +471,11 @@
 	IF (MOD(N_Cut,2) .EQ. 0) THEN 
 !		The border line is not cut by the Rx service area:
 !		Calculate the new Rx co-ordinates:
-		CALL New_coordinates (LongRx, LatRx, Dir_Rx_Tx, DP1, &
-								New_LongRx, New_LatRx)
+		CALL New_coordinates (LongRx, LatRx, Dir_Rx_Tx, DP1, New_LongRx, New_LatRx)
 	  ELSE
 !		The border line is cut by the Rx service area:
 		CALL NearestLinePoint (LongTx, LatTx, New_LongRx, New_LatRx, &
-     					LongRx, LatRx, Rx_serv_area, Border_path, Land_to)
+     					LongRx, LatRx, Rx_serv_area, Land_to)
 	END IF
 !
 	RETURN

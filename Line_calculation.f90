@@ -1,6 +1,6 @@
 !
 !	Line_calculation.f90								P.Benner		23.11.2004
-!														G.H.			07.05.2005
+!														G.H.			22.09.2005
 !
 !	23.11.2004	Steps from 100 / 10 / 1 modified to 25 / 5 / 1
 !
@@ -49,10 +49,8 @@
 	DOUBLE PRECISION	N_Record(22), RB, PI, Lo, La
 	DOUBLE PRECISION	Co_cp(10000,2), LongTx, LatTx, LongRx, LatRx
 	REAL				FS_list(3), FS_list1(3), FS_x
-	CHARACTER*3			C3
 	CHARACTER*8			C_Record(22)
-	CHARACTER*10		BorderFile, BorderFile1
-	CHARACTER*73		Border_filename, Border_filename1
+	CHARACTER*10		BorderFile
 	LOGICAL				CBR, Take_it
 !
 	EQUIVALENCE			(N_Record,C_Record)
@@ -71,24 +69,9 @@
 !
 !	Select line data
 !
-	BorderFile  = '______.000'
-	BorderFile1 = '______.000'
-!
-	IF ((Land_to(3:3) .EQ. ' ') .OR. (ICHAR(Land_to(3:3)) .EQ. 0)) THEN
-	  Land_to(3:3) = '_'
-	END IF
-	IF ((Land_to(2:2) .EQ. ' ') .OR. (ICHAR(Land_to(2:2)) .EQ. 0)) THEN
-	  Land_to(2:2) = '_'
-	END IF
-	IF ((Land_from(3:3) .EQ. ' ') .OR. (ICHAR(Land_from(3:3)) .EQ. 0)) THEN
-	  Land_from(3:3) = '_'
-	END IF
-	IF ((Land_from(2:2) .EQ. ' ') .OR. (ICHAR(Land_from(2:2)) .EQ. 0)) THEN
-	  Land_from(2:2) = '_'
-	END IF
-!
 	BorderFile(1:3) = Land_from
 	BorderFile(4:6) = Land_to
+	BorderFile(7:7) = '.'
 ! 
 	CBR = .FALSE.
 !
@@ -108,20 +91,15 @@
 !			Distance to borderline is too long
 			RETURN
 	    ELSE
-		  WRITE (C3, '(I3.3)') D_to_border
-		  BorderFile(8:10) = C3
+		  WRITE (BorderFile(8:10), '(I3.3)') D_to_border
 	  END IF
 	END IF
 !
 !	In case of CBR calculations, get additionally all centerpoint co-ordinates
 !	of the borderline file:
 	IF (CBR) THEN
-	  BorderFile1(1:7) = BorderFile(1:7)
-	  Border_filename1 = ' '
-	  Border_filename1(1:B_L)  = Border_path(1:B_L)
-	  Border_filename1(B_L+1:B_L+10) = BorderFile1
-	  OPEN (UNIT=3, FILE=Border_filename1(1:B_L+10), STATUS='OLD', &
-			ACCESS='DIRECT',RECL=176, MODE='READ', IOSTAT=IOS)
+	  OPEN (UNIT=3, FILE=TRIM(Border_path) // '\' // BorderFile(1:7) // '000', &
+			STATUS='OLD', ACCESS='DIRECT',RECL=176, MODE='READ', IOSTAT=IOS)
 !
 	  IF (IOS .NE. 0) THEN
 		HCM_Error= 1048
@@ -149,12 +127,8 @@
 	END IF
 !
 !	Open line file:
-	Border_filename = ' '
-	Border_filename(1:B_L)  = Border_path(1:B_L)
-	Border_filename(B_L+1:B_L+10) = BorderFile
-!
-	OPEN (UNIT=3, FILE=Border_filename(1:B_L+10), STATUS='OLD', &
-		  ACCESS='DIRECT',RECL=176, MODE='READ', IOSTAT=IOS)
+	  OPEN (UNIT=3, FILE=TRIM(Border_path) // '\' // BorderFile, &
+			STATUS='OLD', ACCESS='DIRECT',RECL=176, MODE='READ', IOSTAT=IOS)
 !
 	IF (IOS .NE. 0) THEN
 	  HCM_Error= 1048

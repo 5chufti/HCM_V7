@@ -1,6 +1,6 @@
 !	
 !	HCMMS_V7.F90										P.Benner		23.02.2004
-!														G.H.			12.07.2005
+!														G.H.			22.09.2005
 !	Version 7					
 !
 !	Harmonized Calculation Method for mobile services
@@ -26,6 +26,9 @@
 	DOUBLE PRECISION	CI, LongTx, LatTx, LongRx, LatRx
 	REAL				Perm_FS_in
 	INTEGER*4			I, IOS, IMR
+	CHARACTER*376		Strings
+!
+	EQUIVALENCE			(Strings,Sea_temperature)
 !
 !
 !	*************************************************************************
@@ -114,59 +117,27 @@
 !
 	HCM_error = 0
 !
+!	Convert strings to uppercase and remove chr(0)
+!
+	DO I = 1, 376
+	  IMR = ICHAR(STRINGS(I:I))		
+      IF ((IMR .GE. 97) .AND. (IMR .LE. 122)) STRINGS(I:I) = CHAR(IMR - 32)
+	  IF (IMR .EQ. 0) STRINGS(I:I) = CHAR(32)
+	END DO
+!
 !	Clear all Info's
 !
 	DO I = 1, 20
 	  Info(I) = .FALSE.
 	END DO
 !
-!	Determine the length of Topo_path (T_L), Morpho_path (M_L) and Border_path (B_L):
-	DO T_L = 63, 1, -1
-	  IF ((Topo_path(T_L:T_L) .EQ. " ") .OR. &
-		  (Topo_path(T_L:T_L) .EQ. CHAR(0))) THEN
-!		  continue
-	    ELSE
-		  EXIT
-	  END IF
-	END DO
-	IF (Topo_path(T_L:T_L) .EQ. '\') THEN
-!		Do nothing
-	  ELSE
-		T_L = T_L + 1
-		Topo_path(T_L:T_L) = '\'
-	END IF
+!	Read all input data:    
+!	correct countrycodes for filenames
+	IF (Land_to(3:3) .EQ. ' ') Land_to(3:3) = '_'
+	IF (Land_to(2:2) .EQ. ' ') Land_to(2:2) = '_'
+	IF (Land_from(3:3) .EQ. ' ') Land_from(3:3) = '_'
+	IF (Land_from(2:2) .EQ. ' ') Land_from(2:2) = '_'
 !
-	DO M_L = 63, 1, -1
-	  IF ((Morpho_path(M_L:M_L) .EQ. " ") .OR. &
-		  (Morpho_path(M_L:M_L) .EQ. CHAR(0))) THEN
-!		  continue
-	    ELSE
-		  EXIT
-	  END IF
-	END DO
-	IF (Morpho_path(M_L:M_L) .EQ. '\') THEN
-!		Do nothing
-	  ELSE
-		M_L = M_L + 1
-		Morpho_path(M_L:M_L) = '\'
-	END IF
-!
-	DO B_L = 63, 1, -1
-	  IF ((Border_path(B_L:B_L) .EQ. " ") .OR. &
-		  (Border_path(B_L:B_L) .EQ. CHAR(0))) THEN
-!		  continue
-	    ELSE
-		  EXIT
-	  END IF
-	END DO
-	IF (Border_path(B_L:B_L) .EQ. '\') THEN
-!		Do nothing
-	  ELSE
-		B_L = B_L + 1
-		Border_path(B_L:B_L) = '\'
-	END IF
-!
-!	Read all input data:      
 !	Get the longitude of transmitter 'LongTX':
 	READ (Coo_Tx(1:3), '(F3.0)', IOSTAT = IOS) LongTx
 	IF (IOS .NE. 0) THEN
@@ -188,9 +159,8 @@
 	  RETURN
 	END IF
 	LongTx = LongTx + CI / 3.6D3
-	IF ((Coo_Tx(4:4) .EQ. 'W') .OR. (Coo_Tx(4:4) .EQ. 'w')) LongTx = 3.6D2 - LongTx
-	IF (.NOT.((Coo_Tx(4:4).EQ.'E') .OR. (Coo_Tx(4:4).EQ.'W') .OR. &
-			  (Coo_Tx(4:4).EQ.'e') .OR. (Coo_Tx(4:4).EQ.'w'))) THEN
+	IF (Coo_Tx(4:4) .EQ. 'W') LongTx = 3.6D2 - LongTx
+	IF ((Coo_Tx(4:4).NE.'E') .AND. (Coo_Tx(4:4).NE.'W')) THEN
 	  HCM_error = 1004
 !	  Error in geographical coordinates (Tx longitude, E/W)
 	  RETURN
@@ -217,7 +187,7 @@
 	  RETURN
 	END IF
 	LatTx = LatTx + CI / 3.6D3
-	IF (.NOT. ((Coo_Tx(11:11) .EQ. 'N') .OR. (Coo_Tx(11:11) .EQ. 'n'))) THEN
+	IF (Coo_Tx(11:11) .NE. 'N') THEN
 	  HCM_error = 1008
 !	  Error in geographical coordinates (Tx latitude, N/S)
 	  RETURN
@@ -238,19 +208,13 @@
 !	  Error in transmitting frequency value
 	  RETURN
 	END IF
-	IF ((Tx_frequ(12:12) .EQ. 'k') .OR. (Tx_frequ(12:12) .EQ. 'K')) THEN
-	  Tx_frequency = Tx_frequency / 1.0D3
-	END IF
-	IF ((Tx_frequ(12:12) .EQ. 'g') .OR. (Tx_frequ(12:12) .EQ. 'G')) THEN
-	  Tx_frequency = Tx_frequency * 1.0D3
-	END IF
-!	"M" or "m" -> no change
-	IF (.NOT. ((Tx_frequ(12:12) .EQ. 'k') .OR. &
-			   (Tx_frequ(12:12) .EQ. 'K') .OR. &
-			   (Tx_frequ(12:12) .EQ. 'm') .OR. &
-			   (Tx_frequ(12:12) .EQ. 'M') .OR. &
-			   (Tx_frequ(12:12) .EQ. 'g') .OR. &
-			   (Tx_frequ(12:12) .EQ. 'G') )) THEN
+	IF (Tx_frequ(12:12) .EQ. 'M') THEN
+!		nothing
+	ELSEIF (Tx_frequ(12:12) .EQ. 'K') THEN
+		Tx_frequency = Tx_frequency / 1.0D3
+	ELSEIF (Tx_frequ(12:12) .EQ. 'G') THEN 
+		Tx_frequency = Tx_frequency * 1.0D3
+	ELSE
 	  HCM_error = 1011
 !	  Error in transmitting frequency unit
 	  RETURN
@@ -297,9 +261,8 @@
 		RETURN
 	  END IF
 	  LongRx = LongRx + CI / 3.6D3
-	  IF ((Coo_Rx(4:4) .EQ. 'W') .OR. (Coo_Rx(4:4) .EQ. 'w')) LongRx = 3.6D2 - LongRx
-	  IF (.NOT.((Coo_Rx(4:4).EQ.'E') .OR. (Coo_Rx(4:4).EQ.'W') .OR. &
-				(Coo_Rx(4:4).EQ.'e') .OR. (Coo_Rx(4:4).EQ.'w'))) THEN
+	  IF (Coo_Rx(4:4) .EQ. 'W') LongRx = 3.6D2 - LongRx
+	  IF ((Coo_Rx(4:4).NE.'E') .AND. (Coo_Rx(4:4).NE.'W')) THEN
 		HCM_error = 1017
 !		Error in geographical coordinates (Rx longitude, E/W)
 		RETURN
@@ -326,7 +289,7 @@
 		RETURN
 	  END IF
 	  LatRx = LatRx + CI / 3.6D3
-	  IF (.NOT. ((Coo_Rx(11:11) .EQ. 'N') .OR. (Coo_Rx(11:11) .EQ. 'n'))) THEN
+	  IF (Coo_Rx(11:11) .NE. 'N') THEN
 		HCM_error = 1021
 !		Error in geographical coordinates (Rx latitude, N/S)
 		RETURN
@@ -347,23 +310,18 @@
 !		Error in reception frequency value
 		RETURN
 	  END IF
-	  IF ((Rx_frequ(12:12) .EQ. 'k') .OR. (Rx_frequ(12:12) .EQ. 'K')) THEN
+	  IF (Rx_frequ(12:12) .EQ. 'M') THEN
+!		nothing
+	  ELSEIF (Rx_frequ(12:12) .EQ. 'K') THEN
 		Rx_frequency = Rx_frequency / 1.0D3
-	  END IF
-	  IF ((Rx_frequ(12:12) .EQ. 'g') .OR. (Rx_frequ(12:12) .EQ. 'G')) THEN
+	  ELSEIF (Tx_frequ(12:12) .EQ. 'G') THEN 
 		Rx_frequency = Rx_frequency * 1.0D3
-	  END IF
-!	  "M" or "m" -> no change
-	  IF (.NOT. ((Rx_frequ(12:12) .EQ. 'k') .OR. &
-				 (Rx_frequ(12:12) .EQ. 'K') .OR. &
-				 (Rx_frequ(12:12) .EQ. 'm') .OR. &
-				 (Rx_frequ(12:12) .EQ. 'M') .OR. &
-				 (Rx_frequ(12:12) .EQ. 'g') .OR. &
-				 (Rx_frequ(12:12) .EQ. 'G') )) THEN
+	  ELSE
 		HCM_error = 1024
-!		Error in reception frequency unit
+!		Error in receiving frequency unit
 		RETURN
 	  END IF
+!
 !	  Get radius of the Rx service area:
 	  IF (C_mode .NE. 99) THEN
 		READ (Rad_of_Rx_serv_area, '(F5.0)', IOSTAT=IOS) Rx_serv_area
@@ -376,6 +334,7 @@
 		Rx_serv_area = 0.0
 	  END IF
 	END IF
+!	end of point to point data
 !
 !	get power
 	READ (Max_power, '(F6.1)', IOSTAT=IOS) MaxPow
@@ -386,12 +345,11 @@
 	END IF
 !
 !	Calculate 'Tx_ant_type_corr':
-	IF (Type_of_Tx_ant .EQ. 'e') Type_of_Tx_ant = 'E'
-	IF (Type_of_Tx_ant .EQ. 'i') Type_of_Tx_ant = 'I'
-	IF (Type_of_Tx_ant .EQ. 'E') Tx_ant_type_corr = 0.0
-	IF (Type_of_Tx_ant .EQ. 'I') Tx_ant_type_corr = 2.1
-!
-	IF (.NOT. ((Type_of_Tx_ant .EQ. 'E') .OR. (Type_of_Tx_ant .EQ. 'I'))) THEN
+	IF (Type_of_Tx_ant .EQ. 'E') THEN
+		Tx_ant_type_corr = 0.0
+	ELSEIF (Type_of_Tx_ant .EQ. 'I') THEN
+		Tx_ant_type_corr = 2.1
+	ELSE
 		HCM_Error = 1033
 !		Error in typ of Tx antenna (E/I)
 		RETURN
@@ -674,12 +632,7 @@
 	END IF  
 !
 !	Sea temparatur:
-	IF ((Sea_temperature .EQ. 'W') .OR. (Sea_temperature .EQ. 'w')) THEN
-		Sea_temperature = 'W'
-	  ELSE
-!		Default value !
-		Sea_temperature = 'C'
-	END IF
+	IF (Sea_temperature .NE. 'W') Sea_temperature = 'C'
 !
 !	**************************************************************
 !
