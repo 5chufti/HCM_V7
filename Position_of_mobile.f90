@@ -24,12 +24,13 @@
 !	Include the interface definitions:
 	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
-	INTEGER				N_Cut
+!
+	DOUBLE PRECISION	LongTx, LatTx, LongRx, LatRx
+	DOUBLE PRECISION	New_LongTx, New_LatTx, New_LongRx, New_LatRx
 !
 	REAL				DP1
-!
-	DOUBLE PRECISION	XDi, YDi, LongTx, LatTx, LongRx, LatRx
-	DOUBLE PRECISION	New_LongTx, New_LatTx, New_LongRx, New_LatRx
+	DOUBLE PRECISION	XDi, YDi
+	INTEGER				N_Cut
 !
 	LOGICAL				CutTx, CutRx
 !
@@ -209,15 +210,14 @@
 !	Include the interface definitions:
 	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
-	CHARACTER*3			Country
-	CHARACTER*176		BREC
-!
-	INTEGER				N_Cut, I, T, IOS
-	INTEGER				Error
-!
+	DOUBLE PRECISION	Dir, Long, Lat
 	REAL				ServiceArea
-!
-	DOUBLE PRECISION	BCOO(22), Long, Lat, N_Long, N_Lat, PI, B, Dir
+	INTEGER				N_Cut, Error
+	CHARACTER*3			Country
+!	
+	CHARACTER*176		BREC
+	INTEGER				I, T, IOS
+	DOUBLE PRECISION	BCOO(22), N_Long, N_Lat, PI, B
 	DOUBLE PRECISION	CX, CY, DX, DY, AX, AY, BX, BY, RT, RN, R, S
 !
 	EQUIVALENCE (BREC, BCOO)
@@ -302,14 +302,13 @@
 !	Include the interface definitions:
 	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
-	CHARACTER*3			Country
-	CHARACTER*176		BREC
-!
-	INTEGER				IOS, T, J
+	DOUBLE PRECISION	Long, Lat, N_Long, N_Lat, LongX, LatX
 	REAL				ServiceArea
+	CHARACTER*3			Country
 !
-	DOUBLE PRECISION	Long, Lat, N_Long, N_Lat, BCOO(22), X, Y
-	DOUBLE PRECISION	LongX, LatX, PI, B, DI, DIS, MAXDI
+	CHARACTER*176		BREC
+	INTEGER				IOS, T, J
+	DOUBLE PRECISION	PI, B, DI, DIS, MAXDI, BCOO(22), X, Y
 !
 	EQUIVALENCE (BREC, BCOO)
 !
@@ -361,10 +360,10 @@
 !
 	IMPLICIT			NONE
 !	
+	DOUBLE PRECISION	LONG, LAT, N_LONG, N_LAT, DIR
 	REAL				D
 !
-	DOUBLE PRECISION	LONG, LAT, N_LONG, N_LAT
-	DOUBLE PRECISION	DP, T, T1, T2, DIR   
+	DOUBLE PRECISION	DP, T, T1, T2   
 !
 	IF (D .EQ. 0.0D0) THEN
 	  N_LONG = LONG
@@ -411,12 +410,11 @@
 !	Include the interface definitions:
 	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
-	INTEGER				N_Cut
-!
-	REAL				DP1
-!
 	DOUBLE PRECISION	LongTx, LatTx, LongRx, LatRx
 	DOUBLE PRECISION	New_LongTx, New_LatTx
+!
+	REAL				DP1
+	INTEGER				N_Cut
 !
 !
 !	First: Determine, if in direction of Rx, the Tx circle is cut:
@@ -450,12 +448,11 @@
 !	Include the interface definitions:
 	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
-	INTEGER				N_Cut
-!
-	REAL				DP1
-!
 	DOUBLE PRECISION	LongTx, LatTx, LongRx, LatRx
 	DOUBLE PRECISION	New_LongRx, New_LatRx
+!
+	INTEGER				N_Cut
+	REAL				DP1
 !
 !
 !	First: Determine, if in direction of Tx, the Rx circle is cut:

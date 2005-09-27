@@ -1,6 +1,7 @@
 !
 !	Pofile.f90											P. Benner		20.11.2003
-!														G.H.			10.05.2005
+!														G.H.			26.09.2005
+!
 !	This subroutine constructs a terrain- or morphological profile from point A to
 !	point B in steps of 100 m. The heights or morphological information are stored
 !	in 'Prof(i)'. The total number of points is in 'PN'. The first profile point
@@ -35,24 +36,21 @@
 !
 !	**********************************************************************************
 !
-	SUBROUTINE PROFILE (LongA, LatA, LongB, LatB, Prof, Error, P_Type)
+	SUBROUTINE PROFILE (LongA, LatA, LongB, LatB, Prof, P_Type)
 !
 	IMPLICIT			NONE
 !
 	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
-	INTEGER(2)			Prof(10002)
-	INTEGER(4)			Error
-	INTEGER(2)			PC
 	DOUBLE PRECISION	LongA, LatA, LongB, LatB
-	DOUBLE PRECISION	SIDA, SILAB, COLAB, SILAA, COLAA, COLOA, SILOA, COLOB, SILOB
-	DOUBLE PRECISION	LAY, LOY, DD, DA, DIS, DP, A, B, K, x, y, z
+	INTEGER(2)			Prof(10002)
 	CHARACTER*1			P_Type
 !
+	INTEGER(2)			PC
+	DOUBLE PRECISION	SIDA, SILAB, COLAB, SILAA, COLAA, COLOA, SILOA, COLOB, SILOB
+	DOUBLE PRECISION	LAY, LOY, DD, DA, DIS, DP, A, B, K, x, y, z
+!
 !	**********************************************************************************
-!
-	Error = 0
-!
 !
 !	Max. distance = 1000km; distance between two points = 100m
 !	-> number of points are 10.000 + 2 for Tx site and Rx site
@@ -62,7 +60,7 @@
 !
 !	If the distance is greater than 1000 km, 'ERROR' value is 1028
 	IF (DIS .GT. 1.0D3) THEN
-	  ERROR = 1028
+	  HCM_Error = 1028
 	  RETURN
 	END IF
 !
@@ -86,12 +84,12 @@
 !	Calculate point #1 (TX):
 !
 	IF (P_Type .EQ. 'e') THEN
-!			CALL Point_height (LongA, LatA, Prof(1), Error)
+!			CALL Point_height (LongA, LatA, Prof(1))
 		Prof(1) = 0
 	  ELSE
-		CALL Point_type (LongA, LatA, Prof(1), Error)
+		CALL Point_type (LongA, LatA, Prof(1))
 	END IF
-	IF (Error .NE. 0) RETURN
+	IF (HCM_Error .NE. 0) RETURN
 !
 !	first part of profile (TX to center)
 		SILAA = DSIND(LatA)
@@ -123,12 +121,12 @@
 !	  get Information of new point:
 !
 		IF (P_Type .EQ. 'e') THEN 
-			CALL Point_height (LOY, LAY, Prof(PC), Error)
+			CALL Point_height (LOY, LAY, Prof(PC))
 			Prof(PC) = Prof(PC) - DNINT(DBLE(H_Tx) + K * DBLE(PC-1) * PD)
 		ELSE
-			CALL Point_type (LOY, LAY, Prof(PC), Error)
+			CALL Point_type (LOY, LAY, Prof(PC))
 		END IF	
-		IF (Error .NE. 0) RETURN
+		IF (HCM_Error .NE. 0) RETURN
 	END DO
 !
 !	second part of profile RX to center
@@ -161,22 +159,22 @@
 !	  get Information of new point:
 !
 		IF (P_Type .EQ. 'e') THEN 
-			CALL Point_height (LOY, LAY, Prof(PC), Error) 
+			CALL Point_height (LOY, LAY, Prof(PC)) 
 			Prof(PC) = Prof(PC) - DNINT(DBLE(H_Rx) + K * DBLE(PC-1) * PD)
 		ELSE
-			CALL Point_type (LOY, LAY, Prof(PC), Error)
+			CALL Point_type (LOY, LAY, Prof(PC))
 		END IF	
-		IF (Error .NE. 0) RETURN
+		IF (HCM_Error .NE. 0) RETURN
 	END DO
 !
 !	calculate last point #PC+1 (RX):
 	IF (P_Type .EQ. 'e') THEN
-!			CALL Point_height (LongB, LatB, Prof(PN), Error)
+!			CALL Point_height (LongB, LatB, Prof(PN))
 		Prof(PN) = 0
 	ELSE
-		CALL Point_type (LongB, LatB, Prof(PN), Error)
+		CALL Point_type (LongB, LatB, Prof(PN))
 	END IF
-	IF (Error .NE. 0) RETURN	
+	IF (HCM_Error .NE. 0) RETURN	
 !
 	RETURN
 !

@@ -49,10 +49,12 @@
 !
 	IMPLICIT	NONE
 !
-	INTEGER*4	Figure_frequency, Time_percentage, Figure_distance, Error, I, J
-	INTEGER*4	Distances(78)
+	INTEGER*4	Figure_frequency, Time_percentage, Figure_distance, Error
 	REAL		Figure_Heff, Land_figure_FS, Sea_figure_FS
 	CHARACTER*1	Sea_temperature
+!
+	INTEGER*4	I, J
+	INTEGER*4	Distances(78)
 	LOGICAL*4	Found
 !
 	REAL	Heff_values(8), FXX(702)

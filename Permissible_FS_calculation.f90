@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		25.02.2004
-!														G.H.			22.09.2005
+!														G.H.			27.09.2005
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -687,11 +687,13 @@
 !
 !	Calculation of antenna correction factors "Rx_ant_corr" and "Rx_ant_type_corr":
 !
+	V_angle_Rx_Tx = ATAND ((H_Tx + H_AntTx - H_Rx + H_AntRx) / (1E3 * Distance))
 	IF ((C_mode .EQ. 99) .OR. &
 		((Ant_typ_V_Rx .EQ. '000ND00') .AND. (Ant_typ_H_Rx .EQ. '000ND00'))) THEN
 		Rx_ant_corr  = 0.0
+		H_diff_angle_Rx_Tx = 0.0
+		V_diff_angle_Rx_Tx = 0.0
 	ELSE
-		V_angle_Rx_Tx = ATAND ((H_Tx + H_AntTx - H_Rx + H_AntRx) / (1E3 * Distance))
 		READ (Ele_Rx_input, *, IOSTAT=IOS) Rx_Elevation
 		IF ((IOS .NE. 0) .AND. (Ant_typ_V_Rx .NE. '000ND00')) THEN
 		  HCM_Error = 1042
@@ -704,8 +706,8 @@
 !		  Error in Rx azimuth
 		  RETURN
 		END IF
-		CALL Ctransf (Dir_Rx_Tx,Rx_Azimuth,V_angle_Rx_Tx,Rx_Elevation,H_diff_angle_Rx_Tx,V_diff_angle_Rx_Tx)
-		CALL Antenna_correction (H_diff_angle_Rx_Tx, V_diff_angle_Rx_Tx, Ant_typ_H_Rx, Ant_typ_V_Rx, Rx_ant_corr, HCM_Error)
+		CALL Antenna_correction (Dir_Rx_Tx,Rx_Azimuth,V_angle_Rx_Tx,Rx_Elevation,H_diff_angle_Rx_Tx, &
+				V_diff_angle_Rx_Tx, Ant_typ_H_Rx, Ant_typ_V_Rx, Rx_ant_corr, HCM_Error)
 		IF (HCM_Error .NE. 0) RETURN
 	END IF
 !
@@ -755,7 +757,9 @@
 	SUBROUTINE TACSNMT (DF, CDF)
 !
 	DOUBLE PRECISION	DF
-	REAL				CDF, DD, FTAB1(7)
+	REAL				CDF
+!
+	REAL				DD, FTAB1(7)
 	INTEGER				I
 !
 !	From 30 kHz to 90 kHz in 10 kHz steps:      

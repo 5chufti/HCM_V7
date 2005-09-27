@@ -43,11 +43,12 @@
 !
 	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
+	DOUBLE PRECISION	LongTx, LatTx, LongRx, LatRx
+!
 	INTEGER				IOS, N_rec, N_List, Rec_N_list(3), N_cp
 	INTEGER				N_List1, Rec_N_list1(3), teststep
 	INTEGER				I, J, K, Rec_N_x, Rec_x
-	DOUBLE PRECISION	N_Record(22), RB, PI, Lo, La
-	DOUBLE PRECISION	Co_cp(10000,2), LongTx, LatTx, LongRx, LatRx
+	DOUBLE PRECISION	N_Record(22), RB, PI, Lo, La, Co_cp(10000,2)
 	REAL				FS_list(3), FS_list1(3), FS_x
 	CHARACTER*8			C_Record(22)
 	CHARACTER*10		BorderFile
@@ -409,9 +410,10 @@
 !
 	IMPLICIT			NONE
 !
-	INTEGER				N_cut, I, N_cp
-!
 	DOUBLE PRECISION	LONG, LAT, N_LONG, N_LAT
+	INTEGER				N_cut
+!
+	INTEGER				I, N_cp
 	DOUBLE PRECISION	CX, CY, DX, DY, AX, AY, BX, BY, RT, RN, R, S
 	DOUBLE PRECISION	Co_cp(10000,2)
 !
@@ -467,10 +469,12 @@
 !
 	IMPLICIT			NONE
 !
-	DOUBLE PRECISION	LongLi, LatLi, LongTx, LatTx, Dir, Lo, La, D
+	DOUBLE PRECISION	LongLi, LatLi, LongTx, LatTx
 	REAL				CBR_D, ServTx
-	INTEGER				N_cut
 	LOGICAL				Take_it
+!
+	DOUBLE PRECISION	Dir, Lo, La, D
+	INTEGER				N_cut
 !
 	Take_it = .TRUE.
 	IF ((LongTx .EQ. LongLi) .AND. (LatTx .EQ. LatLi)) THEN
@@ -517,8 +521,11 @@
 !
 	IMPLICIT		NONE
 !
-	INTEGER			N_rec, N_List, Rec_N_list(3), I, J
-	REAL			Calculated_FS, FS_list(3), FS_x
+	INTEGER			N_rec, N_List, Rec_N_list(3)
+	REAL			Calculated_FS, FS_list(3)
+!
+	INTEGER			I, J
+	REAL			FS_x
 !
 	IF (N_List .LT. 3) THEN
 	  N_List = N_list + 1

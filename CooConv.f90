@@ -8,11 +8,11 @@
 !
 	IMPLICIT			NONE
 !
+	DOUBLE PRECISION	Long, Lat
 	CHARACTER*15		Coo
 !
 	INTEGER				I, J, K
-!
-	DOUBLE PRECISION	Long, Lo, Lat, La
+	DOUBLE PRECISION	Lo, La
 !
 !
 	Lo = Long

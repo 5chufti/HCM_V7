@@ -1,6 +1,6 @@
 !
 !	Point_type.f90										P. Benner		09.10.2003
-!														G.H.			22.09.2005
+!														G.H.			26.09.2005
 !
 !
 !	Subroutine to read the morphological type of a given point from the morpho-database.
@@ -42,17 +42,20 @@
 !
 !	**********************************************************************************
 !
-	SUBROUTINE Point_type (Long, Lat, M_Type, Error)
+	SUBROUTINE Point_type (Long, Lat, M_Type)
 !
 	IMPLICIT			NONE
 !
 	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
-	INTEGER(2)			M_Type, M1, M2, M3, M4
+	DOUBLE PRECISION	Long, Lat
+	INTEGER(2)			M_Type
+!
+	INTEGER(2)			M1, M2, M3, M4
 	INTEGER(2)			M_F_3(101,101), M_F_6(51,101)
-	INTEGER(4)			Error, RESH, SLO, SLA, IOS, LOD, LAD, BH, BV, T, OLD_T
+	INTEGER(4)			RESH, SLO, SLA, IOS, LOD, LAD, BH, BV, T, OLD_T
 	INTEGER(4)			P1X, P1Y
-	DOUBLE PRECISION	Long, Lat, LOR, LAR, LO_P1, LA_P1, RELLO, RELLA
+	DOUBLE PRECISION	LOR, LAR, LO_P1, LA_P1, RELLO, RELLA
 	CHARACTER(1)		M_3(20402), M_6(10302)
 	CHARACTER(11)		FN, O_FN
 !
@@ -61,7 +64,6 @@
 !
 !	**********************************************************************************
 !
-	Error  = 0
 	M_Type = 0	! normal land
 !
 !
@@ -103,14 +105,14 @@
 !	Longitude in range of -180.0  to 180.0 
 	IF (Long .GT. 1.8D2) Long = Long - 3.6D2
 	IF (DABS(Long) .GT. 1.8D2) THEN
-	  Error = 200
+	  HCM_Error = 200
 	  RETURN
 	END IF
 !
 !	Latitude in range of -90.0  to 90.0 
 	IF (Lat .GT. 1.8D2) Lat = Lat - 3.6D2
 	IF (DABS(Lat) .GT. 9.0D1) THEN
-	  Error = 210
+	  HCM_Error = 210
 	  RETURN
 	END IF
 !
@@ -126,7 +128,7 @@
 		FN(1:1) = 'W'                     
 	END IF
 	IF (IOS.NE. 0) THEN
-	  ERROR = 200
+	  HCM_Error = 200
 	  RETURN
 	END IF
 !
@@ -137,7 +139,7 @@
 		FN(5:5) = 'S'
 	END IF
 	IF (IOS.NE. 0) THEN
-	  ERROR = 210
+	  HCM_Error = 210
 	  RETURN
 	END IF
 !
@@ -199,7 +201,7 @@
 				MODE='READ')
 	END IF
 	IF (IOS .NE. 0) THEN
-	  ERROR = 36
+	  HCM_Error = 36
 	  RETURN
 	END IF
 !      
@@ -210,7 +212,7 @@
 50	IF (RESH .EQ. 3) READ (2, IOSTAT=IOS, REC=T) M_3
 	IF (RESH .EQ. 6) READ (2, IOSTAT=IOS, REC=T) M_6
 	IF (IOS .NE. 0) THEN
-	  ERROR = 220
+	  HCM_Error = 220
 	  RETURN
 	END IF
 !  

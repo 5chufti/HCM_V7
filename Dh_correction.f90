@@ -21,10 +21,12 @@
 !
 	IMPLICIT		 NONE
 !
-	INTEGER*4		 f_sup, f_inf
-	REAL			 Dh, Dh_corr, A, A1_100, A2_100, A1_600, A2_600 
-	REAL			 C100, C600, C2000, A1_2000, A2_2000 
 	DOUBLE PRECISION Distance, Frequency
+	REAL			 Dh, Dh_corr
+!
+	INTEGER*4		 f_sup, f_inf
+	REAL			 A, A1_100, A2_100, A1_600, A2_600 
+	REAL			 C100, C600, C2000, A1_2000, A2_2000 
 !
 	IF ((Distance .LT. 1.0D1) .OR. (Dh .EQ. 50.0)) THEN
 	  Dh_corr = 0.0

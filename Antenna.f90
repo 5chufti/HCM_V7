@@ -1,6 +1,6 @@
 !
 !	Antenna.f90											P. Benner		14.03.2000
-!														G.H.			07.07.2005
+!														G.H.			26.09.2005
 !						                                
 !
 !	Subroutine to calculate the gain (loss) of an antenna.
@@ -9,7 +9,7 @@
 !	Input values 
 !
 !	A_typ	Type of antenna (TR25-08)
-!	Angle	Angle, where loss is calculated [degrees]
+!	Angle	Angle, where loss is calculated [0..360 degrees]
 !
 !
 !	Output values
@@ -24,20 +24,23 @@
 	IMPLICIT		NONE
 !
 	CHARACTER*7		A_typ
+	REAL			Angle, RHO
+	INTEGER*4		Error
+!
 	CHARACTER*2		TPE
-	REAL			Angle, LEAD, COLEA, TRAIL, TERM1
-	REAL			TERM2, B, COAL, RHO, E, K1, K2, K3, K4, K5
+	REAL			LEAD, COLEA, TRAIL, TERM1
+	REAL			TERM2, B, COAL, E, K1, K2, K3, K4, K5
 	REAL			R0, R1, R2, COAX, P0, X, PI
-	INTEGER*4		Error, IOS, A, M, N, R, P
+	INTEGER*4		IOS, A, M, N, R, P
 !
 	Error = 0
 	PI    = 3.14159265
 	TPE	  = A_typ(4:5)
     RHO = 1.0
 !
-	IF (TPE .EQ. 'ND') THEN
-	  RETURN
-	END IF
+	IF (TPE .EQ. 'ND') RETURN
+!
+	IF (Angle .LT. 0.0) Angle = 360.0 + Angle
 !
 	READ(A_typ(1:3),'(F3.0)', IOSTAT=IOS) LEAD
 	IF (IOS .NE. 0) THEN
@@ -63,7 +66,6 @@
 		  B = 0.5 * TERM1 / TERM2
 		  RHO = 4.0 * B * COAL / ((4.0 * B - 1.0) * COAL**2 + 1.0)
 	  END IF
-!	END IF
 !
 	ELSEIF (TPE .EQ. 'EB') THEN
 	  IF ((LEAD .GT. 79.0) .OR. (LEAD .EQ. 0.0)) THEN
@@ -76,7 +78,6 @@
 		  IF (X .LT. 0.0) X = 0.0
 		  RHO = (1.6*B*COAL+2.4*SQRT(X)) / ((4.0 * B - 1.44) * COAL ** 2 + 1.44)
 	  END IF
-!	END IF
 !
 	ELSEIF (TPE .EQ. 'EC') THEN
 	  IF ((LEAD .GT. 96.0) .OR. (LEAD .EQ. 0.0)) THEN
@@ -89,7 +90,6 @@
 		  IF (X .LT. 0.0) X = 0.0
 		  RHO = (1.2*B*COAL+2.8*SQRT(X)) / ((4.0 * B - 1.96) * COAL ** 2 + 1.96)
 	  END IF
-!	END IF
 !
 	ELSEIF (TPE .EQ. 'DE') THEN
 	  IF ((LEAD .GT. 65.0) .OR. (LEAD .EQ. 0.0)) THEN
@@ -100,7 +100,6 @@
 		  B = TERM1 / TERM2
 		  RHO = ABS (4.0*B*COAL/((4.0*B-1.0)*COAL**2+1.0))
 	  END IF
-!	END IF
 !
 	ELSEIF (TPE .EQ. 'LA') THEN
 	  IF ((LEAD .GT. 120.) .OR. (LEAD .EQ. 0.0)) THEN
@@ -116,7 +115,6 @@
 			  RHO = TRAIL
 		  END IF
 	  END IF  
-!	END IF
 !
 	ELSEIF (TPE .EQ. 'KA') THEN
 	  IF (LEAD .GT. 100.0) THEN
@@ -129,7 +127,6 @@
 		  TERM2 = SQRT (X)
 		  RHO   = ((1.0 - B) * COAL + TERM2) / 2.0
 	  END IF
-!	END IF
 !
 	ELSEIF (TPE .EQ. 'CA') THEN
 	  IF (LEAD .GT. 100.0) THEN
@@ -144,7 +141,6 @@
 		  IF (X .LT. 0.0) X = 0.0
 		  RHO   = SQRT(X)
 	  END IF
-!	END IF
 !
 	ELSEIF (TPE .EQ. 'CB') THEN
 	  IF (LEAD .GT. 100.0) THEN
@@ -159,7 +155,6 @@
 		  IF (X .LT. 0.0) X = 0.0
 		  RHO   = SQRT(X)
 	  END IF
-!	END IF
 !
 	ELSEIF (TPE .EQ. 'CC') THEN
 	  IF (LEAD .GT. 100.0) THEN
@@ -174,7 +169,15 @@
 		  IF (X .LT. 0.0) X = 0.0
 		  RHO   = SQRT(X)
 	  END IF
-!	END IF
+!
+	ELSEIF (TPE .EQ. 'TA') THEN
+     IF ((LEAD .LT. 1.0) .OR. (LEAD .GT. 890.0)) THEN
+		Error = 1038
+		RETURN
+	 ELSE
+       X = -0.3467 / LOG(COSD(LEAD/10.0))
+       RHO = COAL ** X
+     END IF
 !
 	ELSEIF (A_typ(4:4) .EQ. 'V' .OR. A_typ(4:4) .EQ. 'W') THEN
 	  READ(A_typ(1:1),'(I1), IOSTAT=IOS') M

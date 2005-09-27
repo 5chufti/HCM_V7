@@ -5,7 +5,8 @@
 !
 !	Harmonized Calculation Method for mobile services
 !
-!	All input- and output values are in HCM_MS_V7_definitions.F90.
+!	All input- and output values are in HCM_MS_V7_definitions.F90
+!	values are passed via COMMON blocks
 !
 !	Called subroutines:
 !	Point_height

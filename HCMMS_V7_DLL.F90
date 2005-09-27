@@ -1,6 +1,6 @@
 !
 !	HCMMS_V7_DLL.F90									P. Benner		08.01.2004
-!														G.H.			22.09.2005
+!														G.H.			27.09.2005
 !	DLL to the HCMMS_V7 subroutuine (Berlin 2003)
 !
 	SUBROUTINE HCMMS_V7_DLL ( I_C_mode, I_bor_dis, I_PD, I_Distance, I_H_Datab_Tx, &
@@ -171,46 +171,46 @@
 	IF (IOS .EQ. 0) THEN
 		DEBUG = .TRUE.
 !
-		WRITE (12,*) '********** INPUT - Values **********'
-		WRITE (12,*) '  Coo_Tx              = ',Coo_Tx
-		WRITE (12,*) '  Coo_Rx              = ',Coo_Rx
-		WRITE (12,*) '  H_Tx_input          = ',H_Tx_input
-		WRITE (12,*) '  H_Rx_input          = ',H_Rx_input
-		WRITE (12,*) '  Ant_typ_H_Tx        = ',Ant_typ_H_Tx
-		WRITE (12,*) '  Ant_typ_V_Tx        = ',Ant_typ_V_Tx
-		WRITE (12,*) '  Azi_Tx_input        = ',Azi_Tx_input
-		WRITE (12,*) '  Ele_Tx_input        = ',Ele_Tx_input
-		WRITE (12,*) '  H_Tx_ant            = ',H_Tx_ant
-		WRITE (12,*) '  H_Rx_ant            = ',H_Rx_ant
-		WRITE (12,*) '  Type_of_Tx_ant      = ',Type_of_Tx_ant
-		WRITE (12,*) '  Max_power           = ',Max_power
-		WRITE (12,*) '  Tx_frequ            = ',Tx_frequ
-		WRITE (12,*) '  Chan_occup          = ',Chan_occup
-		WRITE (12,*) '  Sea_temperature     = ',Sea_temperature
-		WRITE (12,*) '  Rad_of_Tx_serv_area = ',Rad_of_Tx_serv_area
-		WRITE (12,*) '  Rad_of_Rx_serv_area = ',Rad_of_Rx_serv_area
-		WRITE (12,*) '  D_sea_input         = ',D_sea_input
-		WRITE (12,*) '  Rx_frequ            = ',Rx_frequ
-		WRITE (12,*) '  Desig_of_Rx_emis    = ',Desig_of_Rx_emis
-		WRITE (12,*) '  Desig_of_Tx_emis    = ',Desig_of_Tx_emis
-		WRITE (12,*) '  Ant_typ_H_Rx        = ',Ant_typ_H_Rx
-		WRITE (12,*) '  Ant_typ_V_Rx        = ',Ant_typ_V_Rx
-		WRITE (12,*) '  Azi_Rx_input        = ',Azi_Rx_input
-		WRITE (12,*) '  Ele_Rx_input        = ',Ele_Rx_input
-		WRITE (12,*) '  Type_of_Rx_ant      = ',Type_of_Rx_ant
-		WRITE (12,*) '  Rx_ant_gain         = ',Rx_ant_gain
-		WRITE (12,*) '  Depol_loss          = ',Depol_loss
-		WRITE (12,*) '  Perm_FS_input       = ',Perm_FS_input
-		WRITE (12,*) '  Cor_fact_frequ_diff = ',Cor_fact_frequ_diff
-		WRITE (12,*) '  C_mode              = ',C_mode
-		WRITE (12,*) '  Land_to             = ',Land_to
-		WRITE (12,*) '  Land_from           = ',Land_from
-		WRITE (12,*) '  D_to_border         = ',D_to_border
-		WRITE (12,*) '  Max_CBR_D_input     = ',Max_CBR_D_input
-		WRITE (12,*) '  Topo_path           = ',Topo_path
-		WRITE (12,*) '  Border_path         = ',Border_path
-		WRITE (12,*) '  Morpho_path         = ',Morpho_path
-		WRITE (12,*) '  PD                  = ',PD
+		WRITE (12,'(A40)')      '***********  INPUT - Values ***********'
+		WRITE (12,'(A25,A8)')   'Coo_Tx              = ',Coo_Tx
+		WRITE (12,'(A25,A7)')   'Coo_Rx              = ',Coo_Rx
+		WRITE (12,'(A25,A4)')   'H_Tx_input          = ',H_Tx_input
+		WRITE (12,'(A25,A4)')   'H_Rx_input          = ',H_Rx_input
+		WRITE (12,'(A25,A7)')   'Ant_typ_H_Tx        = ',Ant_typ_H_Tx
+		WRITE (12,'(A25,A7)')   'Ant_typ_V_Tx        = ',Ant_typ_V_Tx
+		WRITE (12,'(A25,A5)')   'Azi_Tx_input        = ',Azi_Tx_input
+		WRITE (12,'(A25,A5)')   'Ele_Tx_input        = ',Ele_Tx_input
+		WRITE (12,'(A25,A4)')   'H_Tx_ant            = ',H_Tx_ant
+		WRITE (12,'(A25,A4)')   'H_Rx_ant            = ',H_Rx_ant
+		WRITE (12,'(A25,A1)')   'Type_of_Tx_ant      = ',Type_of_Tx_ant
+		WRITE (12,'(A25,A6)')   'Max_power           = ',Max_power
+		WRITE (12,'(A25,A12)')  'Tx_frequ            = ',Tx_frequ
+		WRITE (12,'(A25,A1)')   'Chan_occup          = ',Chan_occup
+		WRITE (12,'(A25,A1)')   'Sea_temperature     = ',Sea_temperature
+		WRITE (12,'(A25,A5)')   'Rad_of_Tx_serv_area = ',Rad_of_Tx_serv_area
+		WRITE (12,'(A25,A5)')   'Rad_of_Rx_serv_area = ',Rad_of_Rx_serv_area
+		WRITE (12,'(A25,A5)')   'D_sea_input         = ',D_sea_input
+		WRITE (12,'(A25,A12)')  'Rx_frequ            = ',Rx_frequ
+		WRITE (12,'(A25,A9)')   'Desig_of_Rx_emis    = ',Desig_of_Rx_emis
+		WRITE (12,'(A25,A9)')   'Desig_of_Tx_emis    = ',Desig_of_Tx_emis
+		WRITE (12,'(A25,A7)')   'Ant_typ_H_Rx        = ',Ant_typ_H_Rx
+		WRITE (12,'(A25,A7)')   'Ant_typ_V_Rx        = ',Ant_typ_V_Rx
+		WRITE (12,'(A25,A5)')   'Azi_Rx_input        = ',Azi_Rx_input
+		WRITE (12,'(A25,A5)')   'Ele_Rx_input        = ',Ele_Rx_input
+		WRITE (12,'(A25,A1)')   'Type_of_Rx_ant      = ',Type_of_Rx_ant
+		WRITE (12,'(A25,A4)')   'Rx_ant_gain         = ',Rx_ant_gain
+		WRITE (12,'(A25,A4)')   'Depol_loss          = ',Depol_loss
+		WRITE (12,'(A25,A5)')   'Perm_FS_input       = ',Perm_FS_input
+		WRITE (12,'(A25,A4)')   'Cor_fact_frequ_diff = ',Cor_fact_frequ_diff
+		WRITE (12,'(A25,I5)')   'C_mode              = ',C_mode
+		WRITE (12,'(A25,A3)')   'Land_to             = ',Land_to
+		WRITE (12,'(A25,A3)')   'Land_from           = ',Land_from
+		WRITE (12,'(A25,I5)')   'D_to_border         = ',D_to_border
+		WRITE (12,'(A25,A3)')   'Max_CBR_D_input     = ',Max_CBR_D_input
+		WRITE (12,'(A25,A64)')  'Topo_path           = ',Topo_path
+		WRITE (12,'(A25,A64)')  'Border_path         = ',Border_path
+		WRITE (12,'(A25,A64)')  'Morpho_path         = ',Morpho_path
+		WRITE (12,'(A25,F8.3)') 'PD                  = ',PD
 !		CLOSE (UNIT = 12)	
 	END IF
 !
@@ -272,42 +272,42 @@
 !
 	IF (DEBUG) THEN
 !		OPEN (UNIT = 12, FILE = TRIM(I_str(433:)) // "\\OUTPUT.TXT")
-		WRITE (12,*) '********** OUTPUT - Values **********'
-		WRITE (12,*) '  Version = ',Version
-		WRITE (12,*) '  Distance   = ',Distance
-		WRITE (12,*) '  H_Datab_Tx    = ',H_Datab_Tx
-		WRITE (12,*) '  H_Datab_Rx    = ',H_Datab_Rx
-		WRITE (12,*) '  HCM_error  = ',HCM_error
-		WRITE (12,*) '  Info  = ',Info
-		WRITE (12,*) '  Heff     = ',Heff
-		WRITE (12,*) '  Dh     = ',Dh
-		WRITE (12,*) '  Dh_corr    = ',Dh_corr
-		WRITE (12,*) '  Power_to_Rx     = ',Power_to_Rx
-		WRITE (12,*) '  Free_space_FS     = ',Free_space_FS
-		WRITE (12,*) '  Land_FS     = ',Land_FS
-		WRITE (12,*) '  Sea_FS     = ',Sea_FS
-		WRITE (12,*) '  Tx_ant_corr     = ',Tx_ant_corr
-		WRITE (12,*) '  Tx_ant_type_corr     = ',Tx_ant_type_corr
-		WRITE (12,*) '  Dir_Tx_Rx  = ',Dir_Tx_Rx
-		WRITE (12,*) '  V_angle_Tx_Rx = ',V_angle_Tx_Rx
-		WRITE (12,*) '  V_diff_angle_Tx_Rx    = ',V_diff_angle_Tx_Rx
-		WRITE (12,*) '  H_diff_angle_Tx_Rx    = ',H_diff_angle_Tx_Rx
-		WRITE (12,*) '  Tx_TCA = ',Tx_TCA
-		WRITE (12,*) '  Rx_TCA = ',Rx_TCA
-		WRITE (12,*) '  Tx_TCA_corr = ',Tx_TCA_corr
-		WRITE (12,*) '  Rx_TCA_corr = ',Rx_TCA_corr
-		WRITE (12,*) '  D_sea_calculated = ',D_sea_calculated
-		WRITE (12,*) '  Rx_ant_corr    = ',Rx_ant_corr
-		WRITE (12,*) '  Tx_ant_type_corr    = ',Tx_ant_type_corr
-		WRITE (12,*) '  Delta_frequency     = ',Delta_frequency
-		WRITE (12,*) '  Corr_delta_f    = ',Corr_delta_f
-		WRITE (12,*) '  Calculated_FS     = ',Calculated_FS
-		WRITE (12,*) '  Perm_FS     = ',Perm_FS
-		WRITE (12,*) '  CBR_D  = ',CBR_D
-		WRITE (12,*) '  ERP_ref_Tx  = ',ERP_ref_Tx
-		WRITE (12,*) '  Prot_margin  = ',Prot_margin
-		WRITE (12,*) '  Coo_Tx_new = ',Coo_Tx_new
-		WRITE (12,*) '  Coo_Rx_new = ',Coo_Rx_new
+		WRITE (12,'(A40)') '*********** OUTPUT - Values ***********'
+		WRITE (12,'(A25,A5)')   'Version            = ',Version
+		WRITE (12,'(A25,F8.3)') 'Distance           = ',Distance
+		WRITE (12,'(A25,I4)')   'H_Datab_Tx         = ',H_Datab_Tx
+		WRITE (12,'(A25,I4)')   'H_Datab_Rx         = ',H_Datab_Rx
+		WRITE (12,'(A25,I4)')   'HCM_error          = ',HCM_error
+		WRITE (12,'(A25,A20)')  'Info               = ',I_str(383:402)
+		WRITE (12,'(A25,F8.3)') 'Heff               = ',Heff
+		WRITE (12,'(A25,F8.3)') 'Dh                 = ',Dh
+		WRITE (12,'(A25,F8.3)') 'Dh_corr            = ',Dh_corr
+		WRITE (12,'(A25,F8.3)') 'Power_to_Rx        = ',Power_to_Rx
+		WRITE (12,'(A25,F8.3)') 'Free_space_FS      = ',Free_space_FS
+		WRITE (12,'(A25,F8.3)') 'Land_FS            = ',Land_FS
+		WRITE (12,'(A25,F8.3)') 'Sea_FS             = ',Sea_FS
+		WRITE (12,'(A25,F8.3)') 'Tx_ant_corr        = ',Tx_ant_corr
+		WRITE (12,'(A25,F8.3)') 'Tx_ant_type_corr   = ',Tx_ant_type_corr
+		WRITE (12,'(A25,F8.3)') 'Dir_Tx_Rx          = ',Dir_Tx_Rx
+		WRITE (12,'(A25,F8.3)') 'V_angle_Tx_Rx      = ',V_angle_Tx_Rx
+		WRITE (12,'(A25,F8.3)') 'V_diff_angle_Tx_Rx = ',V_diff_angle_Tx_Rx
+		WRITE (12,'(A25,F8.3)') 'H_diff_angle_Tx_Rx = ',H_diff_angle_Tx_Rx
+		WRITE (12,'(A25,F8.3)') 'Tx_TCA             = ',Tx_TCA
+		WRITE (12,'(A25,F8.3)') 'Rx_TCA             = ',Rx_TCA
+		WRITE (12,'(A25,F8.3)') 'Tx_TCA_corr        = ',Tx_TCA_corr
+		WRITE (12,'(A25,F8.3)') 'Rx_TCA_corr        = ',Rx_TCA_corr
+		WRITE (12,'(A25,F8.3)') 'D_sea_calculated   = ',D_sea_calculated
+		WRITE (12,'(A25,F8.3)') 'Rx_ant_corr        = ',Rx_ant_corr
+		WRITE (12,'(A25,F8.3)') 'Tx_ant_type_corr   = ',Tx_ant_type_corr
+		WRITE (12,'(A25,F8.3)') 'Delta_frequency    = ',Delta_frequency
+		WRITE (12,'(A25,F8.3)') 'Corr_delta_f       = ',Corr_delta_f
+		WRITE (12,'(A25,F8.3)') 'Calculated_FS      = ',Calculated_FS
+		WRITE (12,'(A25,F8.3)') 'Perm_FS            = ',Perm_FS
+		WRITE (12,'(A25,F8.3)') 'CBR_D              = ',CBR_D
+		WRITE (12,'(A25,F8.3)') 'ERP_ref_Tx         = ',ERP_ref_Tx
+		WRITE (12,'(A25,F8.3)') 'Prot_margin        = ',Prot_margin
+		WRITE (12,'(A25,A15)')  'Coo_Tx_new         = ',Coo_Tx_new
+		WRITE (12,'(A25,A15)')  'Coo_Rx_new         = ',Coo_Rx_new
 		CLOSE (UNIT = 12)
 	END IF
 !
