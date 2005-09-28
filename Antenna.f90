@@ -1,6 +1,6 @@
 !
 !	Antenna.f90											P. Benner		14.03.2000
-!														G.H.			26.09.2005
+!														G.H.			27.09.2005
 !						                                
 !
 !	Subroutine to calculate the gain (loss) of an antenna.
@@ -9,7 +9,7 @@
 !	Input values 
 !
 !	A_typ	Type of antenna (TR25-08)
-!	Angle	Angle, where loss is calculated [0..360 degrees]
+!	Angle	Angle, where loss is calculated [0..360 or -180..+180 degrees]
 !
 !
 !	Output values
@@ -28,7 +28,7 @@
 	INTEGER*4		Error
 !
 	CHARACTER*2		TPE
-	REAL			LEAD, COLEA, TRAIL, TERM1
+	REAL			LEAD, COLEA, TRAIL, TERM1, Alpha
 	REAL			TERM2, B, COAL, E, K1, K2, K3, K4, K5
 	REAL			R0, R1, R2, COAX, P0, X, PI
 	INTEGER*4		IOS, A, M, N, R, P
@@ -40,7 +40,11 @@
 !
 	IF (TPE .EQ. 'ND') RETURN
 !
-	IF (Angle .LT. 0.0) Angle = 360.0 + Angle
+	IF (Angle .LT. 1800.0) THEN
+		Alpha = Angle
+	ELSE
+		Alpha = Angle - 360.0
+	ENDIF
 !
 	READ(A_typ(1:3),'(F3.0)', IOSTAT=IOS) LEAD
 	IF (IOS .NE. 0) THEN
@@ -55,7 +59,7 @@
 	TRAIL = TRAIL / 100.0
 	COLEA = COSD (LEAD)
 	TERM1 = 1.0 - COLEA ** 2
-	COAL  = COSD (Angle)
+	COAL  = COSD (Alpha)
 !
 	IF (TPE .EQ. 'EA') THEN
 	  IF ((LEAD .GT. 65.0) .OR. (LEAD .EQ. 0.0)) THEN
@@ -106,8 +110,7 @@
 		  Error = 1038
 		  RETURN
 		ELSE
-		  B = (Angle * PI / 180.0)
-		  IF (B .GT. PI) B = 2.0 * PI - B
+		  B = (Alpha * PI / 180.0)
 		  IF (ABS(B) .LE. 3.0 * (LEAD * PI / 180.0) / 2.0) THEN
 			  TERM2 = COS (PI / 3.0 * B / (LEAD * PI / 180.0))
 			  RHO = COS ((1.0 - TERM2) * PI / 2.0 )
@@ -134,10 +137,10 @@
 		  RETURN
 		ELSE
 		  B = LEAD / 100.0
-		  X = (1.0-B**2)**2*(COS(Angle*PI/90.0))**2+4.0*B**2
+		  X = (1.0-B**2)**2*(COS(Alpha*PI/90.0))**2+4.0*B**2
 		  IF (X .LT. 0.0) X = 0.0
 		  TERM2 = SQRT(X)
-		  X = ((1.0-B**2) * COS(Angle*PI/90.0)+TERM2) / 2.0
+		  X = ((1.0-B**2) * COS(Alpha*PI/90.0)+TERM2) / 2.0
 		  IF (X .LT. 0.0) X = 0.0
 		  RHO   = SQRT(X)
 	  END IF
@@ -148,10 +151,10 @@
 		  RETURN
 		ELSE
 		  B = LEAD / 100.0
-		  X = (1.0-B**2)**2*(COS(Angle*PI/60.0))**2+4.0*B**2
+		  X = (1.0-B**2)**2*(COS(Alpha*PI/60.0))**2+4.0*B**2
 		  IF (X .LT. 0.0) X = 0.0
 		  TERM2 = SQRT(X)
-		  X = ((1.0-B**2)*COS(Angle*PI/60.0)+TERM2) / 2.0
+		  X = ((1.0-B**2)*COS(Alpha*PI/60.0)+TERM2) / 2.0
 		  IF (X .LT. 0.0) X = 0.0
 		  RHO   = SQRT(X)
 	  END IF
@@ -162,10 +165,10 @@
 		  RETURN
 		ELSE
 		  B = LEAD / 100.0
-		  X = (1.0-B**2)**2*(COS(Angle*PI/45.0))**2+4.0*B**2
+		  X = (1.0-B**2)**2*(COS(Alpha*PI/45.0))**2+4.0*B**2
 		  IF (X .LT. 0.0) X = 0.0
 		  TERM2 = SQRT(X)
-		  X =  ((1.0-B**2) * COS(Angle*PI/45.0)+TERM2)/ 2.0 
+		  X =  ((1.0-B**2) * COS(Alpha*PI/45.0)+TERM2)/ 2.0 
 		  IF (X .LT. 0.0) X = 0.0
 		  RHO   = SQRT(X)
 	  END IF
@@ -213,7 +216,7 @@
 	  K2 = B**2 * K5 - K3
 	  K1 = B * (1.0 - E)/2.0
 	  R1 = (K1 * COAL + SQRT(K2 * COAL**2 + K3))/(K4 * COAL**2 + K5)
-	  COAX  = COSD((Angle-2.0*FLOAT(N)))
+	  COAX  = COSD((Alpha-2.0*FLOAT(N)))
 	  R2 = (K1 * COAX + SQRT(K2 * COAX**2 + K3))/(K4 * COAX**2 + K5)
 	  RHO = R1
 	  IF (RHO .LT. R2) RHO = R2
@@ -231,7 +234,7 @@
 	    END IF
 	    R0 = FLOAT(R)/20.0
 	    P0 = FLOAT(P)/20.0 + 0.35
-	    IF (Angle .GE. 0.0 .AND. Angle .LE. 2.0*FLOAT(N)) THEN
+	    IF (Alpha .GE. 0.0 .AND. Alpha .LE. 2.0*FLOAT(N)) THEN
 		  IF (RHO .LT. P0) RHO = P0
 		ELSE
 		  IF (RHO .LT. R0) RHO = R0

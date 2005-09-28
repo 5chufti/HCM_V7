@@ -1,6 +1,6 @@
 !
 !	Pofile.f90											P. Benner		20.11.2003
-!														G.H.			26.09.2005
+!														G.H.			27.09.2005
 !
 !	This subroutine constructs a terrain- or morphological profile from point A to
 !	point B in steps of 100 m. The heights or morphological information are stored
@@ -138,13 +138,12 @@
 		COLOA = DCOSD(LongB)
 		SILOB = DSIND(LongA)
 		COLOB = DCOSD(LongA)
-		K = DBLE(H_Tx - H_Rx) / DIS
 !
 !	Loop for waypoints
 !	Loop starts with #PN-1, because point #PN is RX.
 	DO PC = (PN - 1), PC, -1
 !	Distance 'DD' between starting point and new point in degrees:
-		DD = DBLE(PC-1) * DP
+		DD = DBLE(PN-PC) * DP
 !	vector to new point
 		A = DSIND(DA - DD) / SIDA
 		B = DSIND(DD) / SIDA
@@ -160,7 +159,7 @@
 !
 		IF (P_Type .EQ. 'e') THEN 
 			CALL Point_height (LOY, LAY, Prof(PC)) 
-			Prof(PC) = Prof(PC) - DNINT(DBLE(H_Rx) + K * DBLE(PC-1) * PD)
+			Prof(PC) = Prof(PC) - DNINT(DBLE(H_Rx) - K * DBLE(PN-PC) * PD)
 		ELSE
 			CALL Point_type (LOY, LAY, Prof(PC))
 		END IF	
