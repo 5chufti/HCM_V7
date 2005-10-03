@@ -1,6 +1,6 @@
 !
 !	Antenna.f90											P. Benner		14.03.2000
-!														G.H.			27.09.2005
+!														G.H.			 3.10.2005
 !						                                
 !
 !	Subroutine to calculate the gain (loss) of an antenna.
@@ -178,8 +178,12 @@
 		Error = 1038
 		RETURN
 	 ELSE
-       X = -0.3467 / LOG(COSD(LEAD/10.0))
-       RHO = COAL ** X
+		IF (COAL .GE. 0.0) THEN
+			X = -0.3467 / LOG(COSD(LEAD/10.0))
+			RHO = COAL ** X
+		ELSE
+			RHO=0.0
+		END IF
      END IF
 !
 	ELSEIF (A_typ(4:4) .EQ. 'V' .OR. A_typ(4:4) .EQ. 'W') THEN
