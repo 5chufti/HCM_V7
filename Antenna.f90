@@ -1,6 +1,6 @@
 !
 !	Antenna.f90											P. Benner		14.03.2000
-!														G.H.			 3.10.2005
+!														G.H.			 5.10.2005
 !						                                
 !
 !	Subroutine to calculate the gain (loss) of an antenna.
@@ -33,14 +33,13 @@
 	REAL			R0, R1, R2, COAX, P0, X, PI
 	INTEGER*4		IOS, A, M, N, R, P
 !
-	Error = 0
 	PI    = 3.14159265
 	TPE	  = A_typ(4:5)
     RHO = 1.0
 !
 	IF (TPE .EQ. 'ND') RETURN
 !
-	IF (Angle .LT. 1800.0) THEN
+	IF (Angle .LT. 180.0) THEN
 		Alpha = Angle
 	ELSE
 		Alpha = Angle - 360.0
@@ -178,11 +177,11 @@
 		Error = 1038
 		RETURN
 	 ELSE
-		IF (COAL .GE. 0.0) THEN
-			X = -0.3467 / LOG(COSD(LEAD/10.0))
+		IF (COAL .GT. 0.0) THEN
+			X = -0.1505 / LOG10(COSD(LEAD/10.0))
 			RHO = COAL ** X
 		ELSE
-			RHO=0.0
+			RHO=0.01
 		END IF
      END IF
 !
@@ -199,7 +198,7 @@
 	  END IF
 	  A = M * 5 + 15
 	  E = 1.0
-	  IF (A_typ(5:5) .EQ. 'A') E = 0.00
+	  IF (A_typ(5:5) .EQ. 'A') E = 1E-5
 	  IF (A_typ(5:5) .EQ. 'B') E = 0.05
 	  IF (A_typ(5:5) .EQ. 'C') E = 0.10
 	  IF (A_typ(5:5) .EQ. 'D') E = 0.15
@@ -212,7 +211,6 @@
 		Error = 1038
 		RETURN
 	  END IF
-	  IF (E .EQ. 0.0) E = 1E-5
 	  K5 = ((1.0 + E)/2.0)**2
 	  B  = K5/2.0*(1-COSD(FLOAT(A))**2)/(K5-(COSD(FLOAT(A))/SQRT(2.0)-(1.0-E)/2.0)**2)
 	  K4 = B - K5
@@ -244,9 +242,9 @@
 		  IF (RHO .LT. R0) RHO = R0
 	    END IF
 !	no trail for W-type, override
-		TRAIL = 0.0
+		TRAIL = 0.01
 	  ENDIF	
-!
+!	no defined type
 	ELSE
 		Error = 1038
 		RETURN

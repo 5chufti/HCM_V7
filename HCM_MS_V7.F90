@@ -1,6 +1,6 @@
 !	
 !	HCMMS_V7.F90										P.Benner		23.02.2004
-!														G.H.			22.09.2005
+!														G.H.			14.10.2005
 !	Version 7					
 !
 !	Harmonized Calculation Method for mobile services
@@ -646,7 +646,6 @@
 		CALL Permissble_FS_calculation ()
 	END IF
 !
-	IF (HCM_error .NE. 0) RETURN
 	Prot_margin = Perm_FS - Calculated_FS
 !	
 	RETURN

@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		25.02.2004
-!														G.H.			27.09.2005
+!														G.H.			14.10.2005
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -687,7 +687,7 @@
 !
 !	Calculation of antenna correction factors "Rx_ant_corr" and "Rx_ant_type_corr":
 !
-	V_angle_Rx_Tx = ATAND ((H_Tx + H_AntTx - H_Rx + H_AntRx) / (1E3 * Distance))
+	V_angle_Rx_Tx = ATAN2D (dfloat(H_Tx + H_AntTx - H_Rx + H_AntRx),(1D3 * Distance))
 	IF ((C_mode .EQ. 99) .OR. &
 		((Ant_typ_V_Rx .EQ. '000ND00') .AND. (Ant_typ_H_Rx .EQ. '000ND00'))) THEN
 		Rx_ant_corr  = 0.0

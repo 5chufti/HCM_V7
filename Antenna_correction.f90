@@ -1,6 +1,6 @@
 !
 !	Antenna_correction.f90
-!														G.H.			27.09.2005
+!														G.H.			5.10.2005
 !
 	SUBROUTINE Ctransf (azi,aziM,ele,eleM,hda,vda)
 !
@@ -80,28 +80,29 @@
 		CALL Ctransf (azi,aziM,ele,eleM,hda,vda)
 	ENDIF
 !
-!	simple case, only horizontal diagram relevant
-!
-	IF (VDA .EQ. 0.0 .OR. vCod(4:5) .EQ. 'ND') THEN
-		CALL Antenna (hCod, hda, a, Error)
-		GOTO	10
-	ENDIF
-!
-!	other simple case, only vertical diagram relevant
-!
-	IF (HDA .EQ. 0.0 .OR. hCod(4:5) .EQ. 'ND') THEN
-		CALL Antenna (vCod, -vda, a, Error)
-		GOTO	10
-	ENDIF
-!
 !	prepare needed values for further calculations
 !
-	CALL Antenna (vCod, -vda, vfe, Error)
-	CALL Antenna (vCod, (180.0 + vda), vbe, Error)
-	CALL Antenna (vCod, 180.0, vb, Error)
-!	
-	CALL Antenna (hCod, hda, h, Error)
-	CALL Antenna (hCod, 180.0, hb, Error)
+!	check if only horizontal diagram relevant
+!
+	IF (vda .EQ. 0.0 .OR. vCod(4:5) .EQ. 'ND') THEN
+		vfe = 1.0
+		vbe = 1.0
+		vb = 1.0
+	ELSE
+		CALL Antenna (vCod, -vda, vfe, Error)
+		CALL Antenna (vCod, (180.0 + vda), vbe, Error)
+		CALL Antenna (vCod, 180.0, vb, Error)
+	ENDIF
+!
+!	check if only vertical diagram relevant
+!
+	IF (hda .EQ. 0.0 .OR. hCod(4:5) .EQ. 'ND') THEN
+		h = 1.0
+		hb = 1.0
+	ELSE
+		CALL Antenna (hCod, hda, h, Error)
+		CALL Antenna (hCod, 180.0, hb, Error)
+	ENDIF
 !
 	IF (Error .NE. 0) RETURN
 !
@@ -161,13 +162,12 @@
 !	
 	  ra = h / va0
 	  a = vae * SQRT(SIND(vda)**2.0 + (ra * COSD(vda))**2.0)
-	  IF (a .GT. 1.0) a = 1.0
 !
 	ENDIF
-10	a = -20.0 * LOG10(a)
 !
-	IF (a .GT. 40.0) a = 40.0
-!
+10	IF (a .LT. 0.01) a=0.01
+	IF (a .GT. 1.0) a=1.0
+	a = -20.0 * LOG10(a)
 	RETURN
 !
 	END SUBROUTINE Antenna_correction

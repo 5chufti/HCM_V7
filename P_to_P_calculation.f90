@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			27.09.2005
+!														G.H.			14.10.2005
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -355,7 +355,7 @@
 !
 !	Calculation of power in direction of the receiver 'Power_to_Rx':
 !
-	V_angle_Tx_Rx = ATAND ((H_Rx + H_AntRx - H_Tx + H_AntTx) / (1E3 * Distance))
+	V_angle_Tx_Rx = ATAN2D(dfloat(H_Rx + H_AntRx - H_Tx + H_AntTx),(1D3 * Distance))
 !
 	IF ((Ant_typ_H_Tx .EQ. '000ND00') .AND. (Ant_typ_V_Tx .EQ. '000ND00')) THEN
 		Tx_ant_corr = 0.0
