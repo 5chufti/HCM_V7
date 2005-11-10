@@ -23,7 +23,7 @@
 	INCLUDE			   'HCM_MS_V7_definitions.F90'
 !
 	INTEGER*2			I_H_Datab_Tx, I_H_Datab_Rx
-	INTEGER*4			I_HCM_error
+	INTEGER*4			I_HCM_error, I_C_mode, I_bor_dis
 	DOUBLE PRECISION	I_PD, I_Distance, I_Dir_Tx_Rx, I_V_angle_Tx_Rx
 	DOUBLE PRECISION	I_D_sea_calculated, I_Delta_frequency
 	REAL				I_Heff, I_Dh, I_Dh_corr, I_Power_to_Rx, I_Tx_TCA
@@ -33,7 +33,6 @@
 	REAL				I_Corr_delta_f, I_Calculated_FS, I_Perm_FS
 	REAL				I_CBR_D, I_ERP_ref_Tx, I_Prot_margin
 	INTEGER				I, J, IOS
-	INTEGER				I_C_mode, I_bor_dis
 	CHARACTER*(*)		I_str
 	LOGICAL				DEBUG
 !

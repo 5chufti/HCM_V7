@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		17.10.2005
-!														G.H.			20.10.2005
+!														G.H.			10.11.2005
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -231,10 +231,10 @@
 	  GOTO 300
 	END IF
 !
-	IF (Delta_frequency .EQ. 0.0D0) THEN
-	  Corr_delta_f = 0.0
-	  GOTO 300
-	END IF
+!	IF (Delta_frequency .EQ. 0.0D0) THEN
+!	  Corr_delta_f = 0.0
+!	  GOTO 300
+!	END IF
 !
 !	Module UMTS / IMT2000
 	IF (C_Mode .EQ. 9) THEN
@@ -248,61 +248,54 @@
 !	Bandwidth of Rx:   
 	DRX = Desig_of_Rx_emis(1:4)
 	I = INDEX(DRX,'K')
-	IF ((I .GT. 0) .AND. (I .LT. 2)) THEN
-	  HCM_Error = 1040
-!	  Channel spacing outside definition range (Rx)! 
-	  RETURN
-	END IF
 	IF (I .EQ. 0) THEN
-	  FACTOR = 0.0
-	  I = INDEX(DRX,'M')
-	  IF (I .EQ. 0) THEN
-		HCM_Error = 1040
-!		Channel spacing outside definition range (Rx)! 
-		RETURN
-	  END IF
-	  FACTOR = 1000.0
+		I = INDEX(DRX,'M')
+		IF (I .EQ. 0) THEN
+			HCM_Error = 1040
+!			Channel spacing outside definition range (Rx)! 
+			RETURN
+		ELSE 
+			FACTOR = 1000.0
+		END IF
+	ELSE
+		FACTOR = 1.0
 	END IF
-!
 !	Replace 'K' or 'M' with '.':
 	DRX(I:I) = '.'   
 	READ (DRX, *, IOSTAT=IOS) CSXR
 	IF (IOS .NE. 0) THEN
-	  HCM_Error = 1040
-!	  Channel spacing outside definition range (Rx)!
-	  RETURN
+		HCM_Error = 1040
+!		Channel spacing outside definition range (Rx)!
+		RETURN
+	ELSE 
+		CSXR = CSXR * FACTOR
 	END IF
-	CSXR = CSXR * FACTOR	! in kHz
 !
 !	Bandwidth of TX:   
 	DTX = Desig_of_Tx_emis(1:4)
 	I = INDEX(DTX,'K')
-	IF ((I .GT. 0) .AND. (I .LT. 2)) THEN
-	  HCM_Error = 1041
-!	  Channel spacing outside definition range (Tx)! 
-	  RETURN
-	END IF
-!      
 	IF (I .EQ. 0) THEN
-	  FACTOR = 0.0
-	  I = INDEX(DTX,'M')
-	  IF (I .EQ. 0) THEN
-		HCM_Error = 1041
-!		Channel spacing outside definition range (Tx)! 
-		RETURN
-	  END IF
-	  FACTOR = 1000.0
+		I = INDEX(DTX,'M')
+		IF (I .EQ. 0) THEN
+			HCM_Error = 1040
+!			Channel spacing outside definition range (Tx)! 
+			RETURN
+		ELSE 
+			FACTOR = 1000.0
+		END IF
+	ELSE
+		FACTOR = 1.0
 	END IF
-!
 !	Replace 'K' or 'M' with '.':
 	DTX(I:I) = '.'   
-	READ (DTX, *, IOSTAT= IOS) CSXT
+	READ (DTX, *, IOSTAT=IOS) CSXT
 	IF (IOS .NE. 0) THEN
-	  HCM_Error = 1041
-!	  Channel spacing outside definition range (Tx)!
-	  RETURN
+		HCM_Error = 1040
+!		Channel spacing outside definition range (Tx)!
+		RETURN
+	ELSE 
+		CSXT = CSXT * FACTOR
 	END IF
-	CSXT = CSXT * FACTOR	! in kHz
 !
 	TX_TETRA = .FALSE.
 	RX_TETRA = .FALSE.
@@ -513,24 +506,37 @@
 !	*****************************************************************
 !
 !
-100	IF (CSXR .LE. 11.0) Channel_sp_Rx = 12.5
+100	SELECT CASE (NINT(CSXR*1000.0))
+		CASE (:11000)
+			IF ((TX_TETRA) .AND. (.NOT. RX_TETRA) .AND. (CSXR .LE. 8.8)) THEN
+				Channel_sp_Rx = 10.0
+			ELSE
+				Channel_sp_Rx = 12.5
+			END IF
+		CASE (11001:14000)
+			Channel_sp_Rx = 20.0
+		CASE (14001:)
+			Channel_sp_Rx = 0.0
+	END SELECT	
 !
-	IF ((TX_TETRA) .AND. (.NOT. RX_TETRA)) THEN
-	  IF (CSXR .LE. 8.8) Channel_sp_Rx = 10.0
-	END IF
+	SELECT CASE (NINT(CSXT*1000.0))	
+		CASE (:4400) 
+			Channel_sp_Tx = 5.0
+		CASE (4401:5500)
+			Channel_sp_Tx = 6.25
+		CASE (5501:8800)
+			Channel_sp_Tx = 10.0
+		CASE (8801:11000)
+			Channel_sp_Tx = 12.5
+		CASE (11001:14000)
+			Channel_sp_Tx = 20.0
+		CASE (14001:16000)
+			Channel_sp_Tx = 25.0
+		CASE (16001:)
+			Channel_sp_Tx = 0.0
+	END SELECT
 !
-	IF ((CSXR .GT. 11.0) .AND. (CSXR .LE. 14.0)) Channel_sp_Rx = 20.0
-	IF (CSXR .GT. 14.0) Channel_sp_Rx = 0.0
-!
-	IF (Channel_sp_Tx .LE. 4.4) Channel_sp_Tx = 5.0
-	IF ((CSXT .GT. 4.4) .AND. (CSXT .LE. 5.5)) Channel_sp_Tx = 6.25
-	IF ((CSXT .GT. 5.5) .AND. (CSXT .LE. 8.8)) Channel_sp_Tx = 10.0
-	IF ((CSXT .GT. 8.8) .AND. (CSXT .LE. 11.0)) Channel_sp_Tx = 12.5
-	IF ((CSXT .GT. 11.0) .AND. (CSXT .LE. 14.0)) Channel_sp_Tx = 20.0
-	IF ((CSXT .GT. 14.0) .AND. (CSXT .LE. 16.0)) Channel_sp_Tx = 25.0
-	IF (CSXT .GT. 16.0) Channel_sp_Tx = 0.0
-!
-	IF ((Channel_sp_Rx .EQ. 0.0) .OR. (Channel_sp_Tx .EQ. 0.0)) THEN
+	IF (Channel_sp_Rx * Channel_sp_Tx .EQ. 0.0) THEN
 !	Wideband:
 		IF (CSXR .GT. CSXT) THEN
 			OMEGA = Delta_frequency / CSXR
@@ -554,126 +560,90 @@
 		IF (OMEGA .GE. 1.75) acorrsinus = OMEGA * 4.8 + 51.6
 !	
 		Corr_delta_f = acorrsinus - (acorrsinus - acorrB1) * B2 / B1
+!
+!	WB/NB correction
+		IF (Channel_sp_Tx .EQ. 0.0) Perm_FS = 6*LOG10(CSXT/25)
 ! 
 	ELSE
 !	narrowband curves:
 		IF (Channel_sp_Rx .EQ. 10.0) THEN
-		  DO I = 1, 7
-			CSXX(I) = CS19(I)
-		  END DO
+			CSXX = CS19
 		END IF
 		IF (Channel_sp_Rx .EQ. 12.5) THEN
 		  IF (Channel_sp_Tx .EQ. 5.0) THEN
-			DO I = 1, 7
-			  CSXX(I) = CS1(I)
-			END DO
+			  CSXX = CS1
 		  END IF
 		  IF (Channel_sp_Tx .EQ. 6.25) THEN
-			DO I = 1, 7
-			  CSXX(I) = CS2(I)
-			END DO
+			  CSXX = CS2
 		  END IF
 		  IF (Channel_sp_Tx .EQ. 10.0) THEN
-			DO I = 1, 7
-			  CSXX(I) = CS3(I)
-			END DO
+			  CSXX = CS3
 		  END IF
 		  IF (Channel_sp_Tx .EQ. 12.5) THEN
-			DO I = 1, 7
-			  CSXX(I) = CS4(I)
-			END DO
+			  CSXX = CS4
 		  END IF
 		  IF (Channel_sp_Tx .EQ. 20.0) THEN
-			DO I = 1, 7
-			  CSXX(I) = CS5(I)
-			END DO
+			  CSXX = CS5
 		   END IF
 		  IF (Channel_sp_Tx .EQ. 25.0) THEN
-			DO I = 1, 7
-			  IF (.NOT. TX_TETRA) CSXX(I) = CS6(I)
-			  IF (TX_TETRA) CSXX(I) = CS20(I)
-			END DO
+			  IF (.NOT. TX_TETRA) CSXX = CS6
+			  IF (TX_TETRA) CSXX = CS20
 		  END IF
 		END IF
 !
 		IF (Channel_sp_Rx .EQ. 20.0) THEN
 		  IF (Channel_sp_Tx .EQ. 5.0) THEN
-			DO I = 1, 7
-			  CSXX(I) = CS7(I)
-			END DO
+			  CSXX = CS7
 		  END IF
 		  IF (Channel_sp_Tx .EQ. 6.25) THEN
-			DO I = 1, 7
-			  CSXX(I) = CS8(I)
-			END DO
+			  CSXX = CS8
 		  END IF
 		  IF (Channel_sp_Tx .EQ. 10.0) THEN
-			DO I = 1, 7
-			  CSXX(I) = CS9(I)
-			END DO
+			  CSXX = CS9
 		  END IF
 		  IF (Channel_sp_Tx .EQ. 12.5) THEN
-			DO I = 1, 7
-			  CSXX(I) = CS10(I)
-			END DO
+			  CSXX = CS10
 		  END IF
 		  IF (Channel_sp_Tx .EQ. 20.0) THEN
-			DO I = 1, 7
-			  CSXX(I) = CS11(I)
-			END DO
+			  CSXX = CS11
 		  END IF
 		  IF (Channel_sp_Tx .EQ. 25.0) THEN
-			DO I = 1, 7
-			  IF (.NOT. TX_TETRA) CSXX(I) = CS12(I)
-			  IF (TX_TETRA) CSXX(I) = CS21(I)
-			END DO
+			  IF (.NOT. TX_TETRA) CSXX = CS12
+			  IF (TX_TETRA) CSXX = CS21
 		  END IF
 		END IF
 !
 		IF (Channel_sp_Rx .EQ. 25.0) THEN
 		  IF (Channel_sp_Tx .EQ. 5.0) THEN
-			DO I = 1, 7
-			  IF (.NOT. RX_TETRA) CSXX(I) = CS13(I)
-			  IF (RX_TETRA) CSXX(I) = CS23(I)
-			END DO
+			  IF (.NOT. RX_TETRA) CSXX = CS13
+			  IF (RX_TETRA) CSXX = CS23
 		  END IF
 		  IF (Channel_sp_Tx .EQ. 6.25) THEN
-			DO I = 1, 7
-			  IF (.NOT. RX_TETRA) CSXX(I) = CS14(I)
-			  IF (RX_TETRA) CSXX(I) = CS24(I)
-			END DO
+			  IF (.NOT. RX_TETRA) CSXX = CS14
+			  IF (RX_TETRA) CSXX = CS24
 		  END IF
 		  IF (Channel_sp_Tx .EQ. 10.0) THEN
-			DO I = 1, 7
-			  IF (.NOT. RX_TETRA) CSXX(I) = CS15(I)
-			  IF (RX_TETRA) CSXX(I) = CS25(I)
-			END DO
+			  IF (.NOT. RX_TETRA) CSXX = CS15
+			  IF (RX_TETRA) CSXX = CS25
 		  END IF
 		  IF (Channel_sp_Tx .EQ. 12.5) THEN
-			DO I = 1, 7
-			  IF (.NOT. RX_TETRA) CSXX(I) = CS16(I)
-			  IF (RX_TETRA) CSXX(I) = CS26(I)
-			END DO
+			  IF (.NOT. RX_TETRA) CSXX = CS16
+			  IF (RX_TETRA) CSXX = CS26
 		  END IF
 		  IF (Channel_sp_Tx .EQ. 20.0) THEN
-			DO I = 1, 7
-			  IF (.NOT. RX_TETRA) CSXX(I) = CS17(I)
-			  IF (RX_TETRA) CSXX(I) = CS27(I)
-			END DO
+			  IF (.NOT. RX_TETRA) CSXX = CS17
+			  IF (RX_TETRA) CSXX = CS27
 		  END IF
 		  IF (Channel_sp_Tx .EQ. 25.0) THEN
 			IF ((TX_TETRA) .AND. (RX_TETRA)) THEN
 			  Info(18) = .TRUE.
 !		  Correction factors for the band 380 - 400 MHz are used.
 			  GOTO 70
+			ELSE
+			  IF ((.NOT. TX_TETRA) .AND. (.NOT. RX_TETRA)) CSXX = CS18
+			  IF ((TX_TETRA) .AND. (.NOT. RX_TETRA)) CSXX = CS22
+			  IF ((.NOT. TX_TETRA) .AND. (RX_TETRA)) CSXX = CS28
 			END IF
-			DO I = 1, 7
-			  IF ((.NOT. TX_TETRA) .AND. (.NOT. RX_TETRA)) CSXX(I) = CS18(I)
-			  IF ((TX_TETRA) .AND. (.NOT. RX_TETRA)) THEN
-				CSXX(I) = CS22(I)
-			  END IF
-			  IF ((.NOT. TX_TETRA) .AND. (RX_TETRA)) CSXX(I) = CS28(I)
-			END DO
 		  END IF
 		END IF
 !
@@ -681,46 +651,30 @@
 !
 !	Calculate Corr_delta_f:
 !
-		IF (Delta_frequency .EQ. 0.0) THEN
-			Corr_delta_f = CSXX(1)
-		  ELSE
-			IF (Delta_frequency .GT. 25.0) THEN
-				Info(15) = .TRUE.
-!			Frequency difference outside definition range!
-				Corr_delta_f = 82
-			  ELSE
-				IF (Delta_frequency .EQ. 5.0)  Corr_delta_f = CSXX(2)
-				IF (Delta_frequency .EQ. 6.25) Corr_delta_f = CSXX(3)
-				IF (Delta_frequency .EQ. 10.0) Corr_delta_f = CSXX(4)
-				IF (Delta_frequency .EQ. 12.5) Corr_delta_f = CSXX(5)
-				IF (Delta_frequency .EQ. 20.0) Corr_delta_f = CSXX(6)
-				IF (Delta_frequency .EQ. 25.0) Corr_delta_f = CSXX(7)
-				IF ((Delta_frequency .LT. 5.0) .AND. (Delta_frequency .GT. 0.0)) THEN
+		SELECT CASE (NINT(delta_frequency*1000.0))
+			CASE (:5000) 
 				  Corr_delta_f = CSXX(2) * Delta_frequency / 5.0
-				END IF
-				IF ((Delta_frequency .LT. 6.25) .AND. (Delta_frequency .GT. 5.0)) THEN
+			CASE (5001:6250)
 				  X1  = (Delta_frequency - 5.0) / (6.25 - 5.0)
 				  Corr_delta_f = CSXX(2) + X1 * (CSXX(3)-CSXX(2))
-				END IF
-				IF ((Delta_frequency .LT. 10.0) .AND. (Delta_frequency .GT. 6.25)) THEN
+			CASE (6251:10000)
 				  X1  = (Delta_frequency - 6.25) / (10.0 - 6.25)
 				  Corr_delta_f = CSXX(3) + X1 * (CSXX(4)-CSXX(3))
-				END IF
-				IF ((Delta_frequency .LT. 12.5) .AND. (Delta_frequency .GT. 10.0)) THEN
+			CASE (10001:12500)
 				  X1  = (Delta_frequency - 10.0) / (12.5 - 10.0)
 				  Corr_delta_f = CSXX(4) + X1 * (CSXX(5)-CSXX(4))
-				END IF
-				IF ((Delta_frequency .LT. 20.0) .AND. (Delta_frequency .GT. 12.5)) THEN
+			CASE (12501:20000)
 				  X1  = (Delta_frequency - 12.5) / (20.0 - 12.5)
 				  Corr_delta_f = CSXX(5) + X1 * (CSXX(6)-CSXX(5))
-				END IF
-				IF ((Delta_frequency .LT. 25.0) .AND. (Delta_frequency .GT. 20.0)) THEN
+			CASE (20001:25000)
 				  X1  = (Delta_frequency - 20.0) / (25.0 - 20.0)
 				  Corr_delta_f = CSXX(6) + X1 * (CSXX(7)-CSXX(6))
-				END IF
-			END IF
-		END IF
-	END IF
+			CASE DEFAULT
+					Info(15) = .TRUE.
+					Corr_delta_f = 82
+		END SELECT
+!
+	END IF	! WB/NB
 !
 300	Perm_FS = Perm_FS + Corr_delta_f
 !
