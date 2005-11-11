@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		17.10.2005
-!														G.H.			10.11.2005
+!														G.H.			11.11.2005
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -215,7 +215,6 @@
 !
 !
 !	Delta frequency in kHz:
-!	Delta_frequency = DABS(Tx_frequency  - Rx_frequency) * 1D3
 	Delta_frequency = DABS((DINT(Tx_frequency*1D6) - DINT(Rx_frequency*1D6))/1D3)
 !	Input value for correction factor according delta frequency ?
 	IF (Cor_fact_frequ_diff .NE. '    ') THEN
@@ -230,11 +229,6 @@
 	  END IF
 	  GOTO 300
 	END IF
-!
-!	IF (Delta_frequency .EQ. 0.0D0) THEN
-!	  Corr_delta_f = 0.0
-!	  GOTO 300
-!	END IF
 !
 !	Module UMTS / IMT2000
 	IF (C_Mode .EQ. 9) THEN
@@ -297,20 +291,10 @@
 		CSXT = CSXT * FACTOR
 	END IF
 !
-	TX_TETRA = .FALSE.
-	RX_TETRA = .FALSE.
-	TX_DIG = .FALSE.
-	RX_DIG = .FALSE.
-	IF (Desig_of_Tx_emis(1:7) .EQ. '25K0G7W') TX_TETRA = .TRUE. 
-	IF (Desig_of_Rx_emis(1:7) .EQ. '25K0G7W') RX_TETRA = .TRUE.
-	IF (Desig_of_Tx_emis(6:6) .EQ. '1') TX_DIG = .TRUE. 
-	IF (Desig_of_Rx_emis(6:6) .EQ. '1') RX_DIG = .TRUE.
-	IF (Desig_of_Tx_emis(6:6) .EQ. '2') TX_DIG = .TRUE. 
-	IF (Desig_of_Rx_emis(6:6) .EQ. '2') RX_DIG = .TRUE.
-	IF (Desig_of_Tx_emis(6:6) .EQ. '7') TX_DIG = .TRUE. 
-	IF (Desig_of_Rx_emis(6:6) .EQ. '7') RX_DIG = .TRUE.
-	IF (Desig_of_Tx_emis(6:6) .EQ. '9') TX_DIG = .TRUE. 
-	IF (Desig_of_Rx_emis(6:6) .EQ. '9') RX_DIG = .TRUE.
+	TX_DIG = (INDEX('1279',Desig_of_Tx_emis(6:6)) .GT. 0)
+	RX_DIG = (INDEX('1279',Desig_of_Rx_emis(6:6)) .GT. 0)
+	TX_TETRA = (Desig_of_Tx_emis(1:7) .EQ. '25K0G7W')
+	RX_TETRA = (Desig_of_Rx_emis(1:7) .EQ. '25K0G7W')
 !
 !	Module normal Berlin:
 	IF ((C_Mode .EQ. 0) .OR. (C_Mode .EQ. 4) .OR. (C_Mode .EQ. 7)) GOTO 100
@@ -340,13 +324,7 @@
 !     
 !	Tx - bandwidth > 100 kHz ?
 !
-20	IF (CSXT .GT. 100.0) THEN
-!		Tx = GSM  
-		TXGSM = .TRUE.
-	  ELSE        
-!		Rx = GSM
-		TXGSM = .FALSE.
-	END IF
+20	TXGSM = (CSXT .GT. 100.0)
 !
 !	Determine Corr_delta_f:
 !
@@ -485,14 +463,15 @@
 		B1 = CSXR
 	END IF
 !
-	IF (Delta_frequency .LT. ((B1 + B2) / 2.0)) Corr_delta_f = 0.0
-	IF ((Delta_frequency .LE. ((B1 + 2.0 * B2) / 2.0)) .AND. & 
-		(Delta_frequency .GE. ((B1 + B2) / 2.0))) Corr_delta_f = 45.0
-	IF (Delta_frequency .GT. ((B1 + 2.0 * B2) / 2.0)) THEN
+	IF (Delta_frequency .LT. ((B1 + B2) / 2.0)) THEN
+		Corr_delta_f = 0.0
+	ELSEIF ((Delta_frequency .LE. ((B1 + 2.0 * B2) / 2.0)) .AND. & 
+		(Delta_frequency .GE. ((B1 + B2) / 2.0))) THEN
+			Corr_delta_f = 45.0
+	ELSEIF (Delta_frequency .GT. ((B1 + 2.0 * B2) / 2.0)) THEN
 	  Info(15) = .TRUE.
 !	  Frequency difference outside definition range!
 	  Corr_delta_f = 82
-	  GOTO 300
 	END IF  
 !
 	GOTO 300
@@ -549,15 +528,24 @@
 		END IF
 !
 !	acorrB1:
-		IF (OMEGA .LT. 0.5) acorrB1 = 0.0
-		IF ((OMEGA .GE. 0.5) .AND. (OMEGA .LT. 2.0)) acorrB1 = OMEGA * 33.3 - 16.7
-		IF (OMEGA .GE. 2.0) acorrB1 = OMEGA * 10.0 + 30.0
+		IF (OMEGA .LT. 0.5) THEN
+			acorrB1 = 0.0
+		ELSEIF ((OMEGA .GE. 0.5) .AND. (OMEGA .LT. 2.0)) THEN
+			acorrB1 = OMEGA * 33.3 - 16.7
+		ELSEIF (OMEGA .GE. 2.0) THEN
+			acorrB1 = OMEGA * 10.0 + 30.0
+		END IF
 !
 !	acorrsinus:
-		IF (OMEGA .LT. 0.5) acorrsinus = 0.0
-		IF ((OMEGA .GE. 0.5) .AND. (OMEGA .LT. 1.25)) acorrsinus = OMEGA * 66.7 - 33.3
-		IF ((OMEGA .GE. 1.25) .AND. (OMEGA .LT. 1.75)) acorrsinus = OMEGA * 20.0 + 25.0
-		IF (OMEGA .GE. 1.75) acorrsinus = OMEGA * 4.8 + 51.6
+		IF (OMEGA .LT. 0.5) THEN
+			acorrsinus = 0.0
+		ELSEIF ((OMEGA .GE. 0.5) .AND. (OMEGA .LT. 1.25)) THEN
+			acorrsinus = OMEGA * 66.7 - 33.3
+		ELSEIF ((OMEGA .GE. 1.25) .AND. (OMEGA .LT. 1.75)) THEN
+			acorrsinus = OMEGA * 20.0 + 25.0
+		ELSEIF (OMEGA .GE. 1.75) THEN
+			acorrsinus = OMEGA * 4.8 + 51.6
+		END IF
 !	
 		Corr_delta_f = acorrsinus - (acorrsinus - acorrB1) * B2 / B1
 !
@@ -568,83 +556,85 @@
 !	narrowband curves:
 		IF (Channel_sp_Rx .EQ. 10.0) THEN
 			CSXX = CS19
-		END IF
-		IF (Channel_sp_Rx .EQ. 12.5) THEN
-		  IF (Channel_sp_Tx .EQ. 5.0) THEN
-			  CSXX = CS1
-		  END IF
-		  IF (Channel_sp_Tx .EQ. 6.25) THEN
-			  CSXX = CS2
-		  END IF
-		  IF (Channel_sp_Tx .EQ. 10.0) THEN
-			  CSXX = CS3
-		  END IF
-		  IF (Channel_sp_Tx .EQ. 12.5) THEN
-			  CSXX = CS4
-		  END IF
-		  IF (Channel_sp_Tx .EQ. 20.0) THEN
-			  CSXX = CS5
-		   END IF
-		  IF (Channel_sp_Tx .EQ. 25.0) THEN
-			  IF (.NOT. TX_TETRA) CSXX = CS6
-			  IF (TX_TETRA) CSXX = CS20
-		  END IF
-		END IF
-!
-		IF (Channel_sp_Rx .EQ. 20.0) THEN
-		  IF (Channel_sp_Tx .EQ. 5.0) THEN
-			  CSXX = CS7
-		  END IF
-		  IF (Channel_sp_Tx .EQ. 6.25) THEN
-			  CSXX = CS8
-		  END IF
-		  IF (Channel_sp_Tx .EQ. 10.0) THEN
-			  CSXX = CS9
-		  END IF
-		  IF (Channel_sp_Tx .EQ. 12.5) THEN
-			  CSXX = CS10
-		  END IF
-		  IF (Channel_sp_Tx .EQ. 20.0) THEN
-			  CSXX = CS11
-		  END IF
-		  IF (Channel_sp_Tx .EQ. 25.0) THEN
-			  IF (.NOT. TX_TETRA) CSXX = CS12
-			  IF (TX_TETRA) CSXX = CS21
-		  END IF
-		END IF
-!
-		IF (Channel_sp_Rx .EQ. 25.0) THEN
-		  IF (Channel_sp_Tx .EQ. 5.0) THEN
-			  IF (.NOT. RX_TETRA) CSXX = CS13
-			  IF (RX_TETRA) CSXX = CS23
-		  END IF
-		  IF (Channel_sp_Tx .EQ. 6.25) THEN
-			  IF (.NOT. RX_TETRA) CSXX = CS14
-			  IF (RX_TETRA) CSXX = CS24
-		  END IF
-		  IF (Channel_sp_Tx .EQ. 10.0) THEN
-			  IF (.NOT. RX_TETRA) CSXX = CS15
-			  IF (RX_TETRA) CSXX = CS25
-		  END IF
-		  IF (Channel_sp_Tx .EQ. 12.5) THEN
-			  IF (.NOT. RX_TETRA) CSXX = CS16
-			  IF (RX_TETRA) CSXX = CS26
-		  END IF
-		  IF (Channel_sp_Tx .EQ. 20.0) THEN
-			  IF (.NOT. RX_TETRA) CSXX = CS17
-			  IF (RX_TETRA) CSXX = CS27
-		  END IF
-		  IF (Channel_sp_Tx .EQ. 25.0) THEN
-			IF ((TX_TETRA) .AND. (RX_TETRA)) THEN
-			  Info(18) = .TRUE.
-!		  Correction factors for the band 380 - 400 MHz are used.
-			  GOTO 70
-			ELSE
-			  IF ((.NOT. TX_TETRA) .AND. (.NOT. RX_TETRA)) CSXX = CS18
-			  IF ((TX_TETRA) .AND. (.NOT. RX_TETRA)) CSXX = CS22
-			  IF ((.NOT. TX_TETRA) .AND. (RX_TETRA)) CSXX = CS28
+		ELSEIF (Channel_sp_Rx .EQ. 12.5) THEN
+			IF (Channel_sp_Tx .EQ. 5.0) THEN
+				CSXX = CS1
+			ELSEIF (Channel_sp_Tx .EQ. 6.25) THEN
+				CSXX = CS2
+			ELSEIF (Channel_sp_Tx .EQ. 10.0) THEN
+				CSXX = CS3
+			ELSEIF (Channel_sp_Tx .EQ. 12.5) THEN
+				CSXX = CS4
+			ELSEIF (Channel_sp_Tx .EQ. 20.0) THEN
+				CSXX = CS5
+			ELSEIF (Channel_sp_Tx .EQ. 25.0) THEN
+				IF (TX_TETRA) THEN
+					CSXX = CS20
+				ELSE
+					CSXX = CS6
+				END IF			
 			END IF
-		  END IF
+		ELSEIF (Channel_sp_Rx .EQ. 20.0) THEN
+			IF (Channel_sp_Tx .EQ. 5.0) THEN
+				CSXX = CS7
+			ELSEIF (Channel_sp_Tx .EQ. 6.25) THEN
+				CSXX = CS8
+			ELSEIF (Channel_sp_Tx .EQ. 10.0) THEN
+				CSXX = CS9
+			ELSEIF (Channel_sp_Tx .EQ. 12.5) THEN
+				CSXX = CS10
+			ELSEIF (Channel_sp_Tx .EQ. 20.0) THEN
+				CSXX = CS11
+			ELSEIF (Channel_sp_Tx .EQ. 25.0) THEN
+				IF (TX_TETRA) THEN
+					CSXX = CS21
+				ELSE
+					CSXX = CS12
+				END IF
+			END IF
+!
+		ELSEIF (Channel_sp_Rx .EQ. 25.0) THEN
+			IF (Channel_sp_Tx .EQ. 5.0) THEN
+				IF (RX_TETRA) THEN
+					CSXX = CS23
+				ELSE
+					CSXX = CS13
+				ENDIF
+			ELSEIF (Channel_sp_Tx .EQ. 6.25) THEN
+				IF (RX_TETRA) THEN
+					CSXX = CS24
+				ELSE
+					CSXX = CS14
+				ENDIF
+			ELSEIF (Channel_sp_Tx .EQ. 10.0) THEN
+				IF (RX_TETRA) THEN
+					CSXX = CS25
+				ELSE
+					CSXX = CS15
+				ENDIF
+			ELSEIF (Channel_sp_Tx .EQ. 12.5) THEN
+				IF (RX_TETRA) THEN
+					CSXX = CS26
+				ELSE
+					CSXX = CS16
+				ENDIF
+			ELSEIF (Channel_sp_Tx .EQ. 20.0) THEN
+				IF (RX_TETRA) THEN
+					CSXX = CS27
+				ELSE
+					CSXX = CS17
+				ENDIF
+			ELSEIF (Channel_sp_Tx .EQ. 25.0) THEN
+				IF ((TX_TETRA) .AND. (RX_TETRA)) THEN
+					Info(18) = .TRUE.
+!		  Correction factors for the band 380 - 400 MHz are used.
+					GOTO 70
+				ELSE
+					IF ((.NOT. TX_TETRA) .AND. (.NOT. RX_TETRA)) CSXX = CS18
+					IF ((TX_TETRA) .AND. (.NOT. RX_TETRA)) CSXX = CS22
+					IF ((.NOT. TX_TETRA) .AND. (RX_TETRA)) CSXX = CS28
+				END IF
+			END IF
 		END IF
 !
 !	Curve selected
@@ -669,9 +659,9 @@
 			CASE (20001:25000)
 				  X1  = (Delta_frequency - 20.0) / (25.0 - 20.0)
 				  Corr_delta_f = CSXX(6) + X1 * (CSXX(7)-CSXX(6))
-			CASE DEFAULT
-					Info(15) = .TRUE.
-					Corr_delta_f = 82
+			CASE (25001:)
+				  Info(15) = .TRUE.
+				  Corr_delta_f = 82
 		END SELECT
 !
 	END IF	! WB/NB

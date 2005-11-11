@@ -1,6 +1,6 @@
 !
 !	Get_figure_FS_value.f90								P.Benner		06.10.2003
-!														G.H.			22.09.2005
+!														G.H.			11.11.2005
 !												
 !
 !	SUBROUTINE Get_figure_FS_value (Figure_frequency, Time_percentage, Sea_temperature, &
@@ -2060,36 +2060,28 @@
 	IF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 50)) THEN
 !	  Use FIGURE1
 	  FXX = F01
-	END IF
-	IF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 10)) THEN
+	ELSEIF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 10)) THEN
 !	  Use FIGURE2
 	  FXX = F02
-	END IF
-	IF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 1)) THEN
+	ELSEIF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 1)) THEN
 !	  Use FIGURE3
 	  FXX = F03
-	END IF
-	IF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 50)) THEN
+	ELSEIF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 50)) THEN
 !	  Use FIGURE9
 	  FXX = F09
-	END IF
-	IF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 10)) THEN
+	ELSEIF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 10)) THEN
 !	  Use FIGURE10
 	  FXX = F10
-	END IF
-	IF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 1)) THEN
+	ELSEIF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 1)) THEN
 !	  Use FIGURE11
 	  FXX = F11
-	END IF
-	IF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 50)) THEN
+	ELSEIF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 50)) THEN
 !	  Use FIGURE17
 	  FXX = F17
-	END IF
-	IF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 10)) THEN
+	ELSEIF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 10)) THEN
 !	  Use FIGURE18
 	  FXX = F18
-	END IF
-	IF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 1)) THEN
+	ELSEIF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 1)) THEN
 !	  Use FIGURE19
 	  FXX = F19
 	END IF
@@ -2102,71 +2094,57 @@
 	IF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 50)) THEN
 !	  Use FIGURE4
 	  FXX = F04
-	END IF
-	IF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 10) .AND. &
+	ELSEIF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 10) .AND. &
 		(Sea_temperature .EQ. "C")) THEN
 !	  Use FIGURE5
 	  FXX = F05
-	END IF
-	IF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 1) .AND. &
+	ELSEIF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 1) .AND. &
 		(Sea_temperature .EQ. "C")) THEN
 !	  Use FIGURE6
 	  FXX = F06
-	END IF
-	IF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 10) .AND. &
+	ELSEIF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 10) .AND. &
 		(Sea_temperature .EQ. "W")) THEN
 !	  Use FIGURE7
 	  FXX = F07
-	END IF
-	IF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 1) .AND. &
+	ELSEIF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 1) .AND. &
 		(Sea_temperature .EQ. "W")) THEN
 !	  Use FIGURE8
 	  FXX = F08
-	END IF
-	IF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 50)) THEN
+	ELSEIF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 50)) THEN
 !	  Use FIGURE12
 	  FXX = F12
-	END IF
-	IF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 10) .AND. &
+	ELSEIF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 10) .AND. &
 		(Sea_temperature .EQ. "C")) THEN
 !	  Use FIGURE13
 	  FXX = F13
-	END IF
-	IF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 1) .AND. &
+	ELSEIF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 1) .AND. &
 		(Sea_temperature .EQ. "C")) THEN
 !	  Use FIGURE14
 	  FXX = F14
-	END IF
-	IF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 10) .AND. &
+	ELSEIF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 10) .AND. &
 		(Sea_temperature .EQ. "W")) THEN
 !	  Use FIGURE15
 	  FXX = F15
-	END IF
-	IF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 1) .AND. &
+	ELSEIF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 1) .AND. &
 		(Sea_temperature .EQ. "W")) THEN
 !	  Use FIGURE16
 	  FXX = F16
-	END IF
-	IF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 50)) THEN
+	ELSEIF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 50)) THEN
 !	  Use FIGURE20
 	  FXX = F20
-	END IF
-	IF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 10) .AND. &
+	ELSEIF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 10) .AND. &
 		(Sea_temperature .EQ. "C")) THEN
 !	  Use FIGURE21
 	  FXX = F21
-	END IF
-	IF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 1) .AND. &
+	ELSEIF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 1) .AND. &
 		(Sea_temperature .EQ. "C")) THEN
 !	  Use FIGURE22
 	  FXX = F22
-	END IF
-	IF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 10) .AND. &
+	ELSEIF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 10) .AND. &
 		(Sea_temperature .EQ. "W")) THEN
 !	  Use FIGURE23
 	  FXX = F23
-	END IF
-	IF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 1) .AND. &
+	ELSEIF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 1) .AND. &
 		(Sea_temperature .EQ. "W")) THEN
 !	  Use FIGURE24
 	  FXX = F24

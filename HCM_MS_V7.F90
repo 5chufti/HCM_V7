@@ -1,6 +1,6 @@
 !	
 !	HCMMS_V7.F90										P.Benner		23.02.2004
-!														G.H.			14.10.2005
+!														G.H.			11.11.2005
 !	Version 7					
 !
 !	Harmonized Calculation Method for mobile services
@@ -403,169 +403,106 @@
 !	"Perm_FS", the max. range of harmful interference "CBR_D" and
 !	the E.R.P. of reference transmitter "ERP_ref_Tx":
 !
-	IF (Tx_frequency .LT. 29.7) Info(4) = .TRUE.
+	Info(4) = .TRUE.
 !
 	IF ((Tx_frequency .GE. 29.7) .AND. (Tx_frequency .LE. 47.0)) THEN
-	  IF (Perm_FS_input .EQ. '     ') Perm_FS = 0.0
+	  Perm_FS = 0.0
 	  CBR_D = 100.0
 	  ERP_ref_Tx = 3.0
-	END IF
-!
-	IF ((Tx_frequency .GT. 47.0) .AND. (Tx_frequency .LT. 68.0)) THEN
-	  Info(4) = .TRUE.
-!	  Frequency out of range of table in Annex 1
+	  Info(4) = .FALSE.
 	END IF
 !
 	IF ((Tx_frequency .GE. 68.0) .AND. (Tx_frequency .LE. 74.8)) THEN
-	  IF (Perm_FS_input .EQ. '     ') Perm_FS = 6.0
+	  Perm_FS = 6.0
 	  CBR_D = 100.0
 	  ERP_ref_Tx = 9.0
-	END IF
-!
-	IF ((Tx_frequency .GT. 74.8) .AND. (Tx_frequency .LT. 75.2)) THEN
-	  Info(4) = .TRUE.
-!	  Frequency out of range of table in Annex 1
+	  Info(4) = .FALSE.
 	END IF
 !
 	IF ((Tx_frequency .GE. 75.2) .AND. (Tx_frequency .LE. 87.5)) THEN
-	  IF (Perm_FS_input .EQ. '     ') Perm_FS = 6.0
+	  Perm_FS = 6.0
 	  CBR_D = 100.0
 	  ERP_ref_Tx = 9.0
-	END IF
-!
-	IF ((Tx_frequency .GT. 87.5) .AND. (Tx_frequency .LT. 146.0)) THEN
-	  Info(4) = .TRUE.
-!	  Frequency out of range of table in Annex 1
+	  Info(4) = .FALSE.
 	END IF
 !
 	IF ((Tx_frequency .GE. 146.0) .AND. (Tx_frequency .LE. 149.9)) THEN
-	  IF (Perm_FS_input .EQ. '     ') Perm_FS = 12.0
+	  Perm_FS = 12.0
 	  CBR_D = 80.0
 	  ERP_ref_Tx =12.0
-	END IF
-!
-	IF ((Tx_frequency .GT. 149.9) .AND. (Tx_frequency .LT. 150.05)) THEN
-	  Info(4) = .TRUE.
-!	  Frequency out of range of table in Annex 1
+	  Info(4) = .FALSE.
 	END IF
 !
 	IF ((Tx_frequency .GE. 150.05) .AND. (Tx_frequency .LE. 174.0)) THEN
-	  IF (Perm_FS_input .EQ. '     ') Perm_FS = 12.0
+	  Perm_FS = 12.0
 	  CBR_D = 80.0
 	  ERP_ref_Tx = 12.0
+	  Info(4) = .FALSE.
 	END IF
 !
-	IF ((Tx_frequency .GT. 174.0) .AND. (Tx_frequency .LT. 380.0)) THEN
-	  Info(4) = .TRUE.
-!	  Frequency out of range of table in Annex 1
-	END IF
-!
-	IF ((Tx_frequency .GE. 380.0) .AND. (Tx_frequency .LE. 385.0)) THEN
-	  IF ((C_mode .EQ. 8) .OR. (C_mode .EQ. -7)) THEN 
-		  IF (Perm_FS_input .EQ. '     ') Perm_FS = 18.0
+	IF ((Tx_frequency .GE. 380.0) .AND. (Tx_frequency .LE. 385.0) .AND. &
+	   ((C_mode .EQ. 8) .OR. (C_mode .EQ. -7))) THEN 
+		  Perm_FS = 18.0
 		  CBR_D = 50.0
 		  ERP_ref_Tx = 14.0
-		ELSE
-		  Info(4) = .TRUE.
-!		  Frequency out of range of table in Annex 1
-	  END IF
+		  Info(4) = .FALSE.
 	END IF
 !
-	IF ((Tx_frequency .GT. 385.0) .AND. (Tx_frequency .LT. 390.0)) THEN
-	  Info(4) = .TRUE.
-!	  Frequency out of range of table in Annex 1
-	END IF
-!
-	IF ((Tx_frequency .GE. 390.0) .AND. (Tx_frequency .LE. 395.0)) THEN
-	  IF ((C_mode .EQ. 8) .OR. (C_mode .EQ. -7)) THEN
-		  IF (Perm_FS_input .EQ. '     ') Perm_FS = 18.0
+	IF ((Tx_frequency .GE. 390.0) .AND. (Tx_frequency .LE. 395.0) .AND. &
+	   ((C_mode .EQ. 8) .OR. (C_mode .EQ. -7))) THEN
+		  Perm_FS = 18.0
 		  CBR_D = 50.0
 		  ERP_ref_Tx = 14.0
-		ELSE
-		  Info(4) = .TRUE.
-!		  Frequency out of range of table in Annex 1
-	  END IF
-	END IF
-!
-	IF ((Tx_frequency .GT. 395.0) .AND. (Tx_frequency .LT. 406.1)) THEN
-	  Info(4) = .TRUE.
-!	  Frequency out of range of table in Annex 1
+		  Info(4) = .FALSE.
 	END IF
 !
 	IF ((Tx_frequency .GE. 406.1) .AND. (Tx_frequency .LE. 430.0)) THEN
-	  IF (Perm_FS_input .EQ. '     ') Perm_FS = 20.0
+	  Perm_FS = 20.0
 	  CBR_D = 50.0
 	  ERP_ref_Tx = 16.0
-	END IF
-!
-	IF ((Tx_frequency .GT. 430.0) .AND. (Tx_frequency .LT. 440.0)) THEN
-	  Info(4) = .TRUE.
-!	  Frequency out of range of table in Annex 1
+	  Info(4) = .FALSE.
 	END IF
 !
 	IF ((Tx_frequency .GE. 440.0) .AND. (Tx_frequency .LE. 470.0)) THEN
-	  IF (Perm_FS_input .EQ. '     ') Perm_FS = 20.0
+	  Perm_FS = 20.0
 	  CBR_D = 50.0
 	  ERP_ref_Tx = 16.0
-	END IF
-!
-	IF ((Tx_frequency .GT. 470.0) .AND. (Tx_frequency .LT. 862.0)) THEN
-	  Info(4) = .TRUE.
-!	  Frequency out of range of table in Annex 1
+	  Info(4) = .FALSE.
 	END IF
 !
 	IF ((Tx_frequency .GE. 862.0) .AND. (Tx_frequency .LE. 960.0)) THEN
-	  IF (Perm_FS_input .EQ. '     ') Perm_FS = 26.0
+	  Perm_FS = 26.0
 	  CBR_D = 30.0
 	  ERP_ref_Tx = 13.0
+	  Info(4) = .FALSE.
 	END IF
 !
-	IF ((Tx_frequency .GT. 960.0) .AND. (Tx_frequency .LT. 1710.0)) THEN
-	  Info(4) = .TRUE.
-!	  Frequency out of range of table in Annex 1
-	END IF
-!
-	IF ((Tx_frequency .GE. 1710.0) .AND. (Tx_frequency .LE. 1785.0)) THEN
-	  IF ((C_mode .EQ. 5) .OR. (C_mode .EQ. 6) .OR. (C_mode .EQ. -6)) THEN
+	IF ((Tx_frequency .GE. 1710.0) .AND. (Tx_frequency .LE. 1785.0) .AND. &
+	   ((C_mode .EQ. 5) .OR. (C_mode .EQ. 6) .OR. (C_mode .EQ. -6))) THEN
+		  Perm_FS = 0.0
 		  CBR_D = 15.0
 		  ERP_ref_Tx = 13.0
-		ELSE
-		  Info(4) = .TRUE.
-!		  Frequency out of range of table in Annex 1
-	  END IF
+		  Info(4) = .FALSE.
 	END IF
 !
-	IF ((Tx_frequency .GT. 1785.0) .AND. (Tx_frequency .LT. 1805.0)) THEN
-	  Info(4) = .TRUE.
-!	  Frequency out of range of table in Annex 1
-	END IF
-!
-	IF ((Tx_frequency .GE. 1805.0) .AND. (Tx_frequency .LE. 1880.0)) THEN
-	  IF ((C_mode .EQ. 5) .OR. (C_mode .EQ. 6) .OR. (C_mode .EQ. -6)) THEN
+	IF ((Tx_frequency .GE. 1805.0) .AND. (Tx_frequency .LE. 1880.0) .AND. &
+	   ((C_mode .EQ. 5) .OR. (C_mode .EQ. 6) .OR. (C_mode .EQ. -6))) THEN
+		  Perm_FS = 0.0
 		  CBR_D = 15.0
 		  ERP_ref_Tx = 13.0
-		ELSE
-		  Info(4) = .TRUE.
-!		  Frequency out of range of table in Annex 1
-	  END IF
+		  Info(4) = .FALSE.
 	END IF
 !
-	IF ((Tx_frequency .GE. 1885.0) .AND. (Tx_frequency .LE. 2025.0)) THEN
-	  IF ((C_mode .EQ. 9) .OR. (C_mode .EQ. -8)) THEN
+	IF ((Tx_frequency .GE. 1885.0) .AND. (Tx_frequency .LE. 2025.0) .AND. &
+	   ((C_mode .EQ. 9) .OR. (C_mode .EQ. -8))) THEN
 		  Perm_FS = 21.0
-		ELSE
-		  Info(4) = .TRUE.
-!		  Frequency out of range of table in Annex 1
-	  END IF
+		  Info(4) = .FALSE.
 	END IF
 !
-	IF ((Tx_frequency .GE. 2110.0) .AND. (Tx_frequency .LE. 2200.0)) THEN
-	  IF ((C_mode .EQ. 9) .OR. (C_mode .EQ. -8)) THEN
+	IF ((Tx_frequency .GE. 2110.0) .AND. (Tx_frequency .LE. 2200.0) .AND. &
+	   ((C_mode .EQ. 9) .OR. (C_mode .EQ. -8))) THEN
 		  Perm_FS = 21.0
-		ELSE
-		  Info(4) = .TRUE.
-!		  Frequency out of range of table in Annex 1
-	  END IF
+		  Info(4) = .FALSE.
 	END IF
 !
 	Perm_FS_from_table = Perm_FS

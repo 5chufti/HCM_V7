@@ -1,6 +1,6 @@
 !
 !	Position_of_mobile.f90								P. Benner		24.08.2004
-!														G.H.			22.09.2005
+!														G.H.			11.11.2005
 !
 !	Subroutine to calculate the new position of Tx (New_LongTx, New_LatTx)
 !	and/or Rx (New_LongRx, New_latRx) if at least one is a mobile and
@@ -30,9 +30,7 @@
 !
 	REAL				DP1
 	DOUBLE PRECISION	XDi, YDi
-	INTEGER				N_Cut
-!
-	LOGICAL				CutTx, CutRx
+	INTEGER				N_Cut_Rx,N_Cut_Tx
 !
 !	************************************************************************
 !
@@ -40,9 +38,6 @@
 	New_LatTx  = LatTx  
 	New_LongRx = LongRx
 	New_LatRx  = LatRx
-!
-	CutTx = .FALSE.
-	CutRx = .FALSE.
 !
 !	Calculate the distance 'Distance' between point A and B	
 	CALL Calc_distance (LongTx, LatTx, LongRx, LatRx, Distance)
@@ -58,29 +53,27 @@
 !	  Determine, if in direction of Rx, the Tx circle is cut:
 	  DP1 = Distance
 	  IF (DP1 .GT. Tx_serv_area) DP1 = Tx_serv_area
-	  CALL TestCut (Dir_Tx_Rx, LongTx, LatTx, DP1, N_Cut, HCM_error, Land_from)
+	  CALL TestCut (Dir_Tx_Rx, LongTx, LatTx, DP1, N_Cut_Tx, HCM_error, Land_from)
 	  IF (HCM_error .NE. 0) THEN
 		HCM_error = 1036
 !		The 'xxx.ALL' borderline file for Tx is missing
 		RETURN
 	  END IF
-	  IF (N_Cut .GT. 0) CutTx = .TRUE.
 	END IF
 !
 	IF (Rx_serv_area .GT. 0.0) THEN
 !	  Determine, if in direction of Tx, the Rx circle is cut:
 	  DP1 = Distance
 	  IF (DP1 .GT. Rx_serv_area) DP1 = Rx_serv_area
-	  CALL TestCut (Dir_Rx_Tx, LongRx, LatRx, DP1, N_Cut, HCM_error, Land_to)
+	  CALL TestCut (Dir_Rx_Tx, LongRx, LatRx, DP1, N_Cut_Rx, HCM_error, Land_to)
 	  IF (HCM_error .NE. 0) THEN
 		HCM_error = 1037
 !		The 'xxx.ALL' borderline file for Rx is missing
 		RETURN
 	  END IF
-	  IF (N_Cut .GT. 0) CutRx = .TRUE.
 	END IF
 !
-	IF ((.NOT. CutTx) .AND. (.NOT. CutRx)) THEN
+	IF ((N_Cut_Tx .EQ. 0) .AND. (N_Cut_Rx .EQ. 0)) THEN
 	  IF (Distance .LE. DBLE(Tx_serv_area + Rx_serv_area)) THEN
 !		  Overlapping:
 		  Distance = 0.0D0
