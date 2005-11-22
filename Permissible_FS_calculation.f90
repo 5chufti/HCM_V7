@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		17.10.2005
-!														G.H.			11.11.2005
+!														G.H.			16.11.2005
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -35,7 +35,7 @@
 !	Rx_Elevation		Rx elevation
 !	Rx_ant_corr			Correction according antenna
 !	Rx_ant_type_corr	Correction according antennatype [E or I]
-!	Delta_frequency		Delta frequency in kHz
+!	Delta_frequency		Delta frequency
 !	Corr_delta_f		Correction factor according delta frequency
 !	Channel_sp_Rx		Channel spacing of Rx (0 for wideband)
 !	Channel_sp_Tx		Channel spacing of Tx (0 for wideband)
@@ -74,12 +74,12 @@
 !	Include definitions:
 	INCLUDE			'HCM_MS_V7_definitions.F90'
 !
-	INTEGER			IOS, I
+	INTEGER*4		IOS, I, CSXR, CSXT, B1, B2
 !
 	LOGICAL			TX_TETRA, RX_TETRA, TX_DIG, RX_DIG, TXGSM
 !
 	REAL			acorrB1, FACTOR, OMEGA, acorrsinus
-	REAL			B1, B2, CSXR, CSXT, GANT, DPN
+	REAL			GANT, DPN
 	REAL			CS1(7), CS2(7), CS3(7), CS4(7), CS5(7)
 	REAL			CS6(7), CS7(7), CS8(7), CS9(7), CS10(7)
 	REAL			CS11(7), CS12(7), CS13(7), CS14(7), CS15(7) 
@@ -215,7 +215,7 @@
 !
 !
 !	Delta frequency in kHz:
-	Delta_frequency = DABS((DINT(Tx_frequency*1D6) - DINT(Rx_frequency*1D6))/1D3)
+	Delta_frequency = DABS(DINT(Tx_frequency*1D6) - DINT(Rx_frequency*1D6))
 !	Input value for correction factor according delta frequency ?
 	IF (Cor_fact_frequ_diff .NE. '    ') THEN
 	  Info(14) = .TRUE.
@@ -232,10 +232,14 @@
 !
 !	Module UMTS / IMT2000
 	IF (C_Mode .EQ. 9) THEN
-	  IF (Delta_frequency .LT. 5000.0) Corr_delta_f = 0.0
-	  IF ((Delta_frequency .GE. 5000.0) .AND. (Delta_frequency .LT. 10000.0)) &
+		SELECT CASE (Delta_frequency)
+			CASE (:5000000)
+				Corr_delta_f = 0.0
+			CASE (5000001:10000000)
 				Corr_delta_f = 24.0
-	  IF (Delta_frequency .GE. 10000.0) Corr_delta_f = 82.0
+			CASE (10000001:)
+				Corr_delta_f = 82.0
+		END SELECT
 	  GOTO 300
 	END IF
 !
@@ -249,20 +253,20 @@
 !			Channel spacing outside definition range (Rx)! 
 			RETURN
 		ELSE 
-			FACTOR = 1000.0
+			FACTOR = 1000000.0
 		END IF
 	ELSE
-		FACTOR = 1.0
+		FACTOR = 1000.0
 	END IF
 !	Replace 'K' or 'M' with '.':
 	DRX(I:I) = '.'   
-	READ (DRX, *, IOSTAT=IOS) CSXR
+	READ (DRX, *, IOSTAT=IOS) X1
 	IF (IOS .NE. 0) THEN
 		HCM_Error = 1040
 !		Channel spacing outside definition range (Rx)!
 		RETURN
 	ELSE 
-		CSXR = CSXR * FACTOR
+		CSXR = NINT(X1 * FACTOR)
 	END IF
 !
 !	Bandwidth of TX:   
@@ -275,20 +279,20 @@
 !			Channel spacing outside definition range (Tx)! 
 			RETURN
 		ELSE 
-			FACTOR = 1000.0
+			FACTOR = 1000000.0
 		END IF
 	ELSE
-		FACTOR = 1.0
+		FACTOR = 1000.0
 	END IF
 !	Replace 'K' or 'M' with '.':
 	DTX(I:I) = '.'   
-	READ (DTX, *, IOSTAT=IOS) CSXT
+	READ (DTX, *, IOSTAT=IOS) X1
 	IF (IOS .NE. 0) THEN
 		HCM_Error = 1040
 !		Channel spacing outside definition range (Tx)!
 		RETURN
 	ELSE 
-		CSXT = CSXT * FACTOR
+		CSXT = NINT(X1 * FACTOR)
 	END IF
 !
 	TX_DIG = (INDEX('1279',Desig_of_Tx_emis(6:6)) .GT. 0)
@@ -324,7 +328,7 @@
 !     
 !	Tx - bandwidth > 100 kHz ?
 !
-20	TXGSM = (CSXT .GT. 100.0)
+20	TXGSM = (CSXT .GT. 100000)
 !
 !	Determine Corr_delta_f:
 !
@@ -336,74 +340,62 @@
 !
 	IF (C_Mode .EQ. 1) THEN 
 !	  Determine Corr_delta_f
-	  IF (NINT(Delta_frequency) .EQ.   0) THEN
-		Corr_delta_f = 0.0
-		GOTO 300
-	  END IF
-	  IF (NINT(Delta_frequency) .EQ. 200) THEN
-		Corr_delta_f =  18.0
-		GOTO 300
-	  END IF
-	  IF (NINT(Delta_frequency) .EQ. 400) THEN
-		Corr_delta_f = 50.0
-		GOTO 300
-	  END IF
-	  Info(15) = .TRUE.
+		SELECT CASE (Delta_frequency)
+			CASE (0)
+				Corr_delta_f = 0.0
+			CASE (200000)
+				Corr_delta_f = 18.0
+			CASE (400000)
+				Corr_delta_f = 50.0
+			CASE DEFAULT
 !	  Frequency difference outside definition range!
-	  Corr_delta_f = 82
-	  GOTO 300
-	END IF
-!
-	IF (Delta_frequency .GT. 400.0) THEN
-	  Info(15) = .TRUE.
-!	  Frequency difference outside definition range!
-	  Corr_delta_f = 82
-	  GOTO 300
+				Info(15) = .TRUE.
+				Corr_delta_f = 82
+		END SELECT
+		GOTO 300
 	END IF
 !
 	IF (C_Mode .EQ. 2) THEN
 !	  GSM <-> TACS
 	  IF (TXGSM) THEN
 !		  GSM interference to TACS
-		  IF (Delta_frequency .LE. 100.0) Corr_delta_f = -11.0
-		  IF ((Delta_frequency .GT. 100.0) .AND. (Delta_frequency .LE. 200.0)) THEN
-			Corr_delta_f = -11.0 + (Delta_frequency - 100.0) * 0.3
-		  END IF
-		  IF ((Delta_frequency .GT. 200.0) .AND. (Delta_frequency .LE. 250.0)) THEN
-			Corr_delta_f = 19.0 + (Delta_frequency - 200.0) * 3.0 / 50.0
-		  END IF
-		  IF (Delta_frequency .GT. 250.0) THEN
-			Corr_delta_f = 22.0 + (Delta_frequency - 250.0) * 27.0 / 150.0
-		  END IF
-		  GOTO 300
-		ELSE
+		SELECT CASE (Delta_frequency)
+			CASE (:100000)
+				Corr_delta_f = -11.0
+			CASE (100001:200000)
+				Corr_delta_f = -11.0 + REAL(Delta_frequency - 100000) * 0.3 / 1000.0
+			CASE (200001:250000)
+				Corr_delta_f = 19.0 + REAL(Delta_frequency - 200000) * 3.0 / 50000.0
+			CASE (250001:)
+				Corr_delta_f = 22.0 + REAL(Delta_frequency - 250000) * 27.0 / 150000.0
+		END SELECT
+	  ELSE
 !		  TACS interference to GSM
 		  CALL TACSNMT (Delta_frequency, Corr_delta_f)
-		  IF (Delta_frequency .GT. 275.0) Corr_delta_f = 51.0
-		  GOTO 300
+		  IF (Delta_frequency .GT. 275000) Corr_delta_f = 51.0
 	  END IF
+	  GOTO 300	
 	END IF              
 !
 	IF (C_Mode .EQ. 3) THEN
 !	  GSM <-> NMT
 	  IF (TXGSM) THEN
 !		  GSM interference to NMT
-		  IF (Delta_frequency .LE. 100.0) Corr_delta_f = -10.0
-		  IF ((Delta_frequency .GT. 100.0) .AND. (Delta_frequency .LE. 200.0)) THEN
-			Corr_delta_f = -10.0 + (Delta_frequency - 100.0) * 0.3
-		  END IF
-		  IF ((Delta_frequency .GT. 200.0) .AND. (Delta_frequency .LE. 250.0)) THEN
-			Corr_delta_f = 20.0 + (Delta_frequency - 200.0) * 3.0 / 50.0
-		  END IF
-		  IF (Delta_frequency .GT. 250.0) THEN
-			Corr_delta_f = 23.0 + (Delta_frequency - 250.0) * 27.0 / 150.0
-		  END IF
-		  GOTO 300
-		ELSE
+		SELECT CASE (Delta_frequency)
+			CASE (:100000)
+				Corr_delta_f = -10.0
+			CASE (100001:200000)
+				Corr_delta_f = -10.0 + REAL(Delta_frequency - 100000) * 0.3 / 1000.0
+			CASE (200001:250000)
+				Corr_delta_f = 20.0 + REAL(Delta_frequency - 200000) * 3.0 / 50000.0
+			CASE (250001:)
+				Corr_delta_f = 23.0 + REAL(Delta_frequency - 250000) * 27.0 / 150000.0
+		END SELECT
+	  ELSE
 !		  NMT interference to GSM
 		  CALL TACSNMT (Delta_frequency, Corr_delta_f)
-		  GOTO 300
 	  END IF
+	  GOTO 300
 	END IF              
 !
 	GOTO 300          
@@ -416,30 +408,23 @@
 !	*								
 !	*****************************************************************
 !
-60    IF (Delta_frequency .GT. 600.0) THEN
+60	IF (Delta_frequency .GT. 600000) THEN
 		Info(15) = .TRUE.
 !		Frequency difference outside definition range!
 		Corr_delta_f = 82
 		GOTO 300
-      END IF       
+	END IF       
 !
-	IF (Delta_frequency .LE. 100.0) THEN
-	  Corr_delta_f = 0.0 
-	  GOTO 300
-	END IF
-!
-	IF ((Delta_frequency .GT. 100.0) .AND. (Delta_frequency .LE. 200.0)) THEN
-	  Corr_delta_f = (Delta_frequency -100.0) * 0.18
-	  GOTO 300
-	END IF
-!
-	IF ((Delta_frequency .GT. 200.0) .AND. (Delta_frequency .LE. 400.0)) THEN
-	  Corr_delta_f = 18.0 + (Delta_frequency -200.0) * 0.16
-	  GOTO 300
-	END IF
-!
-!	Delta_frequency > 400 kHz:
-	Corr_delta_f = 50.0 + (Delta_frequency -400.0) * 0.04
+	SELECT CASE (Delta_frequency)
+		CASE (:100000)
+			Corr_delta_f = 0.0
+		CASE (100001:200000)
+			Corr_delta_f = REAL(Delta_frequency - 100000) * 0.00018
+		CASE (200001:400000)
+			Corr_delta_f = 18.0 + REAL(Delta_frequency - 200000) * 0.00016
+		CASE (400001:)
+			Corr_delta_f = 50.0 + REAL(Delta_frequency - 400000) * 0.00004
+	END SELECT
 !
 	GOTO 300          
 !	
@@ -463,15 +448,15 @@
 		B1 = CSXR
 	END IF
 !
-	IF (Delta_frequency .LT. ((B1 + B2) / 2.0)) THEN
+	IF (Delta_frequency .LT. ((B1 + B2) / 2)) THEN
 		Corr_delta_f = 0.0
-	ELSEIF ((Delta_frequency .LE. ((B1 + 2.0 * B2) / 2.0)) .AND. & 
-		(Delta_frequency .GE. ((B1 + B2) / 2.0))) THEN
+	ELSEIF ((Delta_frequency .LE. ((B1 + 2 * B2) / 2)) .AND. & 
+		(Delta_frequency .GE. ((B1 + B2) / 2))) THEN
 			Corr_delta_f = 45.0
-	ELSEIF (Delta_frequency .GT. ((B1 + 2.0 * B2) / 2.0)) THEN
+	ELSEIF (Delta_frequency .GT. ((B1 + 2 * B2) / 2)) THEN
 	  Info(15) = .TRUE.
 !	  Frequency difference outside definition range!
-	  Corr_delta_f = 82
+	  Corr_delta_f = 82.0
 	END IF  
 !
 	GOTO 300
@@ -485,37 +470,39 @@
 !	*****************************************************************
 !
 !
-100	SELECT CASE (NINT(CSXR*1000.0))
+100	SELECT CASE (CSXR)
 		CASE (:11000)
-			IF ((TX_TETRA) .AND. (.NOT. RX_TETRA) .AND. (CSXR .LE. 8.8)) THEN
-				Channel_sp_Rx = 10.0
+			IF ((TX_TETRA) .AND. (.NOT. RX_TETRA) .AND. (CSXR .LE. 8800)) THEN
+				Channel_sp_Rx = 10000
 			ELSE
-				Channel_sp_Rx = 12.5
+				Channel_sp_Rx = 12500
 			END IF
 		CASE (11001:14000)
-			Channel_sp_Rx = 20.0
-		CASE (14001:)
-			Channel_sp_Rx = 0.0
+			Channel_sp_Rx = 20000
+		CASE (14001:16000)
+			Channel_sp_Rx = 25000
+		CASE (16001:)
+			Channel_sp_Rx = 0
 	END SELECT	
 !
-	SELECT CASE (NINT(CSXT*1000.0))	
+	SELECT CASE (CSXT)	
 		CASE (:4400) 
-			Channel_sp_Tx = 5.0
+			Channel_sp_Tx = 5000
 		CASE (4401:5500)
-			Channel_sp_Tx = 6.25
+			Channel_sp_Tx = 6250
 		CASE (5501:8800)
-			Channel_sp_Tx = 10.0
+			Channel_sp_Tx = 10000
 		CASE (8801:11000)
-			Channel_sp_Tx = 12.5
+			Channel_sp_Tx = 12500
 		CASE (11001:14000)
-			Channel_sp_Tx = 20.0
+			Channel_sp_Tx = 20000
 		CASE (14001:16000)
-			Channel_sp_Tx = 25.0
+			Channel_sp_Tx = 25000
 		CASE (16001:)
-			Channel_sp_Tx = 0.0
+			Channel_sp_Tx = 0
 	END SELECT
 !
-	IF (Channel_sp_Rx * Channel_sp_Tx .EQ. 0.0) THEN
+	IF (Channel_sp_Rx * Channel_sp_Tx .EQ. 0) THEN
 !	Wideband:
 		IF (CSXR .GT. CSXT) THEN
 			OMEGA = Delta_frequency / CSXR
@@ -550,118 +537,122 @@
 		Corr_delta_f = acorrsinus - (acorrsinus - acorrB1) * B2 / B1
 !
 !	WB/NB correction
-		IF (Channel_sp_Tx .EQ. 0.0) Perm_FS = 6*LOG10(CSXT/25)
+		IF ((Channel_sp_Tx .EQ. 0) .AND. (TX_DIG .OR. RX_DIG)) &
+				Perm_FS = Perm_FS + 6*LOG10(REAL(CSXT)/25000.0)
 ! 
 	ELSE
 !	narrowband curves:
-		IF (Channel_sp_Rx .EQ. 10.0) THEN
-			CSXX = CS19
-		ELSEIF (Channel_sp_Rx .EQ. 12.5) THEN
-			IF (Channel_sp_Tx .EQ. 5.0) THEN
-				CSXX = CS1
-			ELSEIF (Channel_sp_Tx .EQ. 6.25) THEN
-				CSXX = CS2
-			ELSEIF (Channel_sp_Tx .EQ. 10.0) THEN
-				CSXX = CS3
-			ELSEIF (Channel_sp_Tx .EQ. 12.5) THEN
-				CSXX = CS4
-			ELSEIF (Channel_sp_Tx .EQ. 20.0) THEN
-				CSXX = CS5
-			ELSEIF (Channel_sp_Tx .EQ. 25.0) THEN
-				IF (TX_TETRA) THEN
-					CSXX = CS20
-				ELSE
-					CSXX = CS6
-				END IF			
-			END IF
-		ELSEIF (Channel_sp_Rx .EQ. 20.0) THEN
-			IF (Channel_sp_Tx .EQ. 5.0) THEN
-				CSXX = CS7
-			ELSEIF (Channel_sp_Tx .EQ. 6.25) THEN
-				CSXX = CS8
-			ELSEIF (Channel_sp_Tx .EQ. 10.0) THEN
-				CSXX = CS9
-			ELSEIF (Channel_sp_Tx .EQ. 12.5) THEN
-				CSXX = CS10
-			ELSEIF (Channel_sp_Tx .EQ. 20.0) THEN
-				CSXX = CS11
-			ELSEIF (Channel_sp_Tx .EQ. 25.0) THEN
-				IF (TX_TETRA) THEN
-					CSXX = CS21
-				ELSE
-					CSXX = CS12
-				END IF
-			END IF
-!
-		ELSEIF (Channel_sp_Rx .EQ. 25.0) THEN
-			IF (Channel_sp_Tx .EQ. 5.0) THEN
-				IF (RX_TETRA) THEN
-					CSXX = CS23
-				ELSE
-					CSXX = CS13
-				ENDIF
-			ELSEIF (Channel_sp_Tx .EQ. 6.25) THEN
-				IF (RX_TETRA) THEN
-					CSXX = CS24
-				ELSE
-					CSXX = CS14
-				ENDIF
-			ELSEIF (Channel_sp_Tx .EQ. 10.0) THEN
-				IF (RX_TETRA) THEN
-					CSXX = CS25
-				ELSE
-					CSXX = CS15
-				ENDIF
-			ELSEIF (Channel_sp_Tx .EQ. 12.5) THEN
-				IF (RX_TETRA) THEN
-					CSXX = CS26
-				ELSE
-					CSXX = CS16
-				ENDIF
-			ELSEIF (Channel_sp_Tx .EQ. 20.0) THEN
-				IF (RX_TETRA) THEN
-					CSXX = CS27
-				ELSE
-					CSXX = CS17
-				ENDIF
-			ELSEIF (Channel_sp_Tx .EQ. 25.0) THEN
-				IF ((TX_TETRA) .AND. (RX_TETRA)) THEN
-					Info(18) = .TRUE.
+		SELECT CASE (Channel_sp_Rx)
+		  CASE (10000)
+		  	CSXX = CS19
+		  CASE (12500)
+			SELECT CASE (Channel_sp_Tx)
+				CASE (5000)
+					CSXX = CS1
+				CASE (6250)
+					CSXX = CS2
+				CASE (10000)
+					CSXX = CS3
+				CASE (12500)
+					CSXX = CS4
+				CASE (20000)
+					CSXX = CS5
+				CASE (25000)
+					IF (TX_TETRA) THEN
+						CSXX = CS20
+					ELSE
+						CSXX = CS6
+					END IF			
+			END SELECT
+		  CASE (20000)
+			SELECT CASE (Channel_sp_Tx)
+				CASE (5000)
+					CSXX = CS7
+				CASE (6250)
+					CSXX = CS8
+				CASE (10000)
+					CSXX = CS9
+				CASE (12500)
+					CSXX = CS10
+				CASE (20000)
+					CSXX = CS11
+				CASE (25000)
+					IF (TX_TETRA) THEN
+						CSXX = CS21
+					ELSE
+						CSXX = CS12
+					END IF			
+			END SELECT
+		  CASE (25000)
+			SELECT CASE (Channel_sp_Tx)
+				CASE (5000)
+					IF (TX_TETRA) THEN
+						CSXX = CS23
+					ELSE
+						CSXX = CS13
+					END IF			
+				CASE (6250)
+					IF (TX_TETRA) THEN
+						CSXX = CS24
+					ELSE
+						CSXX = CS14
+					END IF			
+				CASE (10000)
+					IF (TX_TETRA) THEN
+						CSXX = CS25
+					ELSE
+						CSXX = CS15
+					END IF			
+				CASE (12500)
+					IF (TX_TETRA) THEN
+						CSXX = CS26
+					ELSE
+						CSXX = CS16
+					END IF			
+				CASE (20000)
+					IF (TX_TETRA) THEN
+						CSXX = CS27
+					ELSE
+						CSXX = CS17
+					END IF			
+				CASE (25000)
+					IF ((TX_TETRA) .AND. (RX_TETRA)) THEN
+						Info(18) = .TRUE.
 !		  Correction factors for the band 380 - 400 MHz are used.
-					GOTO 70
-				ELSE
-					IF ((.NOT. TX_TETRA) .AND. (.NOT. RX_TETRA)) CSXX = CS18
-					IF ((TX_TETRA) .AND. (.NOT. RX_TETRA)) CSXX = CS22
-					IF ((.NOT. TX_TETRA) .AND. (RX_TETRA)) CSXX = CS28
-				END IF
-			END IF
-		END IF
+						GOTO 70
+					ELSE
+						IF ((.NOT. TX_TETRA) .AND. (.NOT. RX_TETRA)) CSXX = CS18
+						IF ((TX_TETRA) .AND. (.NOT. RX_TETRA)) CSXX = CS22
+						IF ((.NOT. TX_TETRA) .AND. (RX_TETRA)) CSXX = CS28
+					END IF
+			END SELECT
+		END SELECT
 !
 !	Curve selected
 !
 !	Calculate Corr_delta_f:
 !
-		SELECT CASE (NINT(delta_frequency*1000.0))
+		SELECT CASE (Delta_frequency)
 			CASE (:5000) 
-				  Corr_delta_f = CSXX(2) * Delta_frequency / 5.0
+				  Corr_delta_f = CSXX(2) * REAL(Delta_frequency) / 5000.0
 			CASE (5001:6250)
-				  X1  = (Delta_frequency - 5.0) / (6.25 - 5.0)
+				  X1  = REAL(Delta_frequency - 5000) / 1250.0
 				  Corr_delta_f = CSXX(2) + X1 * (CSXX(3)-CSXX(2))
 			CASE (6251:10000)
-				  X1  = (Delta_frequency - 6.25) / (10.0 - 6.25)
+				  X1  = REAL(Delta_frequency - 6250) / 3750.0
 				  Corr_delta_f = CSXX(3) + X1 * (CSXX(4)-CSXX(3))
 			CASE (10001:12500)
-				  X1  = (Delta_frequency - 10.0) / (12.5 - 10.0)
+				  X1  = REAL(Delta_frequency - 10000) / 2500.0
 				  Corr_delta_f = CSXX(4) + X1 * (CSXX(5)-CSXX(4))
 			CASE (12501:20000)
-				  X1  = (Delta_frequency - 12.5) / (20.0 - 12.5)
+				  X1  = REAL(Delta_frequency - 12500) / 7500.0
 				  Corr_delta_f = CSXX(5) + X1 * (CSXX(6)-CSXX(5))
 			CASE (20001:25000)
-				  X1  = (Delta_frequency - 20.0) / (25.0 - 20.0)
+				  X1  = REAL(Delta_frequency - 20000) / 5000.0
 				  Corr_delta_f = CSXX(6) + X1 * (CSXX(7)-CSXX(6))
 			CASE (25001:)
 				  Info(15) = .TRUE.
-				  Corr_delta_f = 82
+				  Corr_delta_f = 82.0
 		END SELECT
 !
 	END IF	! WB/NB
@@ -737,17 +728,19 @@
 !
 !	****************************************************************
 !
-	SUBROUTINE TACSNMT (DF, CDF)
+	SUBROUTINE TACSNMT (DFI, CDF)
 !
-	DOUBLE PRECISION	DF
+	INTEGER*4			DFI
 	REAL				CDF
 !
+	DOUBLE PRECISION	DF
 	REAL				DD, FTAB1(7)
 	INTEGER				I
 !
 !	From 30 kHz to 90 kHz in 10 kHz steps:      
 	DATA	FTAB1 /-9.0,-8.5,-8.0,-7.0,-6.0,-4.0,-1.0/
 !
+	DF=DBLE(DFI)/1D3
 	IF (DF .LE. 30.0) THEN
 	  CDF = -9.0
 	  RETURN

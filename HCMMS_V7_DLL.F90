@@ -1,6 +1,6 @@
 !
 !	HCMMS_V7_DLL.F90									P. Benner		08.01.2004
-!														G.H.			27.09.2005
+!														G.H.			22.11.2005
 !	DLL to the HCMMS_V7 subroutuine (Berlin 2003)
 !
 	SUBROUTINE HCMMS_V7_DLL ( I_C_mode, I_bor_dis, I_PD, I_Distance, I_H_Datab_Tx, &
@@ -15,7 +15,6 @@
 !
 	!DEC$  ATTRIBUTES DLLEXPORT::HCMMS_V7_DLL
 	!DEC$  ATTRIBUTES ALIAS:'HCMMS_V7_DLL'::HCMMS_V7_DLL
-!
 !
 	IMPLICIT	NONE
 !
@@ -402,11 +401,13 @@
 		  CASE (1047)
 			WRITE (12,*) " Error in input value of borderline distance  (max. 999 km)!"
 		  CASE (1048)
-			WRITE (12,*)	" Selected (border-) line data not available !"
+			WRITE (12,*) " Selected (border-) line data not available !"
 		  CASE (1049)
 			WRITE (12,*) " Error in line data !"
 		  CASE (1050)
-			WRITE (12,*) " No Agreement frequency and CBR input is missing !"
+			WRITE (12,*) " No Agreement frequency and important input is missing !"
+		  CASE (2000:)
+			WRITE (12,*) " Error in looking up FS-figures !"
 		END SELECT
 		RETURN
 	  ELSE	! HCM_Error=0
@@ -599,7 +600,7 @@
 		  WRITE (12,'(A35, F7.1, A3)') "  Correction factor Rx antenna   : ", Rx_ant_corr, " dB"
 		  WRITE (12,'(A35, F7.1, A3)') "  Corr. factor antenna type Rx   : ", Rx_ant_type_corr, " dB"
 		  IF (Delta_frequency .LT. 1000.0) THEN
-			WRITE (12,'(A35, F7.1, A4)') "  Delta frequency                : ", Delta_frequency, " kHz"
+			WRITE (12,'(A35, F7.1, A4)') "  Delta frequency                : ", Delta_frequency/1000.0, " kHz"
 		  ELSE   
 			WRITE (12,*) " Delta frequency is greater than 1 MHz !"
 		  END IF
@@ -607,10 +608,8 @@
 		WRITE (12,*) " Permissible field str. of table"
 		WRITE (12,'(A35, F7.1, A7)') "  (0, if there is an input)      : ", Perm_FS_from_table, " dbuV/m"
 		WRITE (12,'(A35, F7.1, A3)') "  Corr. factor according delta f : ", Corr_delta_f, " dB"
-		IF (Delta_frequency .NE. 0.0) THEN
-			WRITE (12,'(A35, F7.1, A4)') "  Cannel spacing of Rx           : ", Channel_sp_Rx, " kHz"
-			WRITE (12,'(A35, F7.1, A4)') "  Cannel spacing of Tx           : ", Channel_sp_Tx, " kHz"
-		END IF
+		WRITE (12,'(A35, F7.1, A4)') "  Cannel spacing of Rx           : ", Channel_sp_Rx/1000.0, " kHz"
+		WRITE (12,'(A35, F7.1, A4)') "  Cannel spacing of Tx           : ", Channel_sp_Tx/1000.0, " kHz"
 		WRITE (12,'(A35, F7.1, A4)') "  Power in direction of Rx       : ", Power_to_Rx, " dBW"
 		WRITE (12,'(A35, F7.1, A7)') "  Free space field strength      : ", Free_space_FS, " dbuV/m"
 		WRITE (12,*) ""

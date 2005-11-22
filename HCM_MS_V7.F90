@@ -1,6 +1,6 @@
 !	
 !	HCMMS_V7.F90										P.Benner		23.02.2004
-!														G.H.			11.11.2005
+!														G.H.			22.11.2005
 !	Version 7					
 !
 !	Harmonized Calculation Method for mobile services
@@ -25,7 +25,6 @@
 	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
 	DOUBLE PRECISION	CI, LongTx, LatTx, LongRx, LatRx
-	REAL				Perm_FS_in
 	INTEGER*4			I, IOS, IMR
 	CHARACTER*376		Strings
 !
@@ -315,7 +314,7 @@
 !		nothing
 	  ELSEIF (Rx_frequ(12:12) .EQ. 'K') THEN
 		Rx_frequency = Rx_frequency / 1.0D3
-	  ELSEIF (Tx_frequ(12:12) .EQ. 'G') THEN 
+	  ELSEIF (Rx_frequ(12:12) .EQ. 'G') THEN 
 		Rx_frequency = Rx_frequency * 1.0D3
 	  ELSE
 		HCM_error = 1024
@@ -382,21 +381,18 @@
 	END IF
 !
 !
-!	Settings of T% and receiver antenna height according to C_mode:
-	IF ((C_mode .EQ. -2) .OR. (C_mode .EQ. -3) .OR. &
-		(C_mode .EQ. -4) .OR. (C_mode .EQ. -6) .OR. &
-		((C_mode .GE.  1) .AND. (C_mode .LE. 6))) Time_percentage = 10
-	IF ((C_mode .EQ. -5) .OR.  (C_mode .EQ. 7))  Time_percentage = 50
-!
-!	Receiver antenna height 'H_AntRx'
-	IF ((C_mode .EQ. -1) .OR.  (C_mode .EQ. -7)) H_AntRx = 10
-	IF ((C_mode .LE. -2) .AND. (C_mode .GE. -6)) H_AntRx = 3
-	IF (C_mode .EQ. -8) H_AntRx = 3
-!
 !	Default values for Perm_FS, CBR_D, ERP_ref_Tx:
 	CBR_D      = 0.0
 	ERP_ref_Tx = 0.0
-	Perm_FS    = 0.0
+	Perm_FS    = -999.9
+!
+!	Settings of T% and receiver antenna height according to C_mode:
+	IF ((C_mode .EQ. -5) .OR.  (C_mode .EQ. 7))  Time_percentage = 50
+!
+!	Receiver antenna height 'H_AntRx' according to C_mode:
+	IF ((C_mode .EQ. -1) .OR.  (C_mode .EQ. -7)) H_AntRx = 10
+	IF ((C_mode .LE. -2) .AND. (C_mode .GE. -6)) H_AntRx = 3
+	IF (C_mode .EQ. -8) H_AntRx = 3
 !
 !
 !	Determination of permissible interference field strength
@@ -410,100 +406,90 @@
 	  CBR_D = 100.0
 	  ERP_ref_Tx = 3.0
 	  Info(4) = .FALSE.
-	END IF
-!
-	IF ((Tx_frequency .GE. 68.0) .AND. (Tx_frequency .LE. 74.8)) THEN
+	ELSEIF ((Tx_frequency .GE. 68.0) .AND. (Tx_frequency .LE. 74.8)) THEN
 	  Perm_FS = 6.0
 	  CBR_D = 100.0
 	  ERP_ref_Tx = 9.0
 	  Info(4) = .FALSE.
-	END IF
-!
-	IF ((Tx_frequency .GE. 75.2) .AND. (Tx_frequency .LE. 87.5)) THEN
+	ELSEIF ((Tx_frequency .GE. 75.2) .AND. (Tx_frequency .LE. 87.5)) THEN
 	  Perm_FS = 6.0
 	  CBR_D = 100.0
 	  ERP_ref_Tx = 9.0
 	  Info(4) = .FALSE.
-	END IF
-!
-	IF ((Tx_frequency .GE. 146.0) .AND. (Tx_frequency .LE. 149.9)) THEN
+	ELSEIF ((Tx_frequency .GE. 146.0) .AND. (Tx_frequency .LE. 149.9)) THEN
 	  Perm_FS = 12.0
 	  CBR_D = 80.0
 	  ERP_ref_Tx =12.0
 	  Info(4) = .FALSE.
-	END IF
-!
-	IF ((Tx_frequency .GE. 150.05) .AND. (Tx_frequency .LE. 174.0)) THEN
+	ELSEIF ((Tx_frequency .GE. 150.05) .AND. (Tx_frequency .LE. 174.0)) THEN
 	  Perm_FS = 12.0
 	  CBR_D = 80.0
 	  ERP_ref_Tx = 12.0
 	  Info(4) = .FALSE.
-	END IF
-!
-	IF ((Tx_frequency .GE. 380.0) .AND. (Tx_frequency .LE. 385.0) .AND. &
+	ELSEIF ((Tx_frequency .GE. 380.0) .AND. (Tx_frequency .LE. 385.0) .AND. &
 	   ((C_mode .EQ. 8) .OR. (C_mode .EQ. -7))) THEN 
-		  Perm_FS = 18.0
-		  CBR_D = 50.0
-		  ERP_ref_Tx = 14.0
-		  Info(4) = .FALSE.
-	END IF
-!
-	IF ((Tx_frequency .GE. 390.0) .AND. (Tx_frequency .LE. 395.0) .AND. &
+	  Perm_FS = 18.0
+	  CBR_D = 50.0
+	  ERP_ref_Tx = 14.0
+	  Info(4) = .FALSE.
+	ELSEIF ((Tx_frequency .GE. 390.0) .AND. (Tx_frequency .LE. 395.0) .AND. &
 	   ((C_mode .EQ. 8) .OR. (C_mode .EQ. -7))) THEN
-		  Perm_FS = 18.0
-		  CBR_D = 50.0
-		  ERP_ref_Tx = 14.0
-		  Info(4) = .FALSE.
-	END IF
-!
-	IF ((Tx_frequency .GE. 406.1) .AND. (Tx_frequency .LE. 430.0)) THEN
+	  Perm_FS = 18.0
+	  CBR_D = 50.0
+	  ERP_ref_Tx = 14.0
+	  Info(4) = .FALSE.
+	ELSEIF ((Tx_frequency .GE. 406.1) .AND. (Tx_frequency .LE. 430.0)) THEN
 	  Perm_FS = 20.0
 	  CBR_D = 50.0
 	  ERP_ref_Tx = 16.0
 	  Info(4) = .FALSE.
-	END IF
-!
-	IF ((Tx_frequency .GE. 440.0) .AND. (Tx_frequency .LE. 470.0)) THEN
+	ELSEIF ((Tx_frequency .GE. 440.0) .AND. (Tx_frequency .LE. 470.0)) THEN
 	  Perm_FS = 20.0
 	  CBR_D = 50.0
 	  ERP_ref_Tx = 16.0
 	  Info(4) = .FALSE.
-	END IF
-!
-	IF ((Tx_frequency .GE. 862.0) .AND. (Tx_frequency .LE. 960.0)) THEN
+	ELSEIF ((Tx_frequency .GE. 862.0) .AND. (Tx_frequency .LE. 960.0)) THEN
 	  Perm_FS = 26.0
 	  CBR_D = 30.0
 	  ERP_ref_Tx = 13.0
 	  Info(4) = .FALSE.
+	ELSEIF ((Tx_frequency .GE. 1710.0) .AND. (Tx_frequency .LE. 1785.0)) THEN
+	  Perm_FS = 38.0
+	  CBR_D = 15.0
+	  ERP_ref_Tx = 13.0
+	  Info(4) = .FALSE.
+	ELSEIF ((Tx_frequency .GE. 1805.0) .AND. (Tx_frequency .LE. 1880.0)) THEN
+	  Perm_FS = 42.0
+	  CBR_D = 15.0
+	  ERP_ref_Tx = 13.0
+	  Info(4) = .FALSE.
+	ELSEIF ((Tx_frequency .GE. 1885.0) .AND. (Tx_frequency .LE. 2025.0)) THEN
+	  Perm_FS = 21.0
+	  Info(4) = .FALSE.
+	ELSEIF ((Tx_frequency .GE. 2110.0) .AND. (Tx_frequency .LE. 2200.0)) THEN
+	  Perm_FS = 21.0
+	  Info(4) = .FALSE.
 	END IF
 !
-	IF ((Tx_frequency .GE. 1710.0) .AND. (Tx_frequency .LE. 1785.0) .AND. &
-	   ((C_mode .EQ. 5) .OR. (C_mode .EQ. 6) .OR. (C_mode .EQ. -6))) THEN
-		  Perm_FS = 0.0
-		  CBR_D = 15.0
-		  ERP_ref_Tx = 13.0
-		  Info(4) = .FALSE.
-	END IF
+!	Perm_FS according to CMODE
+	IF ((C_mode .GE. 1) .AND. (C_mode .LE. 4)) Perm_FS = 32.0
+	IF (C_mode .EQ. 5) Perm_FS = 38.0
+	IF (C_mode .EQ. 6) Perm_FS = 42.0
 !
-	IF ((Tx_frequency .GE. 1805.0) .AND. (Tx_frequency .LE. 1880.0) .AND. &
-	   ((C_mode .EQ. 5) .OR. (C_mode .EQ. 6) .OR. (C_mode .EQ. -6))) THEN
-		  Perm_FS = 0.0
-		  CBR_D = 15.0
-		  ERP_ref_Tx = 13.0
-		  Info(4) = .FALSE.
-	END IF
+!		GSM 900 (border-) line calculations:
+	IF (C_mode .EQ. -2) Perm_FS = 19.0
 !
-	IF ((Tx_frequency .GE. 1885.0) .AND. (Tx_frequency .LE. 2025.0) .AND. &
-	   ((C_mode .EQ. 9) .OR. (C_mode .EQ. -8))) THEN
-		  Perm_FS = 21.0
-		  Info(4) = .FALSE.
-	END IF
+!		ERMES 12 dBuV/m:
+	IF (C_mode .EQ. -3) Perm_FS = 12.0
 !
-	IF ((Tx_frequency .GE. 2110.0) .AND. (Tx_frequency .LE. 2200.0) .AND. &
-	   ((C_mode .EQ. 9) .OR. (C_mode .EQ. -8))) THEN
-		  Perm_FS = 21.0
-		  Info(4) = .FALSE.
-	END IF
+!		ERMES 32 dBuV/m:
+	IF ((C_mode .EQ. -4) .OR. (C_mode .EQ. 4)) Perm_FS = 32.0
+!
+!		ERMES 52 dBuV/m:
+	IF (C_mode .EQ. -5) Perm_FS = 52.0
+!
+!		GSM 1800 25 dBuV/m (line):
+	IF (C_mode .EQ. -6) Perm_FS = 25.0
 !
 	Perm_FS_from_table = Perm_FS
 !
@@ -511,43 +497,16 @@
 	IF (Perm_FS_input .NE. '     ') THEN
 		Info(5) = .TRUE.
 !		Input value of permissible field strength is used
-		READ (Perm_FS_input, '(F5.1)', IOSTAT=IOS) Perm_FS_in
+		READ (Perm_FS_input, '(F5.1)', IOSTAT=IOS) Perm_FS
 		IF (IOS .NE. 0) THEN
 			HCM_error = 1026
 !			Error in input value of permissible field strength
-		  ELSE
-			Perm_FS = Perm_FS_in
 		END IF
-	  ELSE                                 
-!		No input of permissible field strength:
-		IF ((C_mode .GE. 1) .AND. (C_mode .LE. 4)) Perm_FS = 32.0
-		IF (C_mode .EQ. 5) Perm_FS = 38.0
-		IF (C_mode .EQ. 6) Perm_FS = 42.0
-		IF (C_mode .EQ. 8) Perm_FS = 18.0
-!
-!		UMTS / IMT2000
-		IF (C_mode .EQ. 9) Perm_FS = 21.0
-!	
-!		GSM 900 (border-) line calculations:
-		IF (C_mode .EQ. -2) Perm_FS = 19.0
-!
-!		ERMES 12 dBuV/m:
-		IF (C_mode .EQ. -3) Perm_FS = 12.0
-!
-!		ERMES 32 dBuV/m:
-		IF ((C_mode .EQ. -4) .OR. (C_mode .EQ. 4)) Perm_FS = 32.0
-!
-!		ERMES 52 dBuV/m:
-		IF (C_mode .EQ. -5) Perm_FS = 52.0
-!
-!		GSM 1800 25 dBuV/m:
-		IF (C_mode .EQ. -6) Perm_FS = 25.0
-!
-!		380 - 400 MHz emergency / security services band 18 dBuV/m:
-		IF (C_mode .EQ. -7) Perm_FS = 18.0
-!
-!		UMTS / IMT2000 21 dBuV/m:
-		IF (C_mode .EQ. -8) Perm_FS = 21.0
+	ELSE
+		IF (INFO(4)) THEN
+		  HCM_error = 1050
+		  RETURN
+		END IF
 	END IF                        
 !
 !	Input value MARAIN ?
