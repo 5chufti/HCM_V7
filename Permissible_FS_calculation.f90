@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		17.10.2005
-!														G.H.			16.11.2005
+!														G.H.			29.11.2005
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -214,7 +214,7 @@
 !	**************************************************************
 !
 !
-!	Delta frequency in kHz:
+!	Delta frequency in Hz:
 	Delta_frequency = DABS(DINT(Tx_frequency*1D6) - DINT(Rx_frequency*1D6))
 !	Input value for correction factor according delta frequency ?
 	IF (Cor_fact_frequ_diff .NE. '    ') THEN
@@ -231,17 +231,17 @@
 	END IF
 !
 !	Module UMTS / IMT2000
-	IF (C_Mode .EQ. 9) THEN
-		SELECT CASE (Delta_frequency)
-			CASE (:5000000)
-				Corr_delta_f = 0.0
-			CASE (5000001:10000000)
-				Corr_delta_f = 24.0
-			CASE (10000001:)
-				Corr_delta_f = 82.0
-		END SELECT
-	  GOTO 300
-	END IF
+!	IF (C_Mode .EQ. 9) THEN
+!		SELECT CASE (Delta_frequency)
+!			CASE (:5000000)
+!				Corr_delta_f = 0.0
+!			CASE (5000001:10000000)
+!				Corr_delta_f = 24.0
+!			CASE (10000001:)
+!				Corr_delta_f = 82.0
+!		END SELECT
+!	  GOTO 300
+!	END IF
 !
 !	Bandwidth of Rx:   
 	DRX = Desig_of_Rx_emis(1:4)

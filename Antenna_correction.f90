@@ -5,6 +5,8 @@
 	SUBROUTINE Ctransf (azi,aziM,ele,eleM,hda,vda)
 !
 !	Subroutine to calculate H_diff_angle, V_diff_angle
+!	as spherical coordinate transformation 
+!	all distances and angles are in radians and normalized to the sphere
 !
 !	azi  ... azi from Tx to Rx (  0..360 in degrees)
 !	aziM ... azi of Tx antenna (  0..360 in degrees)
@@ -20,7 +22,7 @@
 !
 	DOUBLE PRECISION	a, b, d
 !
-!	calc distance
+!	calc dist
 	a = DSIND((ele - eleM) / 2D0)**2D0 + DCOSD(eleM) * DCOSD(ele) & 
 		* DSIND((azi - aziM) / 2D0)**2D0
 	d = 2D0 * DATAN2D(DSQRT(a), DSQRT(1D0 - a))
@@ -28,7 +30,7 @@
 	b = DATAN2D(DSIND(azi - aziM) * DCOSD(ele), &
 		DCOSD(eleM) * DSIND(ele) - DSIND(eleM) * DCOSD(ele) * DCOSD(azi - aziM))
 !
-! new point [long2,lat2] from [long1,lat1] with [dist,dir] (all in radians)
+! new point [long2,lat2] from [long1,lat1] with [dist,bearing] (all in radians)
 !
 !    sin(lat2) = cos(dir)*cos(lat1)*sin(dist) + sin(lat1)*cos(dist)
 !

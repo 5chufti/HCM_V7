@@ -1,5 +1,5 @@
 !
-!	Position_of_mobile.f90								P. Benner		24.08.2004
+!	Position_of_mobile.f90								P. Benner		29.11.2004
 !														G.H.			11.11.2005
 !
 !	Subroutine to calculate the new position of Tx (New_LongTx, New_LatTx)
@@ -74,31 +74,12 @@
 	END IF
 !
 	IF ((N_Cut_Tx .EQ. 0) .AND. (N_Cut_Rx .EQ. 0)) THEN
+!	no borderline cut
 	  IF (Distance .LE. DBLE(Tx_serv_area + Rx_serv_area)) THEN
-!		  Overlapping:
+!		  Overlapping -> Tx and Rx in same country:
 		  Distance = 0.0D0
 	      Info(7) = .TRUE.
 !
-!		  Calculate the positions:
-		  IF (Tx_serv_area .GT. Rx_serv_area) THEN
-			  DP1 = Rx_serv_area
-			  IF (Distance .LT. Rx_serv_area) THEN
-				DP1 = Distance
-			  END IF
-!			  Calculate the new Rx co-ordinates:
-			  CALL New_coordinates (LongRx, LatRx, Dir_Rx_Tx, DP1, New_LongRx, New_LatRx)
-			  New_LongTx = New_LongRx
-			  New_LatTx  = New_LatRx
-		    ELSE
-			  DP1 = Tx_serv_area
-			  IF (Distance .LT. Tx_serv_area) THEN
-				DP1 = Distance
-			  END IF
-!			  Calculate the new Tx co-ordinates:
-			  CALL New_coordinates (LongTx, LatTx, Dir_Tx_Rx, DP1, New_LongTx, New_LatTx)
-			  New_LongRx = New_LongTx
-			  New_LatRx  = New_LatTx
-		  END IF
 		ELSE
 !		  Calculate new positions:
 		  IF (Tx_serv_area .GT. 0.0) THEN
