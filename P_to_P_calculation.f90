@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			14.10.2005
+!														G.H.			23.01.2006
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -300,7 +300,7 @@
 !		Height of Rx above sealevel
 	CALL Point_height (New_LongRx, New_LatRx, H_Datab_Rx)
 	IF (HCM_Error .NE. 0) RETURN
-	IF (H_Rx_input .EQ. '    ') THEN
+	IF ((H_Rx_input .EQ. '    ') .OR. (C_mode .LT. 0)) THEN
 		H_Rx = H_Datab_Rx
 		Info(8) = .TRUE.
 !		No height of Rx site is given, height is from the terrain database.
