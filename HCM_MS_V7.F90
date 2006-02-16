@@ -113,7 +113,7 @@
 !
 !	***************************************************************************
 !
-	Version = ' 7ß07'
+	Version = ' 7.00'
 !
 	HCM_error = 0
 !
@@ -663,7 +663,7 @@
 !	1035	Error in input value of distance over sea
 !	1036	The 'xxx.ALL' borderline file for Tx is missing
 !	1037	The 'xxx.ALL' borderline file for Rx is missing
-!	1038	Error ib type of antenna (TR20-08)
+!	1038	Error in type of antenna (TR20-08)
 !	1039	Error in input data of correction factor according frequency difference
 !	1040	Channel spacing outside definition range (Rx)
 !	1041	Channel spacing outside definition range (Tx)

@@ -1,6 +1,6 @@
 !
 !	HCMMS_V7_DLL.F90									P. Benner		08.01.2004
-!														G.H.			22.01.2006
+!														G.H.			22.11.2005
 !	DLL to the HCMMS_V7 subroutuine (Berlin 2003)
 !
 	SUBROUTINE HCMMS_V7_DLL ( I_C_mode, I_bor_dis, I_PD, I_Distance, I_H_Datab_Tx, &
@@ -172,6 +172,8 @@
 		WRITE (12,*) ""
 		WRITE (12,*) "                       R e s u l t s"
 		WRITE (12,*) ""
+		WRITE (12,*) " Version of the HCM module      : V", Version
+		WRITE (12,*) ""
 		WRITE (12,'(A35,I4,A2,$)') &
 				"  Mode of calculation            : ", C_mode, " ("
 		SELECT CASE (C_mode)
@@ -325,8 +327,6 @@
 	  WRITE (12,*) ""
 	  WRITE (12,*) "               Important output :"
 	  WRITE (12,*) ""
-	  WRITE (12,*) " Version of the HCM module      : V", Version
-	  WRITE (12,*) ""
 	  WRITE (12,'(A35,I5)') "  Error value                    : ",HCM_error
 	  IF (HCM_error .NE. 0) THEN
 		SELECT CASE (HCM_Error)
@@ -462,7 +462,7 @@
 		WRITE (12,*) " "
 !
 		IF (Info(1)) THEN
-			WRITE (12,*) " No height of transmitter is given !"
+			WRITE (12,*) " No height of Tx is given or Tx is mobile !"
 			WRITE (12,*) " The height is taken from terrain database !"
 			WRITE (12,*) " "
 		END IF
@@ -503,7 +503,7 @@
 		END IF
 !
 		IF (Info(8)) THEN
-			WRITE (12,*) " No height of receiver is given !"
+			WRITE (12,*) " No height of Rx is given or Rx is mobile / line!"
 			WRITE (12,*) " The height is taken from terrain database !"
 			WRITE (12,*) " "
 		END IF

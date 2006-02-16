@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			23.01.2006
+!														G.H.			14.02.2006
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -224,7 +224,7 @@
 !		Calculate new co-ordinates:
 		CALL Position_of_mobile ( LongTx, LatTx, LongRx, LatRx, &
 					New_LongTx, New_LatTx, New_LongRx, New_LatRx )
-		IF (HCM_Error .NE. 0) RETURN
+		IF ((HCM_Error .NE. 0) .OR. Info(7)) RETURN
 	ELSE
 		New_LongTx = LongTx
 		New_LatTx  = LatTx
@@ -268,13 +268,37 @@
 	New_LatRx = New_LatRx + CI / 3.6D3
 !
 !------------------------------------------------------------------------
+!
+!	Calculate distance and directions again (with new co-ordinates):
+10	CALL Calc_distance (New_LongTx, New_LatTx, New_LongRx, New_LatRx, Distance)
+!
+	IF (Distance .LE. 0.0D0) THEN
+	  Calculated_FS = 999.9
+!	  Distance between Tx and Rx = 0. Calculations not possible.
+	  HCM_error = 1000   
+	  RETURN
+	END IF
+!
+	IF (Distance .GT. 1D3) THEN
+	  Calculated_FS = -999.9
+!	  The distance is greater than 1000 km. Calculations not possible.
+	  HCM_error = 1028
+	  RETURN
+	END IF
+!
+!	Calculate the direction from Rx to Tx:
+	CALL Calc_direction (New_LongRx, New_LatRx, New_LongTx, New_LatTx, Dir_Rx_Tx)
+!
+!	Calculate the direction from Tx to Rx:
+	CALL Calc_direction (New_LongTx, New_LatTx, New_LongRx, New_LatRx, Dir_Tx_Rx)
+!
 !	Checking of Tx site height:
 !		Height of Tx site above sea level:
-10	CALL Point_height (New_LongTx, New_LatTx, H_Datab_Tx)
-
+	CALL Point_height (New_LongTx, New_LatTx, H_Datab_Tx)
+!
 	IF (HCM_error .NE. 0) RETURN
 !
-	IF (H_Tx_input .EQ. '    ') THEN
+	IF ((H_Tx_input .EQ. '    ') .OR. (Tx_serv_area .GT. 0.0)) THEN
 		H_Tx = H_Datab_Tx
 		Info(1) = .TRUE.
 !		No height of Tx site is given, height is taken from the terrain database.
@@ -300,7 +324,7 @@
 !		Height of Rx above sealevel
 	CALL Point_height (New_LongRx, New_LatRx, H_Datab_Rx)
 	IF (HCM_Error .NE. 0) RETURN
-	IF ((H_Rx_input .EQ. '    ') .OR. (C_mode .LT. 0)) THEN
+	IF ((H_Rx_input .EQ. '    ') .OR. (C_mode .LT. 0) .OR. (Rx_serv_area .GT. 0.0)) THEN
 		H_Rx = H_Datab_Rx
 		Info(8) = .TRUE.
 !		No height of Rx site is given, height is from the terrain database.
@@ -323,29 +347,7 @@
 		END IF
 	END IF
 !
-!
-!	Calculate distance and directions again (with new co-ordinates):
-	CALL Calc_distance (New_LongTx, New_LatTx, New_LongRx, New_LatRx, Distance)
-!
-	IF (Distance .LE. 0.0D0) THEN
-	  Calculated_FS = 999.9
-!	  Distance between Tx and Rx = 0. Calculations not possible.
-	  HCM_error = 1000   
-	  RETURN
-	END IF
-!
-	IF (Distance .GT. 1D3) THEN
-	  Calculated_FS = -999.9
-!	  The distance is greater than 1000 km. Calculations not possible.
-	  HCM_error = 1028
-	  RETURN
-	END IF
-!
-!	Calculate the direction from Rx to Tx:
-	CALL Calc_direction (New_LongRx, New_LatRx, New_LongTx, New_LatTx, Dir_Rx_Tx)
-!
-!	Calculate the direction from Tx to Rx:
-	CALL Calc_direction (New_LongTx, New_LatTx, New_LongRx, New_LatRx, Dir_Tx_Rx)
+	V_angle_Tx_Rx = ATAN2D(dfloat(H_Rx + H_AntRx - H_Tx + H_AntTx),(1D3 * Distance))
 !
 !	***************************************************************
 !	*							      
@@ -354,8 +356,6 @@
 !	***************************************************************
 !
 !	Calculation of power in direction of the receiver 'Power_to_Rx':
-!
-	V_angle_Tx_Rx = ATAN2D(dfloat(H_Rx + H_AntRx - H_Tx + H_AntTx),(1D3 * Distance))
 !
 	IF ((Ant_typ_H_Tx .EQ. '000ND00') .AND. (Ant_typ_V_Tx .EQ. '000ND00')) THEN
 		Tx_ant_corr = 0.0

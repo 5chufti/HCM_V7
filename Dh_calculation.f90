@@ -83,7 +83,7 @@
       S1 = S1 / 2
     END DO
 !
-!	Substract 10% at the top and at the bottom:
+!	Subtract 10% at the top and at the bottom:
 !	Remaining difference between the lowest and the highest value
 !	is the value of 'Dh':
 !
