@@ -1,6 +1,6 @@
 !
-!	Get_FS_from_figures.f90								P. Benner		06.10.2003
-!												
+!	Get_FS_from_figures.f90						P. Benner
+!												19.04.2006
 !
 !	SUBROUTINE Get_FS_from_figures ( Land_FS_1kW, Sea_FS_1kW )
 !
@@ -47,11 +47,11 @@
 !
 	INCLUDE				'HCM_MS_V7_definitions.f90'
 !
-	REAL				Land_FS_1kW, Sea_FS_1kW
-!
 	INTEGER*4			Error
 	INTEGER*4			Distances(78), d_inf, d_sup, f_inf, f_sup, I
 	REAL				dh1, dh10
+	REAL				Land_FS_1kW, Sea_FS_1kW
+!
 	REAL				Heff_values(8), h_inf, h_sup
 	REAL				L_Eiii, L_Eiis, L_Eisi, L_Eiss, L_Esii, L_Esis, L_Essi, L_Esss
 	REAL				S_Eiii, S_Eiis, S_Eisi, S_Eiss, S_Esii, S_Esis, S_Essi, S_Esss
@@ -391,13 +391,13 @@
 					L_E10dh1_s = L_E_si
 					S_E10dh1_s = S_E_si
 				  ELSE
-					L_E10dh1_i = L_E_ii + (L_E_is - L_E_ii) * LOG10(dh10/FLOAT(d_inf)) / &
+					L_E10dh1_i = L_E_ii + (L_E_is - L_E_ii) * LOG10(dh1/FLOAT(d_inf)) / &
 							  LOG10(FLOAT(d_sup)/FLOAT(d_inf)) 
-					S_E10dh1_i = S_E_ii + (S_E_is - S_E_ii) * LOG10(dh10/FLOAT(d_inf)) / &
+					S_E10dh1_i = S_E_ii + (S_E_is - S_E_ii) * LOG10(dh1/FLOAT(d_inf)) / &
 							  LOG10(FLOAT(d_sup)/FLOAT(d_inf)) 
-					L_E10dh1_s = L_E_si + (L_E_ss - L_E_si) * LOG10(dh10/FLOAT(d_inf)) / &
+					L_E10dh1_s = L_E_si + (L_E_ss - L_E_si) * LOG10(dh1/FLOAT(d_inf)) / &
 							  LOG10(FLOAT(d_sup)/FLOAT(d_inf)) 
-					S_E10dh1_s = S_E_si + (S_E_ss - S_E_si) * LOG10(dh10/FLOAT(d_inf)) / &
+					S_E10dh1_s = S_E_si + (S_E_ss - S_E_si) * LOG10(dh1/FLOAT(d_inf)) / &
 							  LOG10(FLOAT(d_sup)/FLOAT(d_inf)) 
 				END IF
 !				Inter- or extrapolation of field strength as a function of the frequency:
