@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			14.02.2006
+!														G.H.			31.05.2006
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -574,7 +574,7 @@
 	  END IF
 	ELSE
 !	for line calculations
-	  Heff_Rx = 10.0
+	  Heff_Rx = H_AntRx
 	END IF
 	IF (Heff_Rx .LT. 3.0) Heff_Rx = 3.0
 !

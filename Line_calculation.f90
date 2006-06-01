@@ -65,9 +65,6 @@
 !
 	Rx_serv_area = 0.0
 !
-!	Default receiver antenna height:
-	H_AntRx = 10
-!
 !	Select line data
 !
 	BorderFile(1:3) = Land_from
@@ -136,7 +133,7 @@
 !	  Selected line data not available
 	  RETURN
 	END IF                            
-	GOTO 80
+!	GOTO 80
 !-----------------------------------------------------------------------
 !	Testroutine to calculate to each point:
 	FS_x = -999.9
