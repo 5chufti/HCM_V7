@@ -324,6 +324,7 @@
 !
 	IF (DEBUG) THEN
 	  WRITE (12,*) ""
+	  WRITE (12,*) " Version of the HCM module      : V", Version
 	  WRITE (12,*) ""
 	  WRITE (12,*) "               Important output :"
 	  WRITE (12,*) ""
