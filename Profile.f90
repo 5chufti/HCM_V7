@@ -1,6 +1,6 @@
 !
 !	Pofile.f90											P. Benner		20.11.2003
-!														G.H.			27.09.2005
+!														G.H.			20.06.2006
 !
 !	This subroutine constructs a terrain- or morphological profile from point A to
 !	point B in steps of 100 m. The heights or morphological information are stored
@@ -81,16 +81,6 @@
 !	number of points in profile
 	PN = PN + 1
 !
-!	Calculate point #1 (TX):
-!
-	IF (P_Type .EQ. 'e') THEN
-!			CALL Point_height (LongA, LatA, Prof(1))
-		Prof(1) = 0
-	  ELSE
-		CALL Point_type (LongA, LatA, Prof(1))
-	END IF
-	IF (HCM_Error .NE. 0) RETURN
-!
 !	first part of profile (TX to center)
 		SILAA = DSIND(LatA)
 		COLAA = DCOSD(LatA)
@@ -103,8 +93,7 @@
 		K = DBLE(H_Rx - H_Tx) / DIS
 !
 !	Loop for waypoints
-!	Loop starts with #2, because point #1 is S.
-	DO PC = 2, NINT(REAL(PN)/2.0), 1
+	DO PC = 1, NINT(REAL(PN)/2.0), 1
 !	Distance 'DD' between starting point and new point in degrees:
 		DD = DBLE(PC-1) * DP
 !	vector to new point
@@ -122,7 +111,6 @@
 !
 		IF (P_Type .EQ. 'e') THEN 
 			CALL Point_height (LOY, LAY, Prof(PC))
-			Prof(PC) = Prof(PC) - DNINT(DBLE(H_Tx) + K * DBLE(PC-1) * PD)
 		ELSE
 			CALL Point_type (LOY, LAY, Prof(PC))
 		END IF	
@@ -140,8 +128,7 @@
 		COLOB = DCOSD(LongA)
 !
 !	Loop for waypoints
-!	Loop starts with #PN-1, because point #PN is RX.
-	DO PC = (PN - 1), PC, -1
+	DO PC = PN, PC, -1
 !	Distance 'DD' between starting point and new point in degrees:
 		DD = DBLE(PN-PC) * DP
 !	vector to new point
@@ -159,21 +146,18 @@
 !
 		IF (P_Type .EQ. 'e') THEN 
 			CALL Point_height (LOY, LAY, Prof(PC)) 
-			Prof(PC) = Prof(PC) - DNINT(DBLE(H_Rx) - K * DBLE(PN-PC) * PD)
 		ELSE
 			CALL Point_type (LOY, LAY, Prof(PC))
 		END IF	
 		IF (HCM_Error .NE. 0) RETURN
 	END DO
 !
-!	calculate last point #PC+1 (RX):
-	IF (P_Type .EQ. 'e') THEN
-!			CALL Point_height (LongB, LatB, Prof(PN))
-		Prof(PN) = 0
-	ELSE
-		CALL Point_type (LongB, LatB, Prof(PN))
+!	Correction for 'new profile'
+	IF ((C_mode .GE. 0) .AND. (C_mode .LT. 99) .AND. (P_Type .EQ. 'e')) THEN
+		DO PC = 1, PN, 1
+			Prof(PC) =Prof(PC) - DNINT(DBLE(H_Tx) + K * DBLE(PC-1) * PD)
+		END DO
 	END IF
-	IF (HCM_Error .NE. 0) RETURN	
 !
 	RETURN
 !
