@@ -1,6 +1,6 @@
 !
 !	Pofile.f90											P. Benner		20.11.2003
-!														G.H.			22.06.2006
+!														G.H.			16.11.2006
 !
 !	This subroutine constructs a terrain- or morphological profile from point A to
 !	point B in steps of 100 m. The heights or morphological information are stored
@@ -49,14 +49,14 @@
 !
 	INTEGER(2)			PC
 	DOUBLE PRECISION	SIDA, SILAB, COLAB, SILAA, COLAA, COLOA, SILOA, COLOB, SILOB
-	DOUBLE PRECISION	LAY, LOY, DD, DA, DIS, DP, A, B, K, x, y, z, o_Tx, o_Rx
+	DOUBLE PRECISION	LAY, LOY, DD, DA, DIS, DP, PDa, A, B, K, x, y, z, o_Tx, o_Rx
+	LOGICAL				slant
 !
 !	**********************************************************************************
 !
 !	Max. distance = 1000km; distance between two points = 100m
 !	-> number of points are 10.000 + 2 for Tx site and Rx site
 !
-	Prof = 0	
 !	Calculate the total distance 'DIS' in km:
 	CALL Calc_distance (LongA, LatA, LongB, LatB, DIS) 
 !
@@ -74,60 +74,21 @@
 	SIDA  = DSIND(DA)
 !
 !	adjust PD to Distance
-	PN = DNINT(DIS / PD)
-!	PD = DIS / DBLE(PN)
+	PN = NINT(DIS / PD)
+	PDa = DIS / DBLE(PN)
 !
 !	Distance 'DP' between two points in degrees:
 	DP   = DA / DBLE(PN)
 !
 !	number of points in profile
 	PN = PN + 1
-!
-!	prepeare for sloped profile
+!	set END Marker
+	Prof(PN+1)=-9999
+!	prepare for sloped profile
 	o_Tx = DBLE(H_Tx)
-	IF ((c_Mode .GE. 0) .AND. (c_Mode .LT. 99) .AND. (P_Type .EQ. 'e')) THEN
-		K = DBLE(H_Rx - H_Tx) / DIS
-		o_Rx = DBLE(H_Rx)
-	ELSE
-		K = 0
-		o_Rx = DBLE(H_Tx)
-	END IF
-!
-!	first part of profile (TX to center)
-		SILAA = DSIND(LatA)
-		COLAA = DCOSD(LatA)
-		SILAB = DSIND(LatB)
-		COLAB = DCOSD(LatB)
-		SILOA = DSIND(LongA)
-		COLOA = DCOSD(LongA)
-		SILOB = DSIND(LongB)
-		COLOB = DCOSD(LongB)
-!
-!	Loop for waypoints Tx to center
-	DO PC = 1, NINT(REAL(PN)/2.0), 1
-!	Distance 'DD' between starting point and new point in degrees:
-		DD = DBLE(PC-1) * DP
-!	vector to new point
-		A = DSIND(DA - DD) / SIDA
-		B = DSIND(DD) / SIDA
-!	convert startpoint to x,y,z system and add vector
-		x = A * COLAA * COLOA +  B * COLAB * COLOB
-		y = A * COLAA * SILOA +  B * COLAB * SILOB
-		z = A * SILAA         +  B * SILAB
-!	convert new x,y,z to coordinates
-		LAY = DATAN2D(z,DSQRT(x**2D0 + y**2D0))
-		LOY = DATAN2D(y,x)
-!
-!	  get Information of new point:
-!
-		IF (P_Type .EQ. 'e') THEN 
-			CALL Point_height (LOY, LAY, Prof(PC))
-			Prof(PC) = Prof(PC) - DNINT(o_Tx + K * DBLE(PC-1) * PD)
-		ELSE
-			CALL Point_type (LOY, LAY, Prof(PC))
-		END IF	
-		IF (HCM_Error .NE. 0) RETURN
-	END DO
+	o_Rx = DBLE(H_Rx)
+	K = DBLE(H_Rx - H_Tx) / DIS
+	slant = ((c_Mode .GE. 0) .AND. (c_Mode .LT. 99))
 !
 !	second part of profile RX to center
 		SILAA = DSIND(LatB)
@@ -140,7 +101,7 @@
 		COLOB = DCOSD(LongA)
 !
 !	Loop for waypoints Rx to center
-	DO PC = PN, PC, -1
+	DO PC = PN, INT(REAL(PN)/2.0), -1
 !	Distance 'DD' between starting point and new point in degrees:
 		DD = DBLE(PN-PC) * DP
 !	vector to new point
@@ -158,7 +119,43 @@
 !
 		IF (P_Type .EQ. 'e') THEN 
 			CALL Point_height (LOY, LAY, Prof(PC)) 
-			Prof(PC) = Prof(PC) - DNINT(o_Rx - K * DBLE(PN-PC) * PD)
+			IF (slant) Prof(PC) = Prof(PC) - NINT(o_Rx - K * DBLE(PN-PC) * PDa)
+		ELSE
+			CALL Point_type (LOY, LAY, Prof(PC))
+		END IF	
+		IF (HCM_Error .NE. 0) RETURN
+	END DO
+!
+!	first part of profile (TX to center)
+		SILAA = DSIND(LatA)
+		COLAA = DCOSD(LatA)
+		SILAB = DSIND(LatB)
+		COLAB = DCOSD(LatB)
+		SILOA = DSIND(LongA)
+		COLOA = DCOSD(LongA)
+		SILOB = DSIND(LongB)
+		COLOB = DCOSD(LongB)
+!
+!	Loop for waypoints Tx to center
+	DO PC = 1, PC, 1
+!	Distance 'DD' between starting point and new point in degrees:
+		DD = DBLE(PC-1) * DP
+!	vector to new point
+		A = DSIND(DA - DD) / SIDA
+		B = DSIND(DD) / SIDA
+!	convert startpoint to x,y,z system and add vector
+		x = A * COLAA * COLOA +  B * COLAB * COLOB
+		y = A * COLAA * SILOA +  B * COLAB * SILOB
+		z = A * SILAA         +  B * SILAB
+!	convert new x,y,z to coordinates
+		LAY = DATAN2D(z,DSQRT(x**2D0 + y**2D0))
+		LOY = DATAN2D(y,x)
+!
+!	  get Information of new point:
+!
+		IF (P_Type .EQ. 'e') THEN 
+			CALL Point_height (LOY, LAY, Prof(PC))
+			IF (slant) Prof(PC) = Prof(PC) - NINT(o_Tx + K * DBLE(PC-1) * PDa)
 		ELSE
 			CALL Point_type (LOY, LAY, Prof(PC))
 		END IF	

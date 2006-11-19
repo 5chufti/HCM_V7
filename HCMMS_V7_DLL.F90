@@ -1,6 +1,6 @@
 !
 !	HCMMS_V7_DLL.F90									P. Benner		08.01.2004
-!														G.H.			22.11.2005
+!														G.H.			18.11.2006
 !	DLL to the HCMMS_V7 subroutuine (Berlin 2003)
 !
 	SUBROUTINE HCMMS_V7_DLL ( I_C_mode, I_bor_dis, I_PD, I_Distance, I_H_Datab_Tx, &
@@ -22,7 +22,7 @@
 	INCLUDE			   'HCM_MS_V7_definitions.F90'
 !
 	INTEGER*2			I_H_Datab_Tx, I_H_Datab_Rx
-	INTEGER*4			I_HCM_error, I_C_mode, I_bor_dis
+	INTEGER*4			I_HCM_error, I_C_mode, I_bor_dis, Ta, Te
 	DOUBLE PRECISION	I_PD, I_Distance, I_Dir_Tx_Rx, I_V_angle_Tx_Rx
 	DOUBLE PRECISION	I_D_sea_calculated, I_Delta_frequency
 	REAL				I_Heff, I_Dh, I_Dh_corr, I_Power_to_Rx, I_Tx_TCA
@@ -270,7 +270,9 @@
 !
 !	Call HCM_MS_V7 subroutuine:
 !
+	Call System_Clock(Ta)
 	CALL HCM_MS_V7
+	Call System_Clock(Te)
 !
 !	***********************************************************************
 !
@@ -563,10 +565,10 @@
 		END IF
 !
 		WRITE (12,*) " "
-		WRITE (12,*)	" "
 		WRITE (12,*) " "
 		WRITE (12,*) "              Additional output :"
 		WRITE (12,*) " "
+		WRITE (12,'(A35,F6.3,A2)') "  Calc. Time                     : ", (Real(Te-Ta)/10000.0), " s"
 		WRITE (12,'(A35, I7, A2)') "  Height of Tx (terrain database): ", H_Datab_Tx, " m"
 		IF (C_mode .GE. 0) THEN 
 		  WRITE (12,'(A35, I7, A2)') "  Height of Rx (terrain database): ", H_Datab_Rx, " m" 

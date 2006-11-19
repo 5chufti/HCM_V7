@@ -1,8 +1,8 @@
 !
 !	HCM_MS_V7_definitions.f90
 !
-	INTEGER*2			T_Prof(10002), M_Prof(10002), PN, H_Datab_Tx, H_Datab_Rx
-	INTEGER*4			HCM_error, Time_percentage, C_mode, D_to_border
+	INTEGER*2			T_Prof(10002), M_Prof(10002), H_X(10201), PN, H_Datab_Tx, H_Datab_Rx
+	INTEGER*4			HCM_error, Time_percentage, C_mode, D_to_border, OLD_T
 	INTEGER*4			H_AntTx, H_AntRx, H_Tx, H_Rx, Delta_frequency, Channel_sp_Rx, Channel_sp_Tx
 !
 	REAL				Heff, TCA, TCA_corr
@@ -30,6 +30,7 @@
 	CHARACTER*6			Max_power
 	CHARACTER*7			Ant_typ_H_Tx, Ant_typ_V_Tx, Ant_typ_H_Rx, Ant_typ_V_Rx
 	CHARACTER*9			Desig_of_Tx_emis, Desig_of_Rx_emis
+	CHARACTER*11		O_FN
 	CHARACTER*12		Tx_frequ, Rx_frequ
 	CHARACTER*15		Coo_Tx, Coo_Rx, Coo_Tx_new, Coo_Rx_new
 	CHARACTER*63		Topo_path, Morpho_path, Border_path
@@ -53,14 +54,14 @@
 						Power_to_Rx, Free_space_FS, Tx_serv_area, Rx_serv_area, MaxPow, &
 						H_diff_angle_Rx_Tx, V_diff_angle_Rx_Tx, H_diff_angle_Tx_Rx, V_diff_angle_Tx_Rx, &
 !
-						HCM_error, Time_percentage, C_mode, D_to_border, &
+						HCM_error, Time_percentage, C_mode, D_to_border, OLD_T, &
 						H_AntTx, H_AntRx, H_Tx, H_Rx, Delta_frequency, Channel_sp_Rx, Channel_sp_Tx, &
 !
 						Info, &
 !
 !						Third all 2 byte variables (INTEGER*2)
 
-						T_Prof, M_Prof, PN, H_Datab_Tx, H_Datab_Rx
+						T_Prof, M_Prof, H_X, PN, H_Datab_Tx, H_Datab_Rx
 !
 !						All CHARACTER variables
 	COMMON	/CDATA/		Sea_temperature, Type_of_Tx_ant, Type_of_Rx_ant, Chan_occup, &
@@ -75,4 +76,4 @@
 						Desig_of_Tx_emis, Desig_of_Rx_emis, &
 						Tx_frequ, Rx_frequ, &
 						Coo_Tx, Coo_Rx, Coo_Tx_new, Coo_Rx_new, &
-						Topo_path, Morpho_path, Border_path
+						Topo_path, Morpho_path, Border_path, O_FN

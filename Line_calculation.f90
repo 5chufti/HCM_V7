@@ -133,7 +133,7 @@
 !	  Selected line data not available
 	  RETURN
 	END IF                            
-!	GOTO 80
+	GOTO 80
 !-----------------------------------------------------------------------
 !	Testroutine to calculate to each point:
 	FS_x = -999.9

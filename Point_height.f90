@@ -1,13 +1,13 @@
 !
 !	Point_height.F90									P.Benner		20.11.2003
-!														G.H.			26.09.2005
+!														G.H.			08.11.2006
 !
 !	Subroutine to read the height of a given point from the terrain-database.
 !
 !
 !	Input values:
-!			Long		DOUBLE PRECISION	longitude of point
-!			Lat			DOUBLE PRECISION	latitude of point
+!			Long		DOUBLE PRECISION	longitude of point	(-180.0....+180.0)
+!			Lat			DOUBLE PRECISION	latitude of point	(-90.0...+90.0)
 !			Topo_path	CHARACTER*63		path of terrain database, e.g. 'D:\TOPO'
 !
 !
@@ -40,36 +40,24 @@
 !	Filenames correspond to the south-west corner of a 1 * 1
 !	degree block.
 !
-!	**********************************************************************************
+!	Record-No. in the files:
 !
-	SUBROUTINE Point_height (Long, Lat, Height)
-!
-	IMPLICIT	NONE
-!
-	INCLUDE				'HCM_MS_V7_definitions.F90'
-!
-	DOUBLE PRECISION	Long, Lat
-	INTEGER(2)			Height
-!			
-	INTEGER(2)			H1, H2, H3, H4
-	INTEGER(2)			H_F_3(101,101), H_F_6(51,101)
-	INTEGER(4)			RESH, SLO, SLA, IOS, LOD, LAD, BH, BV, T, OLD_T
-	INTEGER(4)			P1X, P1Y
-	REAL				H_F
-	DOUBLE PRECISION	LOR, LAR, LO_P1, LA_P1, RELLO, RELLA
-	DOUBLE PRECISION	LORR, LARR, H12, H34
-	CHARACTER(1)		H_3(20402), H_6(10302)
-	CHARACTER(11)		FN, O_FN
-!
-	EQUIVALENCE (H_F_3, H_3)
-	EQUIVALENCE (H_F_6, H_6) 
-!
-!	**********************************************************************************
-!
-	Height = -9999.9
+!       133 134 135 136 137 138 139 140 141 142 143 144                    
+!       121                                         132                    
+!       109                                         120                    
+!       097                                         108                    
+!       085                                         096                    
+!       073                                         084                    
+!       061                                         072                    
+!       049                                         060                    
+!       037                                         048                    
+!       025                                         036                    
+!       013                                         024                    
+!       001 002 003 004 005 006 007 008 009 010 011 012
 !
 !
-!                 Field H_F_3(I,J)
+!	one record: 
+!                Field H_F_3(I,J)
 !
 !         I=1,J=101   ********************* I=101,J=101
 !                     *********************
@@ -101,145 +89,6 @@
 !                   West                 East
 !
 !
-!
-	OLD_T = 0
-	O_FN = ""
-!   
-!	Longitude in range of -180.0  to 180.0 
-	IF (Long .GT. 1.8D2) Long = Long - 3.6D2
-	IF (DABS(Long) .GT. 1.8D2) THEN
-	  HCM_Error = 200
-	  RETURN
-	END IF
-!
-!	Latitude in range of -90.0  to 90.0 
-	IF (Lat .GT. 1.8D2) Lat = Lat - 3.6D2
-	IF (DABS(Lat) .GT. 9.0D1) THEN
-	  HCM_Error = 210
-	  RETURN
-	END IF
-!
-	LOD = DINT(Long)
-	LAD = DINT(Lat)
-	LOD = ABS(LOD)
-	LAD = ABS(LAD)
-!
-	WRITE (FN(2:4), '(I3.3)', IOSTAT=IOS) LOD
-	IF (Long .GE. 0.0D0) THEN
-		FN(1:1) = 'E'                     
-	  ELSE
-		FN(1:1) = 'W'                     
-	END IF
-	IF (IOS.NE. 0) THEN
-	  HCM_Error = 200
-	  RETURN
-	END IF
-!
-	WRITE (FN(6:7), '(I2.2)', IOSTAT=IOS) LAD
-	IF (Lat .GE. 0.0D0) THEN
-		FN(5:5) = 'N'
-	  ELSE
-		FN(5:5) = 'S'
-	END IF
-	IF (IOS.NE. 0) THEN
-	  HCM_Error = 210
-	  RETURN
-	END IF
-!
-	IF (LAD .LT. 50) THEN 
-		RESH = 3  
-		FN(8:11) = '.33E'
-	  ELSE
-		RESH = 6
-		FN(8:11) = '.63E'
-	END IF
-!
-!	Remaining value behind the decimalpoint in degrees:
-	LOR = DABS(Long - DBLE(DINT(Long)))
-	LAR = DABS(Lat  - DBLE(DINT(Lat)))
-!
-!
-!	Remaining value behind the decimalpoint in seconds:
-	SLO = DNINT(3.6D3 * LOR)
-	IF (SLO .GE. 3600) THEN
-	  SLO = 0
-	  IF (LOD .GE. 0) THEN
-		  LOD = LOD + 1
-		ELSE
-		  LOD = LOD - 1
-	  END IF
-	  LOR = 0.0D0
-	END IF
-	SLA = NINT(3.6D3 * LAR)
-	IF (SLA .GE. 3600) THEN
-	  SLA = 0
-	  IF (LAD .GE. 0) THEN
-		  LAD = LAD + 1
-		ELSE
-		  LAD = LAD - 1
-	  END IF
-	  LAR = 0.0D0
-	END IF
-!                        
-!	Data-block-No. horizontal:
-	BH = 1 + SLO / 300   
-!      
-!	Data-block-No. vertical:
-	BV = 1 + SLA / 300   
-!
-!	Block number T:
-	T = (BV-1) * 12 + BH
-!
-	IF ((FN .EQ. O_FN) .AND. (T .EQ. OLD_T)) GOTO 100
-	IF (FN .EQ. O_FN) GOTO 50
-!   
-!	Data not present and file not open:
-	IF (RESH .EQ. 3) THEN
-		OPEN (UNIT=1, FILE=TRIM(Topo_path) // '\' // FN(1:4) // '\' // FN,  &
-				ACCESS='DIRECT',RECL=20402, STATUS='OLD', IOSTAT=IOS, &
-				MODE='READ')
-	  ELSE
-		OPEN (UNIT=1, FILE=TRIM(Topo_path) // '\' // FN(1:4) // '\' // FN,  &
-			ACCESS='DIRECT',RECL=10302, STATUS='OLD', IOSTAT=IOS, &
-			MODE='READ')
-	END IF
-	IF (IOS .NE. 0) THEN
-	  HCM_Error = 36
-	  RETURN
-	END IF
-!      
-	O_FN = FN
-!
-!	Data not present, but file is open:  
-!	Read RECORD :
-50	IF (RESH .EQ. 3) READ (1, IOSTAT=IOS, REC=T) H_3
-	IF (RESH .EQ. 6) READ (1, IOSTAT=IOS, REC=T) H_6
-	IF (IOS .NE. 0) THEN
-	  HCM_Error = 220
-	  RETURN
-	END IF
-!  
-	OLD_T = T
-!                                           
-!	Record-No. in the files:
-!
-!       133 134 135 136 137 138 139 140 141 142 143 144                    
-!       121                                         132                    
-!       109                                         120                    
-!       097                                         108                    
-!       085                                         096                    
-!       073                                         084                    
-!       061                                         072                    
-!       049                                         060                    
-!       037                                         048                    
-!       025                                         036                    
-!       013                                         024                    
-!       001 002 003 004 005 006 007 008 009 010 011 012
-!
-!	Calculate height :
-!
-!	Calculate P1 :
-!
 !             Heights surrounding point "P" :
 !
 !                   P3            P4
@@ -249,49 +98,121 @@
 !
 !                   P1            P2           
 !
+!	**********************************************************************************
 !
-100	P1X = INT((SLO - (BH - 1) * 300) / RESH + 1)
-	P1Y = INT((SLA - (BV - 1) * 300) / 3 + 1)
-	IF (RESH .EQ. 3) THEN
-	  H1 = H_F_3(P1X, P1Y)
-	  H2 = H_F_3(P1X+1, P1Y)
-	  H3 = H_F_3(P1X, P1Y+1)
-	  H4 = H_F_3(P1X+1, P1Y+1)
+	SUBROUTINE Point_height (Long, Lat, Height)
+!
+	IMPLICIT	NONE
+!
+	INCLUDE				'HCM_MS_V7_definitions.F90'
+!
+	DOUBLE PRECISION	Long, Lat
+	INTEGER(2)			Height
+!			
+	INTEGER(2)			H1, H2, H3, H4
+	INTEGER(4)			RESH, LOD, LAD, BH, BV, R, E
+	DOUBLE PRECISION	LOR, LAR, EH, EV, LORR, LARR, H12, H34
+	CHARACTER(11)		FN
+!
+!	**********************************************************************************
+!
+	Height = -9999.9
+!
+!	split in Integer and Remainder
+	LOD = INT(Long)
+	LOR = NINT(DABS(Long - DBLE(LOD))*3.6D3)
+	LOD = ABS(LOD)
+	LAD = INT(Lat)
+	LAR = NINT(DABS(Lat  - DBLE(LAD))*3.6D3)
+	LAD = ABS(LAD)
+!
+	IF (LOR .GE. 3600) THEN
+	  LOR = 0
+	  IF (Long .GE. 0) THEN
+		  LOD = LOD + 1
+		ELSE
+		  LOD = LOD - 1
+	  END IF
 	END IF
-	IF (RESH .EQ. 6) THEN
-	  H1 = H_F_6(P1X, P1Y)
-	  H2 = H_F_6(P1X+1, P1Y)
-	  H3 = H_F_6(P1X, P1Y+1)
-	  H4 = H_F_6(P1X+1, P1Y+1)
+	IF (LAR .GE. 3600) THEN
+	  LAR = 0
+	  IF (Lat .GE. 0) THEN
+		  LAD = LAD + 1
+		ELSE
+		  LAD = LAD - 1
+	  END IF
 	END IF
 !
-	IF ((H1 .EQ. -9999) .OR. (H2 .EQ. -9999) .OR. &
-		(H3 .EQ. -9999) .OR. (H4 .EQ. -9999)) THEN
+	IF (LAD .LT. 50) THEN 
+		RESH = 100  
+		FN(8:11) = '.33E'
+	  ELSE
+		RESH = 50
+		FN(8:11) = '.63E'
+	END IF
+!
+	WRITE (FN(2:4), '(I3.3)') LOD
+	IF (Long .GE. 0.0D0) THEN
+		FN(1:1) = 'E'                     
+	  ELSE
+		FN(1:1) = 'W'                     
+	END IF
+!
+	WRITE (FN(6:7), '(I2.2)') LAD
+	IF (Lat .GE. 0.0D0) THEN
+		FN(5:5) = 'N'
+	  ELSE
+		FN(5:5) = 'S'
+	END IF
+!
+!	coordinates of block containing P
+	BH = INT(LOR/3D2)
+	BV = INT(LAR/3D2)
+!	coordinates of point P in block
+	EH = DBLE(LOR-BH*3D2)/DBLE(300/RESH)
+	EV = DBLE(LAR-BV*3D2)/3D0
+!
+	R = 12*BV + BH
+!
+	IF ((FN .EQ. O_FN) .AND. (R .EQ. OLD_T)) GOTO 200
+	IF (FN .EQ. O_FN) GOTO 100
+!	point in new file
+	OPEN (UNIT=1, FILE=TRIM(Topo_path) // '\' // FN(1:4) // '\' // FN,  &
+		ACCESS='DIRECT',RECL=202*(RESH+1), STATUS='OLD', &
+		ERR=400, MODE='READ')
+!
+	O_FN=FN
+!
+100	READ (1, ERR=450, REC=R+1) H_X		
+	OLD_T = R
+!
+200	E = INT(EV)*(RESH+1) + INT(EH) + 1
+!
+!	Read Element :
+	H1=H_X(E)
+	H2=H_X(E+1)
+	H3=H_X(E+RESH+1)
+	H4=H_X(E+RESH+2)
+!
+	IF (MIN(H1,H2,H3,H4) .EQ. -9999) THEN
 	  HCM_Error = 400
 	  RETURN
 	END IF
 !
-!	Point-1 position in degrees relativ to the beginning of block:
-	LO_P1 = DBLE ((BH-1) * 300 + (P1X-1) * RESH) / 3.6D3
-	LA_P1 = DBLE ((BV-1) * 300 + (P1Y-1) *    3) / 3.6D3
-!
-!	Position of P relativ to P1 in degrees :
-	RELLO = LOR - LO_P1
-	RELLA = LAR - LA_P1                   
-!   
-!	In seconds :
-	LOR = RELLO * 3.6D3
-	LAR = RELLA * 3.6D3
-!      
-!	Relativ to gridsize :
-	LORR = LOR / DBLE(RESH)
-	LARR = LAR / 3.0D0
-!      
+!	coordinates of P relativ to P1
+	LORR = MOD(EH,1D0)
+	LARR = MOD(EV,1D0)
+!	calculate height P
 	H12 = DBLE(H1) + DBLE(H2 - H1) * LORR
 	H34 = DBLE(H3) + DBLE(H4 - H3) * LORR
-	H_F = H12 + (H34 - H12) * LARR
-	Height = NINT(H_F)
+	Height = NINT(H12 + (H34 - H12) * LARR)
 !
+	RETURN
+!
+400	HCM_Error = 36
+	RETURN
+!
+450	HCM_Error = 220
 	RETURN
 !
 	END SUBROUTINE Point_Height
