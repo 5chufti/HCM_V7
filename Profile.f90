@@ -89,6 +89,7 @@
 	o_Rx = DBLE(H_Rx)
 	K = DBLE(H_Rx - H_Tx) / DIS
 	slant = ((c_Mode .GE. 0) .AND. (c_Mode .LT. 99))
+!	slant = .TRUE.
 !
 !	second part of profile RX to center
 		SILAA = DSIND(LatB)
