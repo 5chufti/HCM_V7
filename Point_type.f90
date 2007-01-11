@@ -1,6 +1,6 @@
 !
 !	Point_type.f90										P. Benner		09.10.2003
-!														G.H.			18.11.2006
+!														G.H.			20.12.2006
 !
 !	Subroutine to read the morphological type of a given point from the morpho-database.
 !
@@ -112,8 +112,10 @@
 !
 	INTEGER(4)			RESH, LOD, LAD, BH, BV, R, E
 	DOUBLE PRECISION	LOR, LAR, EH, EV
+	CHARACTER(1)		H_C(20402)
 	CHARACTER(11)		FN
 !
+	EQUIVALENCE			(H_X,H_C)
 !	**********************************************************************************
 !
 	M_Type = 0	! normal land
@@ -183,7 +185,12 @@
 !      
 	O_FN = FN
 !
-100	READ (UNIT=2, ERR=450, REC=R+1) H_X		
+100	IF (RESH .EQ. 100) THEN
+		READ (UNIT=2,IOSTAT=E, ERR=450, REC=R+1) H_C		
+	ELSE
+		READ (UNIT=2,IOSTAT=E, ERR=450, REC=R+1) H_C(1:5151)
+	END IF		
+!
 	OLD_T = R
 !                                           
 200	E = NINT(EV)*(RESH+1) + NINT(EH) + 1

@@ -1,6 +1,6 @@
 !
 !	Point_height.F90									P.Benner		20.11.2003
-!														G.H.			08.11.2006
+!														G.H.			20.12.2006
 !
 !	Subroutine to read the height of a given point from the terrain-database.
 !
@@ -112,8 +112,10 @@
 	INTEGER(2)			H1, H2, H3, H4
 	INTEGER(4)			RESH, LOD, LAD, BH, BV, R, E
 	DOUBLE PRECISION	LOR, LAR, EH, EV, LORR, LARR, H12, H34
+	CHARACTER(1)		H_C(20402)
 	CHARACTER(11)		FN
 !
+	EQUIVALENCE			(H_X,H_C)
 !	**********************************************************************************
 !
 	Height = -9999.9
@@ -183,7 +185,12 @@
 !
 	O_FN=FN
 !
-100	READ (1, ERR=450, REC=R+1) H_X		
+100	IF (RESH .EQ. 100) THEN
+		READ (UNIT=1,IOSTAT=E, ERR=450, REC=R+1) H_C		
+	ELSE
+		READ (UNIT=1,IOSTAT=E, ERR=450, REC=R+1) H_C(1:5151)
+	END IF		
+!
 	OLD_T = R
 !
 200	E = INT(EV)*(RESH+1) + INT(EH) + 1
