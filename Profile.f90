@@ -88,6 +88,7 @@
 	o_Tx = DBLE(H_Tx)
 	o_Rx = DBLE(H_Rx)
 	K = DBLE(H_Rx - H_Tx) / DIS
+!	slant = ((Tx_serv_area .EQ. 0.0) .AND. (Rx_serv_area .EQ. 0.0))
 	slant = ((c_Mode .GE. 0) .AND. (c_Mode .LT. 99))
 !	slant = .TRUE.
 !

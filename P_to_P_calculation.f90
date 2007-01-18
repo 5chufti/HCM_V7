@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			31.05.2006
+!														G.H.			17.01.2007
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -493,6 +493,14 @@
 !	limitation of corr.factors is done in TCA_correction_calculation
 !	***********************************************************
 !
+	IF ((c_Mode .GE. 0) .AND. (c_Mode .LT. 99)) THEN
+		I1 = H_AntTx
+		I2 = H_AntRx
+	ELSE
+		I1 = H_Tx + H_AntTx
+		I2 = H_Rx + H_AntRx
+	END IF
+
 !	calculate transmitter clearance angle 'Tx_TCA' according to proceeding table
 	IF (Tx_serv_area .EQ. 0.0) THEN
 !	  Calculate Tx_TCA:
@@ -503,7 +511,7 @@
 			J = PN - 2
 		END IF
 		DO I = 1, J
-			x_TCA = (REAL(T_Prof(1+I))-H_AntTx)/(SNGL(PD)*REAL(I)*1E3)
+			x_TCA = (REAL(T_Prof(1+I))-I1)/(SNGL(PD)*REAL(I)*1E3)
 			x_TCA = ATAND (x_TCA)	! in degrees
 			IF (x_TCA .GT. Tx_TCA) Tx_TCA = x_TCA
 		END DO
@@ -522,7 +530,7 @@
 			J = PN - 2
 		END IF
 		DO I = 1, J
-			x_TCA = (REAL(T_Prof(PN-I))-H_AntRx)/(SNGL(PD)*REAL(I)*1E3)
+			x_TCA = (REAL(T_Prof(PN-I))-I2)/(SNGL(PD)*REAL(I)*1E3)
 			x_TCA = ATAND (x_TCA)	! in degrees
 			IF (x_TCA .GT. Rx_TCA) Rx_TCA = x_TCA
 		END DO

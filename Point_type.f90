@@ -1,6 +1,6 @@
 !
 !	Point_type.f90										P. Benner		09.10.2003
-!														G.H.			20.12.2006
+!														G.H.			18.01.2007
 !
 !	Subroutine to read the morphological type of a given point from the morpho-database.
 !
@@ -185,12 +185,7 @@
 !      
 	O_FN = FN
 !
-100	IF (RESH .EQ. 100) THEN
-		READ (UNIT=2,IOSTAT=E, ERR=450, REC=R+1) H_C		
-	ELSE
-		READ (UNIT=2,IOSTAT=E, ERR=450, REC=R+1) H_C(1:5151)
-	END IF		
-!
+100	READ (UNIT=1, ERR=450, REC=R+1) H_C(1:(202*(RESH+1)))
 	OLD_T = R
 !                                           
 200	E = NINT(EV)*(RESH+1) + NINT(EH) + 1
