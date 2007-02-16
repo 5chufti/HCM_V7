@@ -1,6 +1,6 @@
 !
 !	Dh_calculation.f90									P. Benner		20.11.2003
-!														G.H.			04.05.2005
+!														G.H.			14.02.2007
 !
 !	Subroutine to calculate the terrain irregularity 'Dh'.
 !
@@ -87,12 +87,11 @@
 !	Remaining difference between the lowest and the highest value
 !	is the value of 'Dh':
 !
-!	IF (N .LT. 5) THEN
-!		Dh = REAL(HI(N) - HI(1))
-!	  ELSE
-!		Dh = REAL(HI(N-NINT(REAL(N)/10.0)) - HI(NINT(REAL(N)/10.0)))
-!	END IF
-	Dh = 0.8 * REAL(HI(N) - HI(1))
+	IF (N .LT. 5) THEN
+		Dh = REAL(HI(N) - HI(1))
+	  ELSE
+		Dh = REAL(HI(N-NINT(REAL(N)/10.0)) - HI(NINT(REAL(N)/10.0)))
+	END IF
 !
 	RETURN
 !

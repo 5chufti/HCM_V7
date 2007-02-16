@@ -121,12 +121,10 @@
 	M_Type = 0	! normal land
 !
 !	split in Integer and Remainder
-	LOD = INT(Long)
-	LOR = NINT(DABS(Long - DBLE(LOD))*3.6D3)
-	LOD = ABS(LOD)
-	LAD = INT(Lat)
-	LAR = NINT(DABS(Lat  - DBLE(LAD))*3.6D3)
-	LAD = ABS(LAD)
+	LOD = ABS(INT(Long))
+	LOR = ABS(NINT(MOD(Long,1D0)*3.6D3))
+	LAD = ABS(INT(Lat))
+	LAR = ABS(NINT(MOD(Lat,1D0)*3.6D3))
 !
 	IF (LOR .GE. 3600) THEN
 	  LOR = 0

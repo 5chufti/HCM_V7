@@ -439,8 +439,8 @@
 !	  (If distance is less than 2 km, no addition is done !)
 !
 	  IF (Distance .GT. 2.0) THEN
-		I1 = DNINT(1D0 / PD)
-		I2 = DNINT((Distance - 1D0) / PD)
+		I1 = NINT(1D0 / PD)
+		I2 = NINT((Distance - 1D0) / PD)
 		DO I = I1, I2
 		  HDZ(I) = HDZ(I) + 10.0
 		END DO

@@ -1,6 +1,6 @@
 !
 !	Pofile.f90											P. Benner		20.11.2003
-!														G.H.			16.11.2006
+!														G.H.			14.02.2007
 !
 !	This subroutine constructs a terrain- or morphological profile from point A to
 !	point B in steps of 100 m. The heights or morphological information are stored
@@ -49,7 +49,7 @@
 !
 	INTEGER(2)			PC
 	DOUBLE PRECISION	SIDA, SILAB, COLAB, SILAA, COLAA, COLOA, SILOA, COLOB, SILOB
-	DOUBLE PRECISION	LAY, LOY, DD, DA, DIS, DP, PDa, A, B, K, x, y, z, o_Tx, o_Rx
+	DOUBLE PRECISION	LAY, LOY, DD, DA, DIS, DPa, PDa, A, B, K, x, y, z, o_Tx, o_Rx
 	LOGICAL				slant
 !
 !	**********************************************************************************
@@ -78,7 +78,7 @@
 	PDa = DIS / DBLE(PN)
 !
 !	Distance 'DP' between two points in degrees:
-	DP   = DA / DBLE(PN)
+	DPa   = DA / DBLE(PN)
 !
 !	number of points in profile
 	PN = PN + 1
@@ -87,10 +87,8 @@
 !	prepare for sloped profile
 	o_Tx = DBLE(H_Tx)
 	o_Rx = DBLE(H_Rx)
-	K = DBLE(H_Rx - H_Tx) / DIS
-!	slant = ((Tx_serv_area .EQ. 0.0) .AND. (Rx_serv_area .EQ. 0.0))
+	K = DBLE(H_Rx - H_Tx) / DA
 	slant = ((c_Mode .GE. 0) .AND. (c_Mode .LT. 99))
-!	slant = .TRUE.
 !
 !	second part of profile RX to center
 		SILAA = DSIND(LatB)
@@ -105,7 +103,7 @@
 !	Loop for waypoints Rx to center
 	DO PC = PN, INT(REAL(PN)/2.0), -1
 !	Distance 'DD' between starting point and new point in degrees:
-		DD = DBLE(PN-PC) * DP
+		DD = DBLE(PN-PC) * DPa
 !	vector to new point
 		A = DSIND(DA - DD) / SIDA
 		B = DSIND(DD) / SIDA
@@ -120,8 +118,9 @@
 !	  get Information of new point:
 !
 		IF (P_Type .EQ. 'e') THEN 
-			CALL Point_height (LOY, LAY, Prof(PC)) 
-			IF (slant) Prof(PC) = Prof(PC) - NINT(o_Rx - K * DBLE(PN-PC) * PDa)
+			CALL Point_height (LOY, LAY, Prof(PC)) 	
+!			Prof(PC) = Prof(PC) + NINT(PDa*(PC-1)*(DBLE(PN-PC) * PDa) / 17.0)
+			IF (slant) Prof(PC) = Prof(PC) - NINT(o_Rx - K * DD)
 		ELSE
 			CALL Point_type (LOY, LAY, Prof(PC))
 		END IF	
@@ -141,7 +140,7 @@
 !	Loop for waypoints Tx to center
 	DO PC = 1, PC, 1
 !	Distance 'DD' between starting point and new point in degrees:
-		DD = DBLE(PC-1) * DP
+		DD = DBLE(PC-1) * DPa
 !	vector to new point
 		A = DSIND(DA - DD) / SIDA
 		B = DSIND(DD) / SIDA
@@ -157,7 +156,8 @@
 !
 		IF (P_Type .EQ. 'e') THEN 
 			CALL Point_height (LOY, LAY, Prof(PC))
-			IF (slant) Prof(PC) = Prof(PC) - NINT(o_Tx + K * DBLE(PC-1) * PDa)
+!			Prof(PC) = Prof(PC) + NINT(PDa*(PC-1)*(DBLE(PN-PC) * PDa) / 17.0)
+			IF (slant) Prof(PC) = Prof(PC) - NINT(o_Tx + K * DD)
 		ELSE
 			CALL Point_type (LOY, LAY, Prof(PC))
 		END IF	
