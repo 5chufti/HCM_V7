@@ -1,6 +1,6 @@
 !
 !	Point_height.F90									P.Benner		20.11.2003
-!														G.H.			18.01.2007
+!														G.H.			23.02.2007
 !
 !	Subroutine to read the height of a given point from the terrain-database.
 !
@@ -177,13 +177,13 @@
 	IF ((FN .EQ. O_FN) .AND. (R .EQ. OLD_T)) GOTO 200
 	IF (FN .EQ. O_FN) GOTO 100
 !	point in new file
-	OPEN (UNIT=1, FILE=TRIM(Topo_path) // '\' // FN(1:4) // '\' // FN,  &
+	OPEN (UNIT=5, FILE=TRIM(Topo_path) // '\' // FN(1:4) // '\' // FN,  &
 		ACCESS='DIRECT',RECL=202*(RESH+1), STATUS='OLD', &
 		ERR=400, MODE='READ')
 !
 	O_FN=FN
 !
-100	READ (UNIT=1, ERR=450, REC=R+1) H_C(1:(202*(RESH+1)))
+100	READ (UNIT=5, ERR=450, REC=R+1) H_C(1:(202*(RESH+1)))
 	OLD_T = R
 !
 200	E = INT(EV)*(RESH+1) + INT(EH) + 1

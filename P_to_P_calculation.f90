@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			17.01.2007
+!														G.H.			20.02.2007
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -347,7 +347,7 @@
 		END IF
 	END IF
 !
-	V_angle_Tx_Rx = ATAN2D(dfloat(H_Rx + H_AntRx - H_Tx + H_AntTx),(1D3 * Distance))
+	V_angle_Tx_Rx = ATAN2D(dfloat(H_Rx + H_AntRx - (H_Tx + H_AntTx)),(1D3 * Distance))
 !
 !	***************************************************************
 !	*							      

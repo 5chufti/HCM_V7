@@ -1,6 +1,6 @@
 !
 !	Point_type.f90										P. Benner		09.10.2003
-!														G.H.			18.01.2007
+!														G.H.			23.02.2007
 !
 !	Subroutine to read the morphological type of a given point from the morpho-database.
 !
@@ -177,13 +177,13 @@
 	IF ((FN .EQ. O_FN) .AND. (R .EQ. OLD_T)) GOTO 200
 	IF (FN .EQ. O_FN) GOTO 100
 !	point in new file
-	OPEN (UNIT=2, FILE=TRIM(Morpho_path) // '\' // FN(1:4) // '\' // FN,  &
+	OPEN (UNIT=6, FILE=TRIM(Morpho_path) // '\' // FN(1:4) // '\' // FN,  &
 			ACCESS='DIRECT',RECL=202*(RESH+1), STATUS='OLD', &
 			ERR=400, MODE='READ')
 !      
 	O_FN = FN
 !
-100	READ (UNIT=1, ERR=450, REC=R+1) H_C(1:(202*(RESH+1)))
+100	READ (UNIT=6, ERR=450, REC=R+1) H_C(1:(202*(RESH+1)))
 	OLD_T = R
 !                                           
 200	E = NINT(EV)*(RESH+1) + NINT(EH) + 1
