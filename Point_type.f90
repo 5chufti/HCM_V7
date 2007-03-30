@@ -1,6 +1,6 @@
 !
 !	Point_type.f90										P. Benner		09.10.2003
-!														G.H.			23.02.2007
+!														G.H.			30.03.2007
 !
 !	Subroutine to read the morphological type of a given point from the morpho-database.
 !
@@ -152,7 +152,7 @@
 	END IF
 !
 	WRITE (FN(2:4), '(I3.3)') LOD
-	IF (Long .GE. 0.0D0) THEN
+	IF (Long .GT. -1.0D0) THEN
 		FN(1:1) = 'E'                     
 	  ELSE
 		FN(1:1) = 'W'                     

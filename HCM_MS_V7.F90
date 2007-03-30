@@ -1,6 +1,6 @@
 !	
 !	HCMMS_V7.F90										P.Benner		23.02.2004
-!														G.H.			22.11.2005
+!														G.H.			30.03.2007
 !	Version 7					
 !
 !	Harmonized Calculation Method for mobile services
@@ -261,7 +261,7 @@
 		RETURN
 	  END IF
 	  LongRx = LongRx + CI / 3.6D3
-	  IF (Coo_Rx(4:4) .EQ. 'W') LongRx = 3.6D2 - LongRx
+	  IF (Coo_Rx(4:4) .EQ. 'W') LongRx = 0D0 - LongRx
 	  IF ((Coo_Rx(4:4).NE.'E') .AND. (Coo_Rx(4:4).NE.'W')) THEN
 		HCM_error = 1017
 !		Error in geographical coordinates (Rx longitude, E/W)

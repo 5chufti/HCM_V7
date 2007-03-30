@@ -17,7 +17,6 @@
 	!DEC$  ATTRIBUTES ALIAS:'HCMMS_V7_DLL'::HCMMS_V7_DLL
 !
 	IMPLICIT	NONE
-!
 !	Include the interface definitions:
 	INCLUDE			   'HCM_MS_V7_definitions.F90'
 !
@@ -32,7 +31,7 @@
 	REAL				I_Corr_delta_f, I_Calculated_FS, I_Perm_FS
 	REAL				I_CBR_D, I_ERP_ref_Tx, I_Prot_margin
 	INTEGER				I, J, IOS
-	CHARACTER*(*)		I_str
+	CHARACTER*(*)		I_str 
 	LOGICAL				DEBUG
 !
 !

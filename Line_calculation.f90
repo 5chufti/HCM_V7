@@ -133,7 +133,9 @@
 !	  Selected line data not available
 	  RETURN
 	END IF                            
-	GOTO 80
+!	all linepoints?
+	INQUIRE (FILE='HCM_LP',EXIST=Take_it)
+	IF (.NOT. Take_it) GOTO 80
 !-----------------------------------------------------------------------
 !	Testroutine to calculate to each point:
 	FS_x = -999.9

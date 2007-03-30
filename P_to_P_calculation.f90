@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			20.02.2007
+!														G.H.			30.03.2007
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -243,7 +243,7 @@
 	New_LongTx = New_LongTx + CI / 6.0D1
 	READ (Coo_Tx_new(7:8), '(F2.0)', IOSTAT = IOS) CI
 	New_LongTx = New_LongTx + CI / 3.6D3
-	IF (Coo_Tx_new(4:4) .EQ. 'W') New_LongTx = 3.6D2 - New_LongTx
+	IF (Coo_Tx_new(4:4) .EQ. 'W') New_LongTx = 0D0 - New_LongTx
 !
 !	Get the latitude of transmitter 'LatTx':
 	READ (Coo_Tx_new(9:10),  '(F2.0)', IOSTAT = IOS) New_LatTx
@@ -258,7 +258,7 @@
 	New_LongRx = New_LongRx + CI / 6.0D1
 	READ (Coo_Rx_new(7:8), '(F2.0)', IOSTAT=IOS) CI
 	New_LongRx = New_LongRx + CI / 3.6D3
-	IF (Coo_Rx_new(4:4) .EQ. 'W') New_LongRx = 3.6D2 - New_LongRx
+	IF (Coo_Rx_new(4:4) .EQ. 'W') New_LongRx = 0D0 - New_LongRx
 !
 !	Get the latitude of receiver 'LATB':
 	READ (Coo_Rx_new(9:10),  '(F2.0)', IOSTAT=IOS) New_LatRx
