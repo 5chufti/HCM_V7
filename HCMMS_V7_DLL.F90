@@ -1,6 +1,6 @@
 !
 !	HCMMS_V7_DLL.F90									P. Benner		08.01.2004
-!														G.H.			18.11.2006
+!														G.H.			24.04.2007
 !	DLL to the HCMMS_V7 subroutuine (Berlin 2003)
 !
 	SUBROUTINE HCMMS_V7_DLL ( I_C_mode, I_bor_dis, I_PD, I_Distance, I_H_Datab_Tx, &
@@ -411,7 +411,6 @@
 		  CASE (2000:)
 			WRITE (12,*) " Error in looking up FS-figures !"
 		END SELECT
-		RETURN
 	  ELSE	! HCM_Error=0
 		WRITE (12,*) " Tx co-ordinates calculated     : ", Coo_Tx_new(1:8)," ",Coo_Tx_new(9:15)
 		IF (C_mode .LT. 0) THEN

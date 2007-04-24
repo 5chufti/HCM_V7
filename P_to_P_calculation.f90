@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			30.03.2007
+!														G.H.			24.04.2007
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -216,7 +216,7 @@
 	Info(13) = .FALSE.
 	Info(16) = .FALSE.
 !
-	Calculated_FS = -999.9
+	Calculated_FS = 999.9
 !	Calculate new positions, if Tx or Rx or both are mobiles and not CBR or '99':
 !	for CBR new positions are calculated in CBR_Coordinates !
 	IF ((C_mode .NE. 99) .AND. ((C_mode .GE. 0) .OR. (D_to_border .GE. 0)) &
@@ -273,7 +273,6 @@
 10	CALL Calc_distance (New_LongTx, New_LatTx, New_LongRx, New_LatRx, Distance)
 !
 	IF (Distance .LE. 0.0D0) THEN
-	  Calculated_FS = 999.9
 !	  Distance between Tx and Rx = 0. Calculations not possible.
 	  HCM_error = 1000   
 	  RETURN
