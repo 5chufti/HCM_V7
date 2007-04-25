@@ -74,16 +74,6 @@
 !
 !	*****************************************************************************************
 !
-!	Check Distance:
-	IF (Distance .LE. 0.0D0) THEN
-	  HCM_error = 1000	! Distance between Tx and Rx = 0; calculations not possible.
-	  RETURN
-	END IF
-	IF (Distance .GT. 1.0D3) THEN
-	  HCM_error = 1028	! Distance is greater than 1000 km; calculations not possible
-	  RETURN
-	END IF
-!
 !	Calculate free space field strength for 1 kW:
 	E_free_1kW = 107.0 - 20.0 * LOG10 (Distance)
 !

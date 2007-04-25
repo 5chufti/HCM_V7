@@ -1,6 +1,6 @@
 !
 !	Position_of_mobile.f90								P. Benner		29.11.2004
-!														G.H.			14.02.2006
+!														G.H.			25.04.2007
 !
 !	Subroutine to calculate the new position of Tx (New_LongTx, New_LatTx)
 !	and/or Rx (New_LongRx, New_latRx) if at least one is a mobile and
@@ -29,7 +29,6 @@
 	DOUBLE PRECISION	New_LongTx, New_LatTx, New_LongRx, New_LatRx
 !
 	REAL				DP1
-	DOUBLE PRECISION	XDi, YDi
 	INTEGER				N_Cut_Rx,N_Cut_Tx
 !
 !	************************************************************************
@@ -105,32 +104,25 @@
 	  IF (Tx_serv_area .GT. Rx_serv_area) THEN
 !		  Tx service area is bigger, calculate new Tx co-ordinates:
 		  CALL Calc_Tx_pos ( LongTx, LatTx, LongRx, LatRx, New_LongTx, New_LatTx)
-!		  Now calculate new Rx Position (Rx is a mobile too):
 !		  Calculate the distance from new Tx point to Rx:
-		  CALL Calc_distance (New_LongTx, New_LatTx, LongRx, LatRx, XDi)
-		  Distance = XDi
+		  CALL Calc_distance (New_LongTx, New_LatTx, LongRx, LatRx, Distance)
 !		  Calculate the direction from new Tx point to Rx:
-		  CALL Calc_direction (New_LongTx, New_LatTx, LongRx, LatRx, YDi) 
-		  Dir_Tx_Rx = YDi
+		  CALL Calc_direction (New_LongTx, New_LatTx, LongRx, LatRx, Dir_Tx_Rx) 
 !		  Calculate the direction from Rx to new Tx point:
-		  CALL Calc_direction (LongRx, LatRx, New_LongTx, New_LatTx, YDi) 
-		  Dir_Rx_Tx = YDi
-		  CALL Calc_Rx_pos ( New_LongTx, New_LatTx, LongRx, LatRx, &
-							 New_LongRx, New_LatRx)
+		  CALL Calc_direction (LongRx, LatRx, New_LongTx, New_LatTx, Dir_Rx_Tx) 
+!		  Now calculate new Rx Position (Rx is a mobile too):	
+		  CALL Calc_Rx_pos ( New_LongTx, New_LatTx, LongRx, LatRx, New_LongRx, New_LatRx)
 	    ELSE
 !		  Rx service area is bigger, calculate new Rx co-ordinates:
 		  CALL Calc_Rx_pos ( LongTx, LatTx, LongRx, LatRx, New_LongRx, New_LatRx )
-!		  Now calculate new Tx Position (Tx is a mobile too):
 !		  Calculate the distance from new Rx point to Tx:
-		  CALL Calc_distance (New_LongRx, New_LatRx, LongTx, LatTx, XDi)
-		  Distance = XDi
+		  CALL Calc_distance (New_LongRx, New_LatRx, LongTx, LatTx, Distance)
 !		  Calculate the direction from Tx to new Rx point:
-		  CALL Calc_direction (LongTx, LatTx, New_LongRx, New_LatRx, YDi) 
-		  Dir_Tx_Rx = YDi
+		  CALL Calc_direction (LongTx, LatTx, New_LongRx, New_LatRx, Dir_Tx_Rx) 
 !		  Calculate the direction from the new Rx point to Tx:
-		  CALL Calc_direction (New_LongRx, New_LatRx, LongTx, LatTx, YDi) 
-		  Dir_Rx_Tx = YDi
-		  CALL Calc_Tx_pos ( LongTx, LatTx, New_LongRx, New_LatRx, New_LongTx, New_LatTx )
+		  CALL Calc_direction (New_LongRx, New_LatRx, LongTx, LatTx, Dir_Rx_Tx) 
+!		  Now calculate new Tx Position (Tx is a mobile too):
+		  CALL Calc_Tx_pos (LongTx, LatTx, New_LongRx, New_LatRx, New_LongTx, New_LatTx )
 	  END IF
 !
 !	Only one station is a mobile: 
@@ -144,9 +136,9 @@
 	END IF
 !
 !   Calculate the distance from (new) Rx point to (new) Tx:
-	CALL Calc_distance (New_LongRx, New_LatRx, LongTx, LatTx, XDi)
+	CALL Calc_distance (New_LongRx, New_LatRx, New_LongTx, New_LatTx, Distance)
 !
-	IF (Distance .EQ. 0.0D0) Info(7) = .TRUE.
+	IF (Distance .LT. PD) Info(7) = .TRUE.
 !
 	RETURN
 !

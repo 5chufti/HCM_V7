@@ -171,8 +171,6 @@
 		WRITE (12,*) ""
 		WRITE (12,*) "                       R e s u l t s"
 		WRITE (12,*) ""
-		WRITE (12,*) " Version of the HCM module      : V", Version
-		WRITE (12,*) ""
 		WRITE (12,'(A35,I4,A2,$)') &
 				"  Mode of calculation            : ", C_mode, " ("
 		SELECT CASE (C_mode)
