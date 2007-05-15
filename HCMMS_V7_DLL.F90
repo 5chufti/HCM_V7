@@ -1,6 +1,6 @@
 !
 !	HCMMS_V7_DLL.F90									P. Benner		08.01.2004
-!														G.H.			24.04.2007
+!														G.H.			15.05.2007
 !	DLL to the HCMMS_V7 subroutuine (Berlin 2003)
 !
 	SUBROUTINE HCMMS_V7_DLL ( I_C_mode, I_bor_dis, I_PD, I_Distance, I_H_Datab_Tx, &
@@ -552,8 +552,7 @@
 		END IF
 !
 		IF (Info(17)) THEN
-			WRITE (12,*) " Tx channel spacing outside definition range!"
-			WRITE (12,*) " 25 kHz is used !" 
+			WRITE (12,*) " Channel spacing outside curve range, broadband formula is used!"
 		END IF
 !
 		IF (Info(18)) THEN
@@ -598,11 +597,7 @@
 		  WRITE (12,'(A35, F7.1, A7)') "  Diff.angle vert.(Rx->Tx - EleR): ", V_diff_angle_Rx_Tx, " degree"
 		  WRITE (12,'(A35, F7.1, A3)') "  Correction factor Rx antenna   : ", Rx_ant_corr, " dB"
 		  WRITE (12,'(A35, F7.1, A3)') "  Corr. factor antenna type Rx   : ", Rx_ant_type_corr, " dB"
-		  IF (Delta_frequency .LT. 1000.0) THEN
-			WRITE (12,'(A35, F7.1, A4)') "  Delta frequency                : ", Delta_frequency/1000.0, " kHz"
-		  ELSE   
-			WRITE (12,*) " Delta frequency is greater than 1 MHz !"
-		  END IF
+		  WRITE (12,'(A35, F7.1, A4)') "  Delta frequency                : ", Delta_frequency/1000.0, " kHz"
 		END IF
 		WRITE (12,*) " Permissible field str. of table"
 		WRITE (12,'(A35, F7.1, A7)') "  (0, if there is an input)      : ", Perm_FS_from_table, " dbuV/m"

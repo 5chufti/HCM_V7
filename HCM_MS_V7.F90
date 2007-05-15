@@ -707,7 +707,7 @@
 !	Info(15)	Frequency difference outside definition range; 82 dB is used
 !	Info(16)	Calculated distance over sea is set to 0 because of missing
 !				morphological data. !
-!	Info(17)	Tx channel spacing outside definition range, 25 kHz is used!
+!	Info(17)	Channel spacing outside curve range, broadband formula is used!
 !	Info(18)	Correction factors for the band 380 - 400 MHz are used.
 !
 !

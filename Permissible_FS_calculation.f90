@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		17.10.2005
-!														G.H.			20.02.2007
+!														G.H.			15.05.2007
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -58,7 +58,7 @@
 !
 !	Info(14)	Input value of correction factor according frequency difference is used
 !	Info(15)	Frequency difference outside definition range!
-!	Info(17)	Tx channel spacing outside definition range, 25 kHz is used!
+!	Info(17)	Channel spacing outside curve range, broadband formula is used!
 !	Info(18)	Correction factors for the band 380 - 400 MHz are used.
 !
 !
@@ -275,7 +275,7 @@
 	IF (I .EQ. 0) THEN
 		I = INDEX(DTX,'M')
 		IF (I .EQ. 0) THEN
-			HCM_Error = 1040
+			HCM_Error = 1041
 !			Channel spacing outside definition range (Tx)! 
 			RETURN
 		ELSE 
@@ -288,7 +288,7 @@
 	DTX(I:I) = '.'   
 	READ (DTX, *, IOSTAT=IOS) X1
 	IF (IOS .NE. 0) THEN
-		HCM_Error = 1040
+		HCM_Error = 1041
 !		Channel spacing outside definition range (Tx)!
 		RETURN
 	ELSE 
@@ -504,6 +504,7 @@
 !
 	IF (Channel_sp_Rx * Channel_sp_Tx .EQ. 0) THEN
 !	Wideband:
+		Info(17) = .True.
 		IF (CSXR .GT. CSXT) THEN
 			OMEGA = Delta_frequency / CSXR
 			B1 = CSXR
