@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			25.04.2007
+!														G.H.			01.06.2007
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -202,8 +202,9 @@
 !	Interpolation factor for mixed path (<10%)
 	DATA A   /0.0,0.07,0.13,0.2,0.29,0.37,0.46,0.56,0.67,0.8,1.0/
 !
-!	Clear all Info(i)'s for P_to_P_calculation subroutine
+!	Clear HCM_Error and all relevant Info(i)'s for P_to_P_calculation subroutine
 !
+	HCM_Error = 0
 	Info(1)  = .FALSE.
 	Info(2)  = .FALSE.
 	Info(3)  = .FALSE.
