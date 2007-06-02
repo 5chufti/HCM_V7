@@ -511,7 +511,7 @@
 			J = PN - 2
 		END IF
 		DO I = 1, J
-			x_TCA = (REAL(T_Prof(1+I))-I1)/(SNGL(PD)*REAL(I)*1E3)
+			x_TCA = REAL(T_Prof(1+I)-I1)/(SNGL(PD)*REAL(I)*1E3)
 			x_TCA = ATAND (x_TCA)	! in degrees
 			IF (x_TCA .GT. Tx_TCA) Tx_TCA = x_TCA
 		END DO
@@ -530,7 +530,7 @@
 			J = PN - 2
 		END IF
 		DO I = 1, J
-			x_TCA = (REAL(T_Prof(PN-I))-I2)/(SNGL(PD)*REAL(I)*1E3)
+			x_TCA = REAL(T_Prof(PN-I)-I2)/(SNGL(PD)*REAL(I)*1E3)
 			x_TCA = ATAND (x_TCA)	! in degrees
 			IF (x_TCA .GT. Rx_TCA) Rx_TCA = x_TCA
 		END DO
@@ -563,7 +563,7 @@
 		  DO I = D1, D2
 		    HSUM = HSUM + T_Prof(1+I)
 		  END DO
-		  Heff_Tx = H_AntTx - REAL(HSUM)/REAL(D2-D1+1)
+		  Heff_Tx = REAL(I1) - REAL(HSUM)/REAL(D2-D1+1)
 	END IF
 	IF (Heff_Tx .LT. 3.0) Heff_Tx = 3.0
 !
@@ -578,11 +578,11 @@
 		  DO I = D1, D2
 		    HSUM = HSUM + T_Prof(PN-I)
 		  END DO
-		  Heff_Rx = REAL(H_AntRx) - REAL(HSUM)/REAL(D2-D1+1)
+		  Heff_Rx = REAL(I2) - REAL(HSUM)/REAL(D2-D1+1)
 	  END IF
 	ELSE
 !	for line calculations
-	  Heff_Rx = H_AntRx
+	  Heff_Rx = REAL(H_AntRx)
 	END IF
 	IF (Heff_Rx .LT. 3.0) Heff_Rx = 3.0
 !
