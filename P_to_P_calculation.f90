@@ -544,8 +544,6 @@
 !	and correct according to limits in table
 !	************************************************
 !
-	Heff_Tx = 0.0
-	Heff_Rx = 0.0
 	IF (Distance .LT. 1.5D1) THEN
 	    D1 = NINT(REAL(PN) / 15.0)
 		D2 = PN - 1
@@ -685,12 +683,12 @@
 	CALL Get_FS_from_figures ( Land_FS_1kW, Sea_FS_1kW )
 	IF (HCM_Error .NE. 0) RETURN
 !
-!	Clearance angle corrections and delta h correction:
-	Land_FS = Land_FS_1kW + Tx_TCA_corr + Rx_TCA_corr - Dh_corr
-!
 !	Corrections according to the power:
-	Land_FS = Land_FS - 30.0 + Power_to_Rx
+	Land_FS = Land_FS_1kW - 30.0 + Power_to_Rx
 	Sea_FS = Sea_FS_1kW - 30.0 + Power_to_Rx
+!
+!	Clearance angle corrections and delta h correction:
+	Land_FS = Land_FS + Tx_TCA_corr + Rx_TCA_corr - Dh_corr
 !
 	IF (D_sea_calculated .EQ. 0.0) THEN
 		Calculated_FS = Land_FS
