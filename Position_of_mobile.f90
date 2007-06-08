@@ -176,7 +176,7 @@
 	BX = N_Long
 	BY = N_Lat
 !
-	OPEN (UNIT=14, FILE=TRIM(Border_path) // '\' // Country // '.ALL', &
+	OPEN (UNIT=8, FILE=TRIM(Border_path) // '\' // Country // '.ALL', &
           STATUS='OLD', ACCESS='DIRECT',RECL=176, MODE='READ', IOSTAT=IOS)
 	IF (IOS .NE. 0) THEN
 	  Error = 1
@@ -184,9 +184,9 @@
 	END IF         
 	T = 1
 	I = 4
-	READ (14, REC=T, IOSTAT=IOS) BREC
+	READ (8, REC=T, IOSTAT=IOS) BREC
 	IF (IOS .NE. 0) THEN
-	  CLOSE (UNIT=14)
+	  CLOSE (UNIT=8)
 	  RETURN
 	END IF
 !
@@ -196,9 +196,9 @@
 	DX = BCOO(3) * B
 	DY = BCOO(4) * B
 !
-50	READ (14, REC=T, IOSTAT=IOS) BREC
+50	READ (8, REC=T, IOSTAT=IOS) BREC
 	IF (IOS .NE. 0) THEN
-	  CLOSE (UNIT=14)
+	  CLOSE (UNIT=8)
 	  RETURN
 	END IF
 !
@@ -229,7 +229,7 @@
 		GOTO 70
 	END IF
 !	
-	CLOSE (UNIT=14)
+	CLOSE (UNIT=8)
 !
 	RETURN
 !
@@ -258,15 +258,15 @@
 	B = 1.8D2 / PI
 	MAXDI = 1.0D7
 !
-	OPEN (UNIT=14, FILE=TRIM(Border_path) // '\' // Country // '.ALL', &
+	OPEN (UNIT=8, FILE=TRIM(Border_path) // '\' // Country // '.ALL', &
 		STATUS='OLD', ACCESS='DIRECT',RECL=176, MODE='READ', IOSTAT=IOS)
 	IF (IOS .NE. 0) RETURN
 !
 !	Calculate whole borderline
 	T = 1
-70	READ (14, REC=T, IOSTAT=IOS) BREC
+70	READ (8, REC=T, IOSTAT=IOS) BREC
 	IF (IOS .NE. 0) THEN
-	  CLOSE (UNIT=14)
+	  CLOSE (UNIT=8)
 	  RETURN
 	END IF
 !	Do all entries of this record:
@@ -288,7 +288,7 @@
 	T = T + 1
 	GOTO 70
 !
-	CLOSE (UNIT=14)
+	CLOSE (UNIT=8)
 !
 	RETURN
 !
