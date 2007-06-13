@@ -164,103 +164,103 @@
 	PD  = I_PD
 !
 	DEBUG = .FALSE.
-	OPEN (UNIT = 12, FILE = TRIM(I_str(433:)) // "\\DEBUG.TXT", IOSTAT=IOS)
+	OPEN (UNIT = 2, FILE = TRIM(I_str(433:)) // "\\DEBUG.TXT", IOSTAT=IOS)
 	IF (IOS .EQ. 0) THEN
 		DEBUG = .TRUE.
 !
-		WRITE (12,*) ""
-		WRITE (12,*) "                       R e s u l t s"
-		WRITE (12,*) ""
-		WRITE (12,'(A35,I4,A2,$)') &
+		WRITE (2,*) ""
+		WRITE (2,*) "                       R e s u l t s"
+		WRITE (2,*) ""
+		WRITE (2,'(A35,I4,A2,$)') &
 				"  Mode of calculation            : ", C_mode, " ("
 		SELECT CASE (C_mode)
 			CASE (99) 
-				WRITE (12,*) "Point to point like line calc.)"
+				WRITE (2,*) "Point to point like line calc.)"
 			CASE  (9) 
-				WRITE (12,*) "UMTS/IMT2000 point to p."
+				WRITE (2,*) "UMTS/IMT2000 point to p."
 			CASE  (8) 
-				WRITE (12,*) "380-400 MHz emerg./secur.)"
+				WRITE (2,*) "380-400 MHz emerg./secur.)"
 			CASE  (7) 
-				WRITE (12,*) "Normal Agreement cov. 50% t.)"
+				WRITE (2,*) "Normal Agreement cov. 50% t.)"
 			CASE  (6) 
-				WRITE (12,*) "GSM1800 <-> GSM1800 ML 42 dBµV/m)"
+				WRITE (2,*) "GSM1800 <-> GSM1800 ML 42 dBµV/m)"
 			CASE  (5) 
-				WRITE (12,*) "GSM1800 <-> GSM1800 FB 38 dBµV/m)"
+				WRITE (2,*) "GSM1800 <-> GSM1800 FB 38 dBµV/m)"
 			CASE  (4) 
-				WRITE (12,*) "ERMES<->ERMES 32 dBµV/m)"
+				WRITE (2,*) "ERMES<->ERMES 32 dBµV/m)"
 			CASE  (3)
-				WRITE (12,*) "GSM900 <-> NMT)"
+				WRITE (2,*) "GSM900 <-> NMT)"
 			CASE  (2) 
-				WRITE (12,*) "GSM900 <-> TACS)"
+				WRITE (2,*) "GSM900 <-> TACS)"
 			CASE  (1) 
-				WRITE (12,*) "GSM900 <-> GSM900)"
+				WRITE (2,*) "GSM900 <-> GSM900)"
 			CASE  (0) 
-				WRITE (12,*) "Normal Agreement)"
+				WRITE (2,*) "Normal Agreement)"
 			CASE (-1) 
-				WRITE (12,*) "Agreement line calc. h2=10m)"
+				WRITE (2,*) "Agreement line calc. h2=10m)"
 			CASE (-2) 
-				WRITE (12,*) "GSM900 line calc. h2=3m)"
+				WRITE (2,*) "GSM900 line calc. h2=3m)"
 			CASE (-3) 
-				WRITE (12,*) "ERMES line calc.12 dbµV/m)"
+				WRITE (2,*) "ERMES line calc.12 dbµV/m)"
 			CASE (-4) 
-				WRITE (12,*) "ERMES line calc.32 dbµV/m)"
+				WRITE (2,*) "ERMES line calc.32 dbµV/m)"
 			CASE (-5) 
-				WRITE (12,*) "ERMES line calc.52 dbµV/m)"
+				WRITE (2,*) "ERMES line calc.52 dbµV/m)"
 			CASE (-6) 
-				WRITE (12,*) "GSM1800 line calc. h2=3m)"
+				WRITE (2,*) "GSM1800 line calc. h2=3m)"
 			CASE (-7) 
-				WRITE (12,*) "380-400 MHz line calc.)"
+				WRITE (2,*) "380-400 MHz line calc.)"
 			CASE (-8) 
-				WRITE (12,*) "UMTS/IMT2000 line calc.)"
+				WRITE (2,*) "UMTS/IMT2000 line calc.)"
 		END SELECT
-		WRITE (12,*) ""
-		WRITE (12,*) "                     Input data :"
-		WRITE (12,*)
-		WRITE (12,*) " Geographical co-ordinates of Tx: ", Coo_Tx(1:8)," ",Coo_Tx(9:15)
+		WRITE (2,*) ""
+		WRITE (2,*) "                     Input data :"
+		WRITE (2,*)
+		WRITE (2,*) " Geographical co-ordinates of Tx: ", Coo_Tx(1:8)," ",Coo_Tx(9:15)
 		IF (C_mode .GE. 0) THEN
-			WRITE (12,*) " Geographical co-ordinates of Rx: ", Coo_Rx(1:8)," ",Coo_Rx(9:15)
+			WRITE (2,*) " Geographical co-ordinates of Rx: ", Coo_Rx(1:8)," ",Coo_Rx(9:15)
 		END IF
-		WRITE (12,*) " Height above sea level of Tx   : ", H_Tx_input, " m"
+		WRITE (2,*) " Height above sea level of Tx   : ", H_Tx_input, " m"
 		IF (C_mode .GE. 0) THEN
-			WRITE (12,*) " Height above sea level of Rx   : ", H_Rx_input, " m"
+			WRITE (2,*) " Height above sea level of Rx   : ", H_Rx_input, " m"
 		END IF
-		WRITE (12,*) " Type of antenna horiz. of Tx   : ", Ant_typ_H_Tx
-		WRITE (12,*) " Type of antenna verti. of Tx   : ", Ant_typ_V_Tx
-		WRITE (12,*) " Azimuth of max. radiation of Tx: ", Azi_Tx_input, " degr."
-		WRITE (12,*) " Elevation of max. radia. of Tx : ", Ele_Tx_input, " degr."
-		WRITE (12,*) " Antenna height of Tx           : ", H_Tx_ant, " m"
+		WRITE (2,*) " Type of antenna horiz. of Tx   : ", Ant_typ_H_Tx
+		WRITE (2,*) " Type of antenna verti. of Tx   : ", Ant_typ_V_Tx
+		WRITE (2,*) " Azimuth of max. radiation of Tx: ", Azi_Tx_input, " degr."
+		WRITE (2,*) " Elevation of max. radia. of Tx : ", Ele_Tx_input, " degr."
+		WRITE (2,*) " Antenna height of Tx           : ", H_Tx_ant, " m"
 		IF (C_mode .GE. 0) THEN
-			WRITE (12,*) " Antenna height of Rx           : ", H_Rx_ant, " m"
+			WRITE (2,*) " Antenna height of Rx           : ", H_Rx_ant, " m"
 		END IF
-		WRITE (12,*) " Type of antenna Tx             : ", Type_of_Tx_ant
-		WRITE (12,*) " Maximum radiated power         : ", Max_power, " dBW"
-		WRITE (12,*) " Transmitting frequency         : ", Tx_frequ, "Hz"
-		WRITE (12,*) " Channel occupation             : ", Chan_occup
-		WRITE (12,*) " Cold or warm sea               : ", Sea_temperature
-		WRITE (12,*) " Distance over sea              : ", D_sea_input, " km"
-		WRITE (12,*) " Radius of the service area Tx  : ", Rad_of_Tx_serv_area, " km"
-		WRITE (12,*) " Country code of Tx station     : ", Land_from
+		WRITE (2,*) " Type of antenna Tx             : ", Type_of_Tx_ant
+		WRITE (2,*) " Maximum radiated power         : ", Max_power, " dBW"
+		WRITE (2,*) " Transmitting frequency         : ", Tx_frequ, "Hz"
+		WRITE (2,*) " Channel occupation             : ", Chan_occup
+		WRITE (2,*) " Cold or warm sea               : ", Sea_temperature
+		WRITE (2,*) " Distance over sea              : ", D_sea_input, " km"
+		WRITE (2,*) " Radius of the service area Tx  : ", Rad_of_Tx_serv_area, " km"
+		WRITE (2,*) " Country code of Tx station     : ", Land_from
 		IF (C_mode .GE. 0) THEN
-			WRITE (12,*) " Reception frequency            : ", Rx_frequ, "Hz"
-			WRITE (12,*) " Designation of emission Rx     : ", Desig_of_Rx_emis
-			WRITE (12,*) " Designation of emission Tx     : ", Desig_of_Tx_emis
-			WRITE (12,*) " Type of antenna horiz. of Rx   : ", Ant_typ_H_Rx
-			WRITE (12,*) " Type of antenna verti. of Rx   : ", Ant_typ_V_Rx
-			WRITE (12,*) " Azimuth of max. radiation of Rx: ", Azi_Rx_input, " degr."
-			WRITE (12,*) " Elevation of max. radia. of Rx : ", Ele_Rx_input, " degr."
-			WRITE (12,*) " Type of antenna Rx             : ", Type_of_Rx_ant
-			WRITE (12,*) " Gain of Rx-antenna             : ", Rx_ant_gain, " dB"
-			WRITE (12,*) " Depolarization loss            : ", Depol_loss, " dB"
-			WRITE (12,*) " Country code of Rx station     : ", Land_to
-			WRITE (12,*) " Input value of corr. f.delta f.: ", Cor_fact_frequ_diff, " dB"
-			WRITE (12,*) " Radius of the service area Rx  : ", Rad_of_Rx_serv_area, " km"
+			WRITE (2,*) " Reception frequency            : ", Rx_frequ, "Hz"
+			WRITE (2,*) " Designation of emission Rx     : ", Desig_of_Rx_emis
+			WRITE (2,*) " Designation of emission Tx     : ", Desig_of_Tx_emis
+			WRITE (2,*) " Type of antenna horiz. of Rx   : ", Ant_typ_H_Rx
+			WRITE (2,*) " Type of antenna verti. of Rx   : ", Ant_typ_V_Rx
+			WRITE (2,*) " Azimuth of max. radiation of Rx: ", Azi_Rx_input, " degr."
+			WRITE (2,*) " Elevation of max. radia. of Rx : ", Ele_Rx_input, " degr."
+			WRITE (2,*) " Type of antenna Rx             : ", Type_of_Rx_ant
+			WRITE (2,*) " Gain of Rx-antenna             : ", Rx_ant_gain, " dB"
+			WRITE (2,*) " Depolarization loss            : ", Depol_loss, " dB"
+			WRITE (2,*) " Country code of Rx station     : ", Land_to
+			WRITE (2,*) " Input value of corr. f.delta f.: ", Cor_fact_frequ_diff, " dB"
+			WRITE (2,*) " Radius of the service area Rx  : ", Rad_of_Rx_serv_area, " km"
 		ELSE
-			WRITE (12,*) " Input value of max. crossb. r. : ", Max_CBR_D_input, " km"
+			WRITE (2,*) " Input value of max. crossb. r. : ", Max_CBR_D_input, " km"
 		END IF
-		WRITE (12,*) " Input value of permissible fs. : ", Perm_FS_input, " dBµV/m"
-		WRITE (12,*) ""
-		WRITE (12,*) "" 
-		WRITE (12,*) ""	
+		WRITE (2,*) " Input value of permissible fs. : ", Perm_FS_input, " dBµV/m"
+		WRITE (2,*) ""
+		WRITE (2,*) "" 
+		WRITE (2,*) ""	
 	END IF
 !
 !	***********************************************************************
@@ -322,200 +322,200 @@
 !
 !
 	IF (DEBUG) THEN
-	  WRITE (12,*) ""
-	  WRITE (12,*) " Version of the HCM module      : V", Version
-	  WRITE (12,*) ""
-	  WRITE (12,*) "               Important output :"
-	  WRITE (12,*) ""
-	  WRITE (12,'(A35,I5)') "  Error value                    : ",HCM_error
+	  WRITE (2,*) ""
+	  WRITE (2,*) " Version of the HCM module      : V", Version
+	  WRITE (2,*) ""
+	  WRITE (2,*) "               Important output :"
+	  WRITE (2,*) ""
+	  WRITE (2,'(A35,I5)') "  Error value                    : ",HCM_error
 	  IF (HCM_error .NE. 0) THEN
 		SELECT CASE (HCM_Error)
 		  CASE (:999)
-			WRITE (12,*) " Error in Point_heigt or Point_type subroutine (database)."
+			WRITE (2,*) " Error in Point_heigt or Point_type subroutine (database)."
 		  CASE (1000)
-			WRITE (12,*) " Distance is 0.0 km. Calculations not possible !"
+			WRITE (2,*) " Distance is 0.0 km. Calculations not possible !"
 		  CASE (1001:1008)
-			WRITE (12,*) " Error in geographical Tx co-ordinates !"
+			WRITE (2,*) " Error in geographical Tx co-ordinates !"
 		  CASE (1009)
-			WRITE (12,*) " Error in input data of Tx antenna height !"
+			WRITE (2,*) " Error in input data of Tx antenna height !"
 		  CASE (1010)
-			WRITE (12,*) " Error in transmitting frequency value !"
+			WRITE (2,*) " Error in transmitting frequency value !"
 		  CASE (1011)
-			WRITE (12,*) " Error in transmitting frequency unit !"
+			WRITE (2,*) " Error in transmitting frequency unit !"
 		  CASE (1012)
-			WRITE (12,*) " Error in input data of service area Tx!"
+			WRITE (2,*) " Error in input data of service area Tx!"
 		  CASE (1013)
-			WRITE (12,*) " Error in input data of height of transmitter !"
+			WRITE (2,*) " Error in input data of height of transmitter !"
 		  CASE (1014:1021)
-			WRITE (12,*) " Error in geographical Rx co-ordinates !"
+			WRITE (2,*) " Error in geographical Rx co-ordinates !"
 		  CASE (1022)
-			WRITE (12,*) " Error in input data of Rx antenna height !"
+			WRITE (2,*) " Error in input data of Rx antenna height !"
 		  CASE (1023)
-			WRITE (12,*) " Error in reception frequency value !"
+			WRITE (2,*) " Error in reception frequency value !"
 		  CASE (1024)
-			WRITE (12,*) " Error in reception frequency unit !"
+			WRITE (2,*) " Error in reception frequency unit !"
 		  CASE (1025)
-			WRITE (12,*) " Mode of calculation is not available !"
+			WRITE (2,*) " Mode of calculation is not available !"
 		  CASE (1026)
-			WRITE (12,*) " Error in input data of permissible field strength !"
+			WRITE (2,*) " Error in input data of permissible field strength !"
 		  CASE (1027)
-			WRITE (12,*) " Error in input value of maximum crossborder range!"
+			WRITE (2,*) " Error in input value of maximum crossborder range!"
 		  CASE (1028)
-			WRITE (12,*) " Distance greater than 1000 km. Calculations not possible !"
+			WRITE (2,*) " Distance greater than 1000 km. Calculations not possible !"
 		  CASE (1029)
-			WRITE (12,*) " Error in input data of service area Rx!"
+			WRITE (2,*) " Error in input data of service area Rx!"
 		  CASE (1030)
-			WRITE (12,*) " Error in input data of height of receiver !"
+			WRITE (2,*) " Error in input data of height of receiver !"
 		  CASE (1031)
-			WRITE (12,*) " Error in input data of Tx elevation !"
+			WRITE (2,*) " Error in input data of Tx elevation !"
 		  CASE (1032)
-			WRITE (12,*) " Error in input-data of Tx azimuth !"
+			WRITE (2,*) " Error in input-data of Tx azimuth !"
 		  CASE (1033)
-			WRITE (12,*) " Error in input data of Tx antenna type (E or I) !"
+			WRITE (2,*) " Error in input data of Tx antenna type (E or I) !"
 		  CASE (1034)
-			WRITE (12,*) " Error in input data of maximal radiated power !"
+			WRITE (2,*) " Error in input data of maximal radiated power !"
 		  CASE (1035)
-			WRITE (12,*) " Error in input value of distance over sea !"
+			WRITE (2,*) " Error in input value of distance over sea !"
 		  CASE (1036)
-			WRITE (12,*) " xxx.ALL borderline file for Tx is missing!"
+			WRITE (2,*) " xxx.ALL borderline file for Tx is missing!"
 		  CASE (1037)
-			WRITE (12,*) " xxx.ALL borderline file for Rx is missing!"
+			WRITE (2,*) " xxx.ALL borderline file for Rx is missing!"
 		  CASE (1038)
-			WRITE (12,*) " Error in input data of antenna type (TR25-08), (Tx or Rx) !"
+			WRITE (2,*) " Error in input data of antenna type (TR25-08), (Tx or Rx) !"
 		  CASE (1039)
-			WRITE (12,*) " Error in input data of correction factor according frequency difference !"
+			WRITE (2,*) " Error in input data of correction factor according frequency difference !"
 		  CASE (1040)
-			WRITE (12,*) " Channel spacing outside definition range (Rx) !"   
+			WRITE (2,*) " Channel spacing outside definition range (Rx) !"   
 		  CASE (1041)
-			WRITE (12,*) " Channel spacing outside definition range (Tx) !"
+			WRITE (2,*) " Channel spacing outside definition range (Tx) !"
 		  CASE (1042)
-			WRITE (12,*) " Error in input data of elevation (Rx) !"
+			WRITE (2,*) " Error in input data of elevation (Rx) !"
 		  CASE (1043)
-			WRITE (12,*) " Error in input data of azimuth (Rx) !"
+			WRITE (2,*) " Error in input data of azimuth (Rx) !"
 		  CASE (1044)
-			WRITE (12,*) " Error in type of antenna Rx (E/I)!"
+			WRITE (2,*) " Error in type of antenna Rx (E/I)!"
 		  CASE (1045)
-			WRITE (12,*) " Error in input data of gain of Rx antenna !"
+			WRITE (2,*) " Error in input data of gain of Rx antenna !"
 		  CASE (1046)
-			WRITE (12,*) " Error in input data of depolarization loss !"
+			WRITE (2,*) " Error in input data of depolarization loss !"
 		  CASE (1047)
-			WRITE (12,*) " Error in input value of borderline distance  (max. 999 km)!"
+			WRITE (2,*) " Error in input value of borderline distance  (max. 999 km)!"
 		  CASE (1048)
-			WRITE (12,*) " Selected (border-) line data not available !"
+			WRITE (2,*) " Selected (border-) line data not available !"
 		  CASE (1049)
-			WRITE (12,*) " Error in line data !"
+			WRITE (2,*) " Error in line data !"
 		  CASE (1050)
-			WRITE (12,*) " No Agreement frequency and important input is missing !"
+			WRITE (2,*) " No Agreement frequency and important input is missing !"
 		  CASE (2000:)
-			WRITE (12,*) " Error in looking up FS-figures !"
+			WRITE (2,*) " Error in looking up FS-figures !"
 		END SELECT
 	  ELSE	! HCM_Error=0
-		WRITE (12,*) " Tx co-ordinates calculated     : ", Coo_Tx_new(1:8)," ",Coo_Tx_new(9:15)
+		WRITE (2,*) " Tx co-ordinates calculated     : ", Coo_Tx_new(1:8)," ",Coo_Tx_new(9:15)
 		IF (C_mode .LT. 0) THEN
 		  IF (D_to_border .EQ. 0) THEN
-			WRITE (12,*) " The maximum field strength at"
-			WRITE (12,'(A35, F7.1, A7)') "  the border line                : ", Calculated_FS, " dBuV/m"
+			WRITE (2,*) " The maximum field strength at"
+			WRITE (2,'(A35, F7.1, A7)') "  the border line                : ", Calculated_FS, " dBuV/m"
 		  END IF
 		  IF (D_to_border .GT. 0) THEN
-            WRITE (12,*) " The maximum field strength at"
-            WRITE (12,'(A6, I3, A26, F7.1, A7)') "  the ", D_to_border,  " km line                : ", Calculated_FS, " dBuV/m"
+            WRITE (2,*) " The maximum field strength at"
+            WRITE (2,'(A6, I3, A26, F7.1, A7)') "  the ", D_to_border,  " km line                : ", Calculated_FS, " dBuV/m"
           END IF
           IF (D_to_border .LT. 0) THEN
-            WRITE (12,*) " The maximum field strength at"
-		    WRITE (12,'(A35, F7.1, A7)') "  the cross border range         : ", Calculated_FS, " dBuV/m"
+            WRITE (2,*) " The maximum field strength at"
+		    WRITE (2,'(A35, F7.1, A7)') "  the cross border range         : ", Calculated_FS, " dBuV/m"
           END IF
-          WRITE (12,*) " The co-ordinates of the"
-          WRITE (12,'(A35, A8, A1, A7)') "  (border-) line point are       : ", Coo_Rx_new(1:8), " ", Coo_Rx_new(9:15)
-          WRITE  (12,*) " The distance to the (border-)"
-          WRITE  (12, '(A35, F7.2, A4)') "  line point is                  : ", Distance, " km."
-          WRITE  (12,*) " Direction to the (border-)"   
-          WRITE  (12, '(A35, F7.2, A6)') "  line point                     : ", Dir_Tx_Rx, " degr."
-          WRITE  (12, '(A35, F7.1, A8)') "  Permissible field strength     : ", Perm_FS, " dBµV/m."
-          WRITE  (12, '(A35, F7.1, A4)') "  The protection margin is       : ", Prot_margin, " dB."
-		  WRITE (12, '(A35, A3)') "  Land of transmitter            : ", Land_from
-		  WRITE (12, '(A35,A3)') "  Land to calculate to           : ", Land_to
+          WRITE (2,*) " The co-ordinates of the"
+          WRITE (2,'(A35, A8, A1, A7)') "  (border-) line point are       : ", Coo_Rx_new(1:8), " ", Coo_Rx_new(9:15)
+          WRITE (2,*) " The distance to the (border-)"
+          WRITE (2, '(A35, F7.2, A4)') "  line point is                  : ", Distance, " km."
+          WRITE (2,*) " Direction to the (border-)"   
+          WRITE (2, '(A35, F7.2, A6)') "  line point                     : ", Dir_Tx_Rx, " degr."
+          WRITE (2, '(A35, F7.1, A8)') "  Permissible field strength     : ", Perm_FS, " dBµV/m."
+          WRITE (2, '(A35, F7.1, A4)') "  The protection margin is       : ", Prot_margin, " dB."
+		  WRITE (2, '(A35, A3)') "  Land of transmitter            : ", Land_from
+		  WRITE (2, '(A35,A3)') "  Land to calculate to           : ", Land_to
 		  IF (D_to_border .EQ. 0) THEN
-			WRITE (12,*) " Calculation is performed on the borderline."
+			WRITE (2,*) " Calculation is performed on the borderline."
 		  END IF
 		  IF (D_to_border .LT. 0) THEN
-			WRITE (12,*) " Calculation is performed on the cross border range."
+			WRITE (2,*) " Calculation is performed on the cross border range."
 		  END IF
 		  IF (D_to_border .GT. 0) THEN
-			WRITE (12,'(A33, I4, A9)') "  Calculation is performed on the", D_to_border, " km-line."
+			WRITE (2,'(A33, I4, A9)') "  Calculation is performed on the", D_to_border, " km-line."
 		  END IF
-		  WRITE (12,'(A35, F7.1, A3)') "  Max. range of harmful interfer.: ", CBR_D, " km"
-		  WRITE (12,'(A35, F7.1, A4)') "  E.R.P of reference transmitter : ", ERP_ref_Tx, " dBW"
+		  WRITE (2,'(A35, F7.1, A3)') "  Max. range of harmful interfer.: ", CBR_D, " km"
+		  WRITE (2,'(A35, F7.1, A4)') "  E.R.P of reference transmitter : ", ERP_ref_Tx, " dBW"
 		ELSE !	CMODE >= 0
-		  WRITE (12,*) " Rx co-ordinates calculated     : ", Coo_Rx_new(1:8)," ",Coo_Rx_new(9:15)
-		  WRITE (12,'(A35, F7.1, A7)') "  Calculated field strength      : ", Calculated_FS, " dBuV/m"
-		  WRITE (12,'(A35, F7.1, A7)') "  Permissible field strength     : ", Perm_FS, " dBuV/m"
-		  WRITE (12,'(A19)') "  Protection margin"
-		  WRITE (12,'(A35, F7.1, A3)') "  (Perm_FS - Calculated_FS)      : ", Prot_margin, " dB"
+		  WRITE (2,*) " Rx co-ordinates calculated     : ", Coo_Rx_new(1:8)," ",Coo_Rx_new(9:15)
+		  WRITE (2,'(A35, F7.1, A7)') "  Calculated field strength      : ", Calculated_FS, " dBuV/m"
+		  WRITE (2,'(A35, F7.1, A7)') "  Permissible field strength     : ", Perm_FS, " dBuV/m"
+		  WRITE (2,'(A19)') "  Protection margin"
+		  WRITE (2,'(A35, F7.1, A3)') "  (Perm_FS - Calculated_FS)      : ", Prot_margin, " dB"
 		END IF ! CMODE
 !
-		WRITE (12,'(A35, F7.1, A3)') "  Distance over sea              : ", D_sea_calculated, " km"
-		WRITE (12,*) " "
-		WRITE (12,*) " "
-		WRITE (12,*) " "
-		WRITE (12,*) "                    Information :"
-		WRITE (12,*) " "
+		WRITE (2,'(A35, F7.1, A3)') "  Distance over sea              : ", D_sea_calculated, " km"
+		WRITE (2,*) " "
+		WRITE (2,*) " "
+		WRITE (2,*) " "
+		WRITE (2,*) "                    Information :"
+		WRITE (2,*) " "
 !
 		IF (Info(1)) THEN
-			WRITE (12,*) " No height of Tx is given or Tx is mobile !"
-			WRITE (12,*) " The height is taken from terrain database !"
-			WRITE (12,*) " "
+			WRITE (2,*) " No height of Tx is given or Tx is mobile !"
+			WRITE (2,*) " The height is taken from terrain database !"
+			WRITE (2,*) " "
 		END IF
 !
 		IF (Info(2)) THEN
-			WRITE (12,*) " Height of transmitter differs from terrain database !"
-			WRITE (12,*) " "
+			WRITE (2,*) " Height of transmitter differs from terrain database !"
+			WRITE (2,*) " "
 		END IF
 !
 		IF (Info(3)) THEN
-			WRITE (12,*) " The transmitter height differs more than 10% "
-			WRITE (12,*) " from the terrain database!"
-			WRITE (12,*) " Calculations may be (extremely) wrong !"
-			WRITE (12,*) " "
+			WRITE (2,*) " The transmitter height differs more than 10% "
+			WRITE (2,*) " from the terrain database!"
+			WRITE (2,*) " Calculations may be (extremely) wrong !"
+			WRITE (2,*) " "
 		END IF
 !
 		IF (Info(4)) THEN
-			WRITE (12,*) " Transmitter frequency is outside the range of"
-			WRITE (12,*) " table in Annex 1! Permissible field strength,"
-			WRITE (12,*) " max. crossborder range and the ERP of the"
-			WRITE (12,*) " reference transmitter are set to 0!"
-			WRITE (12,*) " "   
+			WRITE (2,*) " Transmitter frequency is outside the range of"
+			WRITE (2,*) " table in Annex 1! Permissible field strength,"
+			WRITE (2,*) " max. crossborder range and the ERP of the"
+			WRITE (2,*) " reference transmitter are set to 0!"
+			WRITE (2,*) " "   
 		END IF
 !
 		IF (Info(5)) THEN
-			WRITE (12,*) " Input value of permissible field strength is used !"
-			WRITE (12,*) " "
+			WRITE (2,*) " Input value of permissible field strength is used !"
+			WRITE (2,*) " "
 		END IF
 !
 		IF (Info(6)) THEN
-			WRITE (12,*) " Input value for the maximum crossborder range is used !"
-			WRITE (12,*) " "
+			WRITE (2,*) " Input value for the maximum crossborder range is used !"
+			WRITE (2,*) " "
 		END IF
 !
 		IF (Info(7)) THEN
-			WRITE (12,*) " The field stength is set to 999.9, because of service area overlapping."
-			WRITE (12,*) " "   
+			WRITE (2,*) " The field stength is set to 999.9, because of service area overlapping."
+			WRITE (2,*) " "   
 		END IF
 !
 		IF (Info(8)) THEN
-			WRITE (12,*) " No height of Rx is given or Rx is mobile / line!"
-			WRITE (12,*) " The height is taken from terrain database !"
-			WRITE (12,*) " "
+			WRITE (2,*) " No height of Rx is given or Rx is mobile / line!"
+			WRITE (2,*) " The height is taken from terrain database !"
+			WRITE (2,*) " "
 		END IF
 !
 		IF (Info(9)) THEN
-			WRITE (12,*) " Height of receiver differs from terrain database !"
-			WRITE (12,*) " "
+			WRITE (2,*) " Height of receiver differs from terrain database !"
+			WRITE (2,*) " "
 		END IF
 !
 		IF (Info(10)) THEN
-			WRITE (12,*) " The receiver height differs more than 10% from the terrain database!"
-			WRITE (12,*) " Calculations may be (extremely) wrong !"
-			WRITE (12,*) " "  
+			WRITE (2,*) " The receiver height differs more than 10% from the terrain database!"
+			WRITE (2,*) " Calculations may be (extremely) wrong !"
+			WRITE (2,*) " "  
 		END IF
 !
 		IF (Info(11)) THEN
@@ -529,101 +529,101 @@
 		END IF
 !
 		IF (Info(13)) THEN
-			WRITE (12,*) " Distance over sea is greater than total distance; distance between", &
+			WRITE (2,*) " Distance over sea is greater than total distance; distance between", &
 				  " Tx and Rx is used !"
-			WRITE (12,*) " "
+			WRITE (2,*) " "
 		END IF
 !
  		IF (Info(14)) THEN
-			WRITE (12,*) " Input value of corr. factor accord. frequency difference is used !"
-			WRITE (12,*) " "
+			WRITE (2,*) " Input value of corr. factor accord. frequency difference is used !"
+			WRITE (2,*) " "
 		END IF
 !
 		IF (Info(15)) THEN
-			WRITE (12,*) " Frequency difference outside definition range !"
-			WRITE (12,*) " 82 dB value is used for correction factor !"
-			WRITE (12,*) " "
+			WRITE (2,*) " Frequency difference outside definition range !"
+			WRITE (2,*) " 82 dB value is used for correction factor !"
+			WRITE (2,*) " "
 		END IF
 !
 		IF (Info(16)) THEN
-			WRITE (12,*) " Calculated distance over sea is set to 0"
-			WRITE (12,*) " because of missing morphological data !"
-			WRITE (12,*) " "
+			WRITE (2,*) " Calculated distance over sea is set to 0"
+			WRITE (2,*) " because of missing morphological data !"
+			WRITE (2,*) " "
 		END IF
 !
 		IF (Info(17)) THEN
-			WRITE (12,*) " Channel spacing outside curve range, broadband formula is used!"
+			WRITE (2,*) " Channel spacing outside curve range, broadband formula is used!"
 		END IF
 !
 		IF (Info(18)) THEN
-			WRITE (12,*) " Correction factors for the band 380 - 400 MHz are used."   
+			WRITE (2,*) " Correction factors for the band 380 - 400 MHz are used."   
 		END IF
 !
-		WRITE (12,*) " "
-		WRITE (12,*) " "
-		WRITE (12,*) "              Additional output :"
-		WRITE (12,*) " "
-		WRITE (12,'(A35,F6.3,A2)') "  Calc. Time                     : ", (Real(Te-Ta)/10000.0), " s"
-		WRITE (12,'(A35, I7, A2)') "  Height of Tx (terrain database): ", H_Datab_Tx, " m"
+		WRITE (2,*) " "
+		WRITE (2,*) " "
+		WRITE (2,*) "              Additional output :"
+		WRITE (2,*) " "
+		WRITE (2,'(A35,F6.3,A2)') "  Calc. Time                     : ", (Real(Te-Ta)/10000.0), " s"
+		WRITE (2,'(A35, I7, A2)') "  Height of Tx (terrain database): ", H_Datab_Tx, " m"
 		IF (C_mode .GE. 0) THEN 
-		  WRITE (12,'(A35, I7, A2)') "  Height of Rx (terrain database): ", H_Datab_Rx, " m" 
-		  WRITE (12,'(A35, F7.3, A3)') "  Distance Tx -> Rx              : ", Distance, " km"
+		  WRITE (2,'(A35, I7, A2)') "  Height of Rx (terrain database): ", H_Datab_Rx, " m" 
+		  WRITE (2,'(A35, F7.3, A3)') "  Distance Tx -> Rx              : ", Distance, " km"
 		END IF            
-		WRITE (12,'(A35, F7.3, A7)') "  Transmitter clearance angle    : ", Tx_TCA, " degree"
-		WRITE (12,'(A35, F7.2, A3)') "  Tx clearance angle corr. factor: ", Tx_TCA_corr, " dB"
-		WRITE (12,'(A35, F7.1, A2)') "  Effective antenna height of Tx : ", Heff_Tx, " m"
-		WRITE (12,'(A35, F7.1, A2)') "  Effective antenna height of Rx : ", Heff_Rx, " m"
-		WRITE (12,'(A35, F7.1, A2)') "  Effective antenna height (CCIR): ", Heff, " m"
-		WRITE (12,'(A35, F7.1, A2)') "  Delta height  (CCIR)           : ", Dh, " m"
-		WRITE (12,'(A35, F7.1, A3)') "  Correct. factor delta h (CCIR) : ", Dh_corr, " dB"
-		WRITE (12,'(A35, F7.1, A7)') "  Land field strength            : ", Land_FS, " dBuV/m"
-		WRITE (12,'(A35, F7.1, A7)') "  Sea field strength             : ", Sea_FS, " dBuV/m"
-		WRITE (12,'(A35, F7.1, A3)') "  Correction factor Tx antenna   : ", Tx_ant_corr, " dB"
-		WRITE (12,'(A35, F7.1, A3)') "  Corr. factor antenna type Tx   : ", Tx_ant_type_corr, " dB"
-		WRITE (12,'(A37, A5, A7)')	 "  Azimuth of Tx antenna          :   ", Azi_Tx_input, " degree"
-		WRITE (12,'(A37, A5, A7)')	 "  Elevation of Tx antenna        :   ",	Ele_Tx_input, " degree"
-		WRITE (12,'(A35, F7.1, A7)') "  Direction Tx -> Rx             : ", Dir_Tx_Rx, " degree"
-		WRITE (12,'(A35, F7.1, A7)') "  Angle vertical Tx to Rx        : ", V_angle_Tx_Rx, " degree"
-		WRITE (12,'(A35, F7.1, A7)') "  Diff.angle hori. (Tx->Rx - Azi): ", H_diff_angle_Tx_Rx, " degree"
-		WRITE (12,'(A35, F7.1, A7)') "  Diff.angle vert. (Tx->Rx - Ele): ", V_diff_angle_Tx_Rx, " degree"
+		WRITE (2,'(A35, F7.3, A7)') "  Transmitter clearance angle    : ", Tx_TCA, " degree"
+		WRITE (2,'(A35, F7.2, A3)') "  Tx clearance angle corr. factor: ", Tx_TCA_corr, " dB"
+		WRITE (2,'(A35, F7.1, A2)') "  Effective antenna height of Tx : ", Heff_Tx, " m"
+		WRITE (2,'(A35, F7.1, A2)') "  Effective antenna height of Rx : ", Heff_Rx, " m"
+		WRITE (2,'(A35, F7.1, A2)') "  Effective antenna height (CCIR): ", Heff, " m"
+		WRITE (2,'(A35, F7.1, A2)') "  Delta height  (CCIR)           : ", Dh, " m"
+		WRITE (2,'(A35, F7.1, A3)') "  Correct. factor delta h (CCIR) : ", Dh_corr, " dB"
+		WRITE (2,'(A35, F7.1, A7)') "  Land field strength            : ", Land_FS, " dBuV/m"
+		WRITE (2,'(A35, F7.1, A7)') "  Sea field strength             : ", Sea_FS, " dBuV/m"
+		WRITE (2,'(A35, F7.1, A3)') "  Correction factor Tx antenna   : ", Tx_ant_corr, " dB"
+		WRITE (2,'(A35, F7.1, A3)') "  Corr. factor antenna type Tx   : ", Tx_ant_type_corr, " dB"
+		WRITE (2,'(A37, A5, A7)')	 "  Azimuth of Tx antenna          :   ", Azi_Tx_input, " degree"
+		WRITE (2,'(A37, A5, A7)')	 "  Elevation of Tx antenna        :   ",	Ele_Tx_input, " degree"
+		WRITE (2,'(A35, F7.1, A7)') "  Direction Tx -> Rx             : ", Dir_Tx_Rx, " degree"
+		WRITE (2,'(A35, F7.1, A7)') "  Angle vertical Tx to Rx        : ", V_angle_Tx_Rx, " degree"
+		WRITE (2,'(A35, F7.1, A7)') "  Diff.angle hori. (Tx->Rx - Azi): ", H_diff_angle_Tx_Rx, " degree"
+		WRITE (2,'(A35, F7.1, A7)') "  Diff.angle vert. (Tx->Rx - Ele): ", V_diff_angle_Tx_Rx, " degree"
 		IF (C_mode .GE. 0) THEN
-		  WRITE (12,'(A37, A5, A7)')	 "  Azimuth of Rx antenna          :   ", Azi_Rx_input, " degree"
-		  WRITE (12,'(A37, A5, A7)')	 "  Elevation of Rx antenna        :   ", Ele_Rx_input, " degree"
-		  WRITE (12,'(A35, F7.3, A7)') "  Receiver clearance angle       : ", Rx_TCA, " degree"
-		  WRITE (12,'(A35, F7.2, A3)') "  Rx clearance angle corr. factor: ", Rx_TCA_corr, " dB"
-		  WRITE (12,'(A35, F7.1, A7)') "  Direction Rx -> Tx             : ", Dir_Rx_Tx, " degree"
-		  WRITE (12,'(A35, F7.1, A7)') "  Angle vertical Rx to Tx        : ", V_angle_Rx_Tx, " degree"
-		  WRITE (12,'(A35, F7.1, A7)') "  Diff.angle hori.(Rx->Tx - AziR): ", H_diff_angle_Rx_Tx, " degree"
-		  WRITE (12,'(A35, F7.1, A7)') "  Diff.angle vert.(Rx->Tx - EleR): ", V_diff_angle_Rx_Tx, " degree"
-		  WRITE (12,'(A35, F7.1, A3)') "  Correction factor Rx antenna   : ", Rx_ant_corr, " dB"
-		  WRITE (12,'(A35, F7.1, A3)') "  Corr. factor antenna type Rx   : ", Rx_ant_type_corr, " dB"
-		  WRITE (12,'(A35, F7.1, A4)') "  Delta frequency                : ", Delta_frequency/1000.0, " kHz"
+		  WRITE (2,'(A37, A5, A7)')	 "  Azimuth of Rx antenna          :   ", Azi_Rx_input, " degree"
+		  WRITE (2,'(A37, A5, A7)')	 "  Elevation of Rx antenna        :   ", Ele_Rx_input, " degree"
+		  WRITE (2,'(A35, F7.3, A7)') "  Receiver clearance angle       : ", Rx_TCA, " degree"
+		  WRITE (2,'(A35, F7.2, A3)') "  Rx clearance angle corr. factor: ", Rx_TCA_corr, " dB"
+		  WRITE (2,'(A35, F7.1, A7)') "  Direction Rx -> Tx             : ", Dir_Rx_Tx, " degree"
+		  WRITE (2,'(A35, F7.1, A7)') "  Angle vertical Rx to Tx        : ", V_angle_Rx_Tx, " degree"
+		  WRITE (2,'(A35, F7.1, A7)') "  Diff.angle hori.(Rx->Tx - AziR): ", H_diff_angle_Rx_Tx, " degree"
+		  WRITE (2,'(A35, F7.1, A7)') "  Diff.angle vert.(Rx->Tx - EleR): ", V_diff_angle_Rx_Tx, " degree"
+		  WRITE (2,'(A35, F7.1, A3)') "  Correction factor Rx antenna   : ", Rx_ant_corr, " dB"
+		  WRITE (2,'(A35, F7.1, A3)') "  Corr. factor antenna type Rx   : ", Rx_ant_type_corr, " dB"
+		  WRITE (2,'(A35, F7.1, A4)') "  Delta frequency                : ", Delta_frequency/1000.0, " kHz"
 		END IF
-		WRITE (12,*) " Permissible field str. of table"
-		WRITE (12,'(A35, F7.1, A7)') "  (0, if there is an input)      : ", Perm_FS_from_table, " dbuV/m"
-		WRITE (12,'(A35, F7.1, A3)') "  Corr. factor according delta f : ", Corr_delta_f, " dB"
-		WRITE (12,'(A35, F7.1, A4)') "  Cannel spacing of Rx           : ", Channel_sp_Rx/1000.0, " kHz"
-		WRITE (12,'(A35, F7.1, A4)') "  Cannel spacing of Tx           : ", Channel_sp_Tx/1000.0, " kHz"
-		WRITE (12,'(A35, F7.1, A4)') "  Power in direction of Rx       : ", Power_to_Rx, " dBW"
-		WRITE (12,'(A35, F7.1, A7)') "  Free space field strength      : ", Free_space_FS, " dbuV/m"
-		WRITE (12,*) ""
+		WRITE (2,*) " Permissible field str. of table"
+		WRITE (2,'(A35, F7.1, A7)') "  (0, if there is an input)      : ", Perm_FS_from_table, " dbuV/m"
+		WRITE (2,'(A35, F7.1, A3)') "  Corr. factor according delta f : ", Corr_delta_f, " dB"
+		WRITE (2,'(A35, F7.1, A4)') "  Cannel spacing of Rx           : ", Channel_sp_Rx/1000.0, " kHz"
+		WRITE (2,'(A35, F7.1, A4)') "  Cannel spacing of Tx           : ", Channel_sp_Tx/1000.0, " kHz"
+		WRITE (2,'(A35, F7.1, A4)') "  Power in direction of Rx       : ", Power_to_Rx, " dBW"
+		WRITE (2,'(A35, F7.1, A7)') "  Free space field strength      : ", Free_space_FS, " dbuV/m"
+		WRITE (2,*) ""
 !	-------------------------------------------------------
-!	  	WRITE (12,*) " "
-!	    WRITE (12,'(A34, I6)') "  Number of profile points       :", PN
-!		WRITE (12,'(A31, F7.3, A3)') "  profile sampling distance  : ", PD, " km"
-!	    WRITE (12,*) " (First value = Tx-height, last value = Rx-height !)"
-!	    WRITE (12,*) " "
-!	    WRITE (12,*) " Number of normalized profile heights [m]" 
-!	    WRITE (12,*) " "    
+!	  	WRITE (2,*) " "
+!	    WRITE (2,'(A34, I6)') "  Number of profile points       :", PN
+!		WRITE (2,'(A31, F7.3, A3)') "  profile sampling distance  : ", PD, " km"
+!	    WRITE (2,*) " (First value = Tx-height, last value = Rx-height !)"
+!	    WRITE (2,*) " "
+!	    WRITE (2,*) " Number of normalized profile heights [m]" 
+!	    WRITE (2,*) " "    
 !	    DO I = 1, PN, 10
-!         WRITE (12,'(A1, I6, A2, 10(I5))') " ", I, "  ", &
+!         WRITE (2,'(A1, I6, A2, 10(I5))') " ", I, "  ", &
 !						T_Prof(I), T_Prof(I+1), T_Prof(I+2), &
 !						T_Prof(I+3), T_Prof(I+4), T_Prof(I+5), &
 !						T_Prof(I+6), T_Prof(I+7), T_Prof(I+8), T_Prof(I+9)
 !	    END DO
 !	--------------------------------------------------------
 	  END IF ! HCM_Error
-	  CLOSE (UNIT = 12)
+	  CLOSE (UNIT = 2)
 	END IF ! DEBUG
 !
 !	***********************************************************************

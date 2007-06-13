@@ -483,16 +483,6 @@
 !	*									
 !	**********************************************************************
 !
-	Tx_TCA	= 0.0
-	Rx_TCA	= 0.0
-	Tx_TCA_corr	= 0.0
-	Rx_TCA_corr	= 0.0
-!
-!	***********************************************************
-!	Calculate Terrain Clearance Angles and TCA correction factors
-!	limitation of corr.factors is done in TCA_correction_calculation
-!	***********************************************************
-!
 	IF ((c_Mode .GE. 0) .AND. (c_Mode .LT. 99)) THEN
 		I1 = H_AntTx
 		I2 = H_AntRx
@@ -500,8 +490,14 @@
 		I1 = H_Tx + H_AntTx
 		I2 = H_Rx + H_AntRx
 	END IF
-
+!
+!	***********************************************************
+!	Calculate Terrain Clearance Angles and TCA correction factors
+!	limitation of corr.factors is done in TCA_correction_calculation
+!	***********************************************************
+!
 !	calculate transmitter clearance angle 'Tx_TCA' according to proceeding table
+!
 	IF (Tx_serv_area .EQ. 0.0) THEN
 !	  Calculate Tx_TCA:
 		Tx_TCA = -90.0
@@ -516,7 +512,10 @@
 			IF (x_TCA .GT. Tx_TCA) Tx_TCA = x_TCA
 		END DO
 !	Calculate correction factor:
-	CALL TCA_correction_calculation (Tx_TCA, Tx_frequency, Tx_TCA_corr)
+		CALL TCA_correction_calculation (Tx_TCA, Tx_frequency, Tx_TCA_corr)
+	ELSE
+		Tx_TCA	= 0.0
+		Tx_TCA_corr	= 0.0
 	END IF
 !
 !	calculate receiver clearance angle 'Rx_TCA' according to proceeding table
@@ -535,7 +534,10 @@
 			IF (x_TCA .GT. Rx_TCA) Rx_TCA = x_TCA
 		END DO
 !	Calculate correction factor:
-	CALL TCA_correction_calculation (Rx_TCA, Rx_frequency, Rx_TCA_corr)
+		CALL TCA_correction_calculation (Rx_TCA, Rx_frequency, Rx_TCA_corr)
+	ELSE
+		Rx_TCA	= 0.0
+		Rx_TCA_corr	= 0.0
 	ENDIF
 !
 !	************************************************
