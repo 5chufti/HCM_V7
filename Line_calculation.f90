@@ -1,6 +1,6 @@
 !
 !	Line_calculation.f90								P.Benner		23.11.2004
-!														G.H.			31.05.2006
+!														G.H.			21.06.2007
 !
 !	23.11.2004	Steps from 100 / 10 / 1 modified to 25 / 5 / 1
 !
@@ -181,10 +181,10 @@
 	GOTO 140
 !	End of testroutine
 !-------------------------------------------------------------------------
-!	1st: calculate to every 25th centerpoint:
+!	1st: calculate to every 15th centerpoint:
 !	Use 1st list:
-80	teststep = 25
-	N_rec = 13	! record number in file
+80	teststep = 15
+	N_rec = 8	! record number in file
 90	N_List = 0	! number of stored record numbers and field strength
 	IOS = 0
 !
@@ -220,7 +220,7 @@
 	END DO
 !
 	IF (N_List .EQ. 0) THEN
-	  IF (teststep .EQ. 25) THEN
+	  IF (teststep .EQ. 15) THEN
 	    teststep = 5
 		N_rec = 3
 		GOTO 90
@@ -232,15 +232,15 @@
 	  END IF
 	END IF     
 !
-	IF (teststep .EQ. 25) THEN
-!		2nd: calculate to every 5th centerpoint +10/-10 neighbouring centerpoints
+	IF (teststep .EQ. 15) THEN
+!		2nd: calculate to every 5th centerpoint +5/-5 neighbouring centerpoints
 !		of stored record-numbers:
 !		Use 2nd list:
 		N_List1 = 0	! number of stored records and field strength
 		IF (N_List .GT. 0) THEN
 		  DO I = 1, N_List
 			J = Rec_N_list(I)
-			DO J = (J-10),(J+10), 5
+			DO J = (J-5),(J+5), 5
 			  IF (J .EQ. Rec_N_list(I)) THEN
 !				  This calculation is already done in the previous step!
 				  Calculated_FS = FS_list(I)

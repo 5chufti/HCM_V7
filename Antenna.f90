@@ -14,7 +14,7 @@
 !
 !	Output values
 !
-!	LOSS	Loss [dB] (0.0 = no loss;  max. = -40.0)
+!	RHO		Loss [linear] (1.0 = no loss;  max. = 0.01)
 !	Error	Error-value (0 = no error; 1038 = error) 
 !
 !	**************************************************************
