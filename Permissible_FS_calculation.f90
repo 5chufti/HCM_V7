@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		17.10.2005
-!														G.H.			15.05.2007
+!														G.H.			10.07.2007
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -243,8 +243,17 @@
 	  GOTO 300
 	END IF
 !
+	TX_DIG = (INDEX('1279',Desig_of_Tx_emis(6:6)) .GT. 0)
+	RX_DIG = (INDEX('1279',Desig_of_Rx_emis(6:6)) .GT. 0)
+	TX_TETRA = (Desig_of_Tx_emis(1:7) .EQ. '25K0G7W')
+	RX_TETRA = (Desig_of_Rx_emis(1:7) .EQ. '25K0G7W')
+!
 !	Bandwidth of Rx:   
-	DRX = Desig_of_Rx_emis(1:4)
+	IF (RX_TETRA) THEN
+		DRX = '16K0'
+	ELSE
+		DRX = Desig_of_Rx_emis(1:4)
+	ENDIF
 	I = INDEX(DRX,'K')
 	IF (I .EQ. 0) THEN
 		I = INDEX(DRX,'M')
@@ -270,7 +279,11 @@
 	END IF
 !
 !	Bandwidth of TX:   
-	DTX = Desig_of_Tx_emis(1:4)
+	IF (TX_TETRA) THEN
+		DTX = '16K0'
+	ELSE
+		DTX = Desig_of_Tx_emis(1:4)
+	ENDIF
 	I = INDEX(DTX,'K')
 	IF (I .EQ. 0) THEN
 		I = INDEX(DTX,'M')
@@ -294,11 +307,6 @@
 	ELSE 
 		CSXT = NINT(X1 * FACTOR)
 	END IF
-!
-	TX_DIG = (INDEX('1279',Desig_of_Tx_emis(6:6)) .GT. 0)
-	RX_DIG = (INDEX('1279',Desig_of_Rx_emis(6:6)) .GT. 0)
-	TX_TETRA = (Desig_of_Tx_emis(1:7) .EQ. '25K0G7W')
-	RX_TETRA = (Desig_of_Rx_emis(1:7) .EQ. '25K0G7W')
 !
 !	Module normal Berlin:
 	IF ((C_Mode .EQ. 0) .OR. (C_Mode .EQ. 4) .OR. (C_Mode .EQ. 7)) GOTO 100
@@ -587,31 +595,31 @@
 		  CASE (25000)
 			SELECT CASE (Channel_sp_Tx)
 				CASE (5000)
-					IF (TX_TETRA) THEN
+					IF (RX_TETRA) THEN
 						CSXX = CS23
 					ELSE
 						CSXX = CS13
 					END IF			
 				CASE (6250)
-					IF (TX_TETRA) THEN
+					IF (RX_TETRA) THEN
 						CSXX = CS24
 					ELSE
 						CSXX = CS14
 					END IF			
 				CASE (10000)
-					IF (TX_TETRA) THEN
+					IF (RX_TETRA) THEN
 						CSXX = CS25
 					ELSE
 						CSXX = CS15
 					END IF			
 				CASE (12500)
-					IF (TX_TETRA) THEN
+					IF (RX_TETRA) THEN
 						CSXX = CS26
 					ELSE
 						CSXX = CS16
 					END IF			
 				CASE (20000)
-					IF (TX_TETRA) THEN
+					IF (RX_TETRA) THEN
 						CSXX = CS27
 					ELSE
 						CSXX = CS17
