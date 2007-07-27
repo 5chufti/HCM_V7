@@ -32,7 +32,7 @@
 	REAL				I_CBR_D, I_ERP_ref_Tx, I_Prot_margin
 	INTEGER				I, J, IOS
 	CHARACTER*(*)		I_str 
-	LOGICAL				DEBUG
+	LOGICAL				DEBUG, doit
 !
 !
 !	***********************************************************************
@@ -260,7 +260,6 @@
 		WRITE (2,*) " Input value of permissible fs. : ", Perm_FS_input, " dBµV/m"
 		WRITE (2,*) ""
 		WRITE (2,*) "" 
-		WRITE (2,*) ""	
 	END IF
 !
 !	***********************************************************************
@@ -446,13 +445,13 @@
 		  WRITE (2,'(A35, F7.1, A3)') "  Max. range of harmful interfer.: ", CBR_D, " km"
 		  WRITE (2,'(A35, F7.1, A4)') "  E.R.P of reference transmitter : ", ERP_ref_Tx, " dBW"
 		ELSE !	CMODE >= 0
+		  WRITE (2,'(A35, F7.3, A3)') "  Distance Tx -> Rx              : ", Distance, " km"
 		  WRITE (2,*) " Rx co-ordinates calculated     : ", Coo_Rx_new(1:8)," ",Coo_Rx_new(9:15)
 		  WRITE (2,'(A35, F7.1, A7)') "  Calculated field strength      : ", Calculated_FS, " dBuV/m"
 		  WRITE (2,'(A35, F7.1, A7)') "  Permissible field strength     : ", Perm_FS, " dBuV/m"
 		  WRITE (2,'(A19)') "  Protection margin"
 		  WRITE (2,'(A35, F7.1, A3)') "  (Perm_FS - Calculated_FS)      : ", Prot_margin, " dB"
 		END IF ! CMODE
-!
 		WRITE (2,'(A35, F7.1, A3)') "  Distance over sea              : ", D_sea_calculated, " km"
 		WRITE (2,*) " "
 		WRITE (2,*) " "
@@ -565,10 +564,6 @@
 		WRITE (2,*) " "
 		WRITE (2,'(A35,F6.3,A2)') "  Calc. Time                     : ", (Real(Te-Ta)/10000.0), " s"
 		WRITE (2,'(A35, I7, A2)') "  Height of Tx (terrain database): ", H_Datab_Tx, " m"
-		IF (C_mode .GE. 0) THEN 
-		  WRITE (2,'(A35, I7, A2)') "  Height of Rx (terrain database): ", H_Datab_Rx, " m" 
-		  WRITE (2,'(A35, F7.3, A3)') "  Distance Tx -> Rx              : ", Distance, " km"
-		END IF            
 		WRITE (2,'(A35, F7.3, A7)') "  Transmitter clearance angle    : ", Tx_TCA, " degree"
 		WRITE (2,'(A35, F7.2, A3)') "  Tx clearance angle corr. factor: ", Tx_TCA_corr, " dB"
 		WRITE (2,'(A35, F7.1, A2)') "  Effective antenna height of Tx : ", Heff_Tx, " m"
@@ -587,6 +582,7 @@
 		WRITE (2,'(A35, F7.1, A7)') "  Diff.angle hori. (Tx->Rx - Azi): ", H_diff_angle_Tx_Rx, " degree"
 		WRITE (2,'(A35, F7.1, A7)') "  Diff.angle vert. (Tx->Rx - Ele): ", V_diff_angle_Tx_Rx, " degree"
 		IF (C_mode .GE. 0) THEN
+		  WRITE (2,'(A35, I7, A2)') "  Height of Rx (terrain database): ", H_Datab_Rx, " m" 
 		  WRITE (2,'(A37, A5, A7)')	 "  Azimuth of Rx antenna          :   ", Azi_Rx_input, " degree"
 		  WRITE (2,'(A37, A5, A7)')	 "  Elevation of Rx antenna        :   ", Ele_Rx_input, " degree"
 		  WRITE (2,'(A35, F7.3, A7)') "  Receiver clearance angle       : ", Rx_TCA, " degree"
@@ -608,21 +604,24 @@
 		WRITE (2,'(A35, F7.1, A7)') "  Free space field strength      : ", Free_space_FS, " dbuV/m"
 		WRITE (2,*) ""
 !	-------------------------------------------------------
-!	  	WRITE (2,*) " "
-!	    WRITE (2,'(A34, I6)') "  Number of profile points       :", PN
-!		WRITE (2,'(A31, F7.3, A3)') "  profile sampling distance  : ", PD, " km"
-!	    WRITE (2,*) " (First value = Tx-height, last value = Rx-height !)"
-!	    WRITE (2,*) " "
-!	    WRITE (2,*) " Number of normalized profile heights [m]" 
-!	    WRITE (2,*) " "    
-!	    DO I = 1, PN, 10
-!         WRITE (2,'(A1, I6, A2, 10(I5))') " ", I, "  ", &
-!						T_Prof(I), T_Prof(I+1), T_Prof(I+2), &
-!						T_Prof(I+3), T_Prof(I+4), T_Prof(I+5), &
-!						T_Prof(I+6), T_Prof(I+7), T_Prof(I+8), T_Prof(I+9)
-!	    END DO
+!	profilepoints?
+		INQUIRE (FILE='HCM_PR',EXIST=doit)
+		IF (.NOT. doit) GOTO 10
+	  	WRITE (2,*) " "
+	    WRITE (2,'(A34, I6)') "  Number of profile points       :", PN
+		WRITE (2,'(A31, F7.3, A3)') "  profile sampling distance  : ", PD, " km"
+	    WRITE (2,*) " (First value = Tx-height, last value = Rx-height !)"
+	    WRITE (2,*) " "
+	    WRITE (2,*) " Number of normalized profile heights [m]" 
+	    WRITE (2,*) " "    
+	    DO I = 1, PN, 10
+         WRITE (2,'(A1, I6, A2, 10(I5))') " ", I, "  ", &
+						T_Prof(I), T_Prof(I+1), T_Prof(I+2), &
+						T_Prof(I+3), T_Prof(I+4), T_Prof(I+5), &
+						T_Prof(I+6), T_Prof(I+7), T_Prof(I+8), T_Prof(I+9)
+	    END DO
 !	--------------------------------------------------------
-	  END IF ! HCM_Error
+10	  END IF ! HCM_Error
 	  CLOSE (UNIT = 2)
 	END IF ! DEBUG
 !
