@@ -1,6 +1,6 @@
 !
 !	Point_type.f90										P. Benner		09.10.2003
-!														G.H.			30.03.2007
+!														G.H.			16.04.2007
 !
 !	Subroutine to read the morphological type of a given point from the morpho-database.
 !
@@ -121,14 +121,14 @@
 	M_Type = 0	! normal land
 !
 !	split in Integer and Remainder
-	LOD = ABS(INT(Long))
+	LOD = INT(Long)
 	LOR = ABS(NINT(MOD(Long,1D0)*3.6D3))
-	LAD = ABS(INT(Lat))
+	LAD = INT(Lat)
 	LAR = ABS(NINT(MOD(Lat,1D0)*3.6D3))
 !
 	IF (LOR .GE. 3600) THEN
 	  LOR = 0
-	  IF (Long .GE. 0) THEN
+	  IF (LOD .GE. 0) THEN
 		  LOD = LOD + 1
 		ELSE
 		  LOD = LOD - 1
@@ -136,14 +136,14 @@
 	END IF
 	IF (LAR .GE. 3600) THEN
 	  LAR = 0
-	  IF (Lat .GE. 0) THEN
+	  IF (LAD .GE. 0) THEN
 		  LAD = LAD + 1
 		ELSE
 		  LAD = LAD - 1
 	  END IF
 	END IF
 !
-	IF (LAD .LT. 50) THEN 
+	IF (abs(LAD) .LT. 50) THEN 
 		RESH = 100 
 		FN(8:11) = '.33M'
 	  ELSE
@@ -151,15 +151,15 @@
 		FN(8:11) = '.63M'
 	END IF
 !
-	WRITE (FN(2:4), '(I3.3)') LOD
-	IF (Long .GT. -1.0D0) THEN
+	WRITE (FN(2:4), '(I3.3)') ABS(LOD)
+	IF (LOD .GT. -1.0D0) THEN
 		FN(1:1) = 'E'                     
 	  ELSE
 		FN(1:1) = 'W'                     
 	END IF
 !
-	WRITE (FN(6:7), '(I2.2)') LAD
-	IF (Lat .GE. 0.0D0) THEN
+	WRITE (FN(6:7), '(I2.2)') ABS(LAD)
+	IF (LAD .GT. -1.0D0) THEN
 		FN(5:5) = 'N'
 	  ELSE
 		FN(5:5) = 'S'
