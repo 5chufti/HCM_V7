@@ -1,6 +1,6 @@
 !	
 !	HCMMS_V7.F90										P.Benner		23.02.2004
-!														G.H.			30.03.2007
+!														G.H.			24.10.2007
 !	Version 7					
 !
 !	Harmonized Calculation Method for mobile services
@@ -131,6 +131,8 @@
 	  Info(I) = .FALSE.
 	END DO
 !
+	O_FN=""
+	OLD_T=-1
 !	Read all input data:    
 !	correct countrycodes for filenames
 	IF (Land_to(3:3) .EQ. ' ') Land_to(3:3) = '_'
@@ -373,34 +375,15 @@
 !	*																*
 !	*****************************************************************
 !
-!	Is C_mode in defined range? 
-	IF ((C_mode .LT. -8) .OR. ((C_mode .GT. 9) .AND. (C_mode .NE. 99))) THEN
-		HCM_error = 1025
-!		C_mode is out of range
-		RETURN
-	END IF
-!
-!
 !	Default values for Perm_FS, CBR_D, ERP_ref_Tx:
 	CBR_D      = 0.0
 	ERP_ref_Tx = 0.0
 	Perm_FS    = -999.9
-!
-!	Settings of T% and receiver antenna height according to C_mode:
-	IF ((C_mode .EQ. -5) .OR.  (C_mode .EQ. 7))  Time_percentage = 50
-!
-!	Receiver antenna height 'H_AntRx' according to C_mode:
-	IF ((C_mode .EQ. -1) .OR.  (C_mode .EQ. -7)) H_AntRx = 10
-	IF ((C_mode .LE. -2) .AND. (C_mode .GE. -6)) H_AntRx = 3
-	IF (C_mode .EQ. -8) H_AntRx = 3
-!
+	Info(4) = .TRUE.
 !
 !	Determination of permissible interference field strength
 !	"Perm_FS", the max. range of harmful interference "CBR_D" and
 !	the E.R.P. of reference transmitter "ERP_ref_Tx":
-!
-	Info(4) = .TRUE.
-!
 	IF ((Tx_frequency .GE. 29.7) .AND. (Tx_frequency .LE. 47.0)) THEN
 	  Perm_FS = 0.0
 	  CBR_D = 100.0
@@ -471,25 +454,87 @@
 	  Info(4) = .FALSE.
 	END IF
 !
-!	Perm_FS according to CMODE
-	IF ((C_mode .GE. 1) .AND. (C_mode .LE. 4)) Perm_FS = 32.0
-	IF (C_mode .EQ. 5) Perm_FS = 38.0
-	IF (C_mode .EQ. 6) Perm_FS = 42.0
+!	set C_mode depending parameters
+	SELECT CASE (C_mode)
+!	99 = line as P2P
+		CASE (99)
+!			nothing
+!	9 = UMTS / IMT2000 point to point calculations.
+		CASE (9)
+!			nothing
+!	8 = 380 - 400 MHz emergency / security services calcl.
+		CASE (8)
+!			nothing
+!	7 = normal Vienna Agreement coverage calcl. (50% time)
+		CASE (7)
+			Time_percentage = 50
+!	6 = DCS - DCS ML (10 %, EP = 42 dBuV/m)
+		CASE (6)
+			Perm_FS = 42.0
+			Time_percentage = 10
+!	5 = DCS - DCS FB (10 %, EP = 38 dBuV/m)
+		CASE (5)
+			Perm_FS = 38.0
+			Time_percentage = 10
+!	4 = ERMES - ERMES (10 %, EP = 32 dBuV/m)
+		CASE (4)
+			Perm_FS = 32.0
+			Time_percentage = 10
+!	3 = GSM - NMT (10 %, EP = 32 dBuV/m)
+		CASE (3)
+			Perm_FS = 32.0
+			Time_percentage = 10
+!	2 = GSM - TACS (10 %, EP = 32 dBuV/m)
+		CASE (2)
+			Perm_FS = 32.0
+			Time_percentage = 10
+!	1 = GSM - GSM (10 %, EP = 32 dBuV/m)
+		CASE (1)
+			Perm_FS = 32.0
+			Time_percentage = 10
+!	0 = normal Vienna Agreement
+		CASE (0)
+!			nothing
+!	-1 = Coordination line calculation (h2 = 10m)
+		CASE (-1)
+			H_AntRx = 10
+!	-2 = Coordination line calcul. GSM (h2 = 3m)
+		CASE (-2)
+			Perm_FS = 19.0
+			H_AntRx = 3
+!	-3 = Coordination line calcul. ERMES (h2 = 3m), EP = 12 dBuV/m, 10 %
+		CASE (-3)
+			Perm_FS = 12.0
+			Time_percentage = 10
+			H_AntRx = 3
+!	-4 = Coordination line calcul. ERMES (h2 = 3m), EP = 32 dBuV/m, 10 %
+		CASE (-4)
+			Perm_FS = 32.0
+			Time_percentage = 10
+			H_AntRx = 3
+!	-5 = Coordination line calcul. ERMES (h2 = 3m), EP = 52 dBuV/m, 50 %
+		CASE (-5)
+			Perm_FS = 52.0
+			Time_percentage = 50
+			H_AntRx = 3
+!	-6 = Coordination line calcul. DCS (h2 = 3m), EP = 25 dBuV/m, 10 %
+		CASE (-6)
+			Perm_FS = 25.0
+			Time_percentage = 10
+			H_AntRx = 3
+!	-7 = 380 - 400 MHz emergency / security services line calcl.
+		CASE (-7)
+			H_AntRx = 10
+!	-8 = UMTS / IMT2000 line calcl.
+		CASE (-8)
+			Time_percentage = 10
+			H_AntRx = 3
+!	C_mode is out of range
+		CASE DEFAULT
+			HCM_error = 1025
+			RETURN
 !
-!		GSM 900 (border-) line calculations:
-	IF (C_mode .EQ. -2) Perm_FS = 19.0
-!
-!		ERMES 12 dBuV/m:
-	IF (C_mode .EQ. -3) Perm_FS = 12.0
-!
-!		ERMES 32 dBuV/m:
-	IF ((C_mode .EQ. -4) .OR. (C_mode .EQ. 4)) Perm_FS = 32.0
-!
-!		ERMES 52 dBuV/m:
-	IF (C_mode .EQ. -5) Perm_FS = 52.0
-!
-!		GSM 1800 25 dBuV/m (line):
-	IF (C_mode .EQ. -6) Perm_FS = 25.0
+	END SELECT
 !
 	Perm_FS_from_table = Perm_FS
 !

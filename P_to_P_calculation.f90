@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			01.06.2007
+!														G.H.			24.10.2007
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -225,6 +225,7 @@
 !		Calculate new co-ordinates:
 		CALL Position_of_mobile ( LongTx, LatTx, LongRx, LatRx, &
 					New_LongTx, New_LatTx, New_LongRx, New_LatRx )
+		IF (HCM_Error .NE. 0) RETURN
 	ELSE
 		New_LongTx = LongTx
 		New_LatTx  = LatTx
@@ -234,7 +235,6 @@
 !
 	CALL CooConv (New_LongTx, New_LatTx, Coo_Tx_new)
 	CALL CooConv (New_LongRx, New_LatRx, Coo_Rx_new)
-	IF ((HCM_Error .NE. 0) .OR. Info(7)) RETURN
 !
 !	GOTO 10
 !------- necessary to redo convertion due to rounding errors ------------
@@ -502,7 +502,7 @@
 !	  Calculate Tx_TCA:
 		Tx_TCA = -90.0
 		IF (Distance .GE. 1.6D1) THEN
-			J = DNINT(1.6D1 / PD)
+			J = NINT(1.6D1 / PD)
 		ELSE
 			J = PN - 2
 		END IF
@@ -524,7 +524,7 @@
 !	  Calculate Rx_TCA:
 		Rx_TCA = -90.0
 		IF (Distance .GE. 1.6D1) THEN
-			J = DNINT(1.6D1 / PD)
+			J = NINT(1.6D1 / PD)
 		ELSE
 			J = PN - 2
 		END IF
@@ -550,8 +550,8 @@
 	    D1 = NINT(REAL(PN) / 15.0)
 		D2 = PN - 1
 	ELSE
-		D1 = DNINT(1D0 / PD)  
-		D2 = DNINT(1.5D1 / PD)
+		D1 = NINT(1D0 / PD)  
+		D2 = NINT(1.5D1 / PD)
 	END IF
 !
 !	Transmitter:

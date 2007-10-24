@@ -1,6 +1,6 @@
 !
 !	Line_calculation.f90								P.Benner		23.11.2004
-!														G.H.			21.06.2007
+!														G.H.			24.10.2007
 !
 !	23.11.2004	Steps from 100 / 10 / 1 modified to 25 / 5 / 1
 !
@@ -162,12 +162,8 @@
 			IF (.NOT. Take_it) GOTO 70
 		  END IF
 		  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx)
-		  IF (Info(7)) THEN
-!		    Distance between Tx and Rx is less than both service area radius.
-		    RETURN
-		  END IF
 		  IF (HCM_Error .EQ. 1028) GOTO 70	! Distance > 1000 km
-		  IF (HCM_Error .NE. 0) RETURN
+		  IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
 !		  Find maximun of field strength:
 		  IF (Calculated_FS .GE. FS_x) THEN
 			FS_x = Calculated_FS
@@ -208,13 +204,8 @@
 		IF (.NOT. Take_it) GOTO 100
 	  END IF
 	  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx )
-	  IF (Info(7)) THEN
-!	    Distance between Tx and Rx is less than both service area radius.
-	    RETURN
-	  END IF
-
 	  IF (HCM_Error .EQ. 1028) GOTO 100	! Distance > 1000 km
-	  IF (HCM_Error .NE. 0) RETURN
+	  IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
 	  CALL Manage_List (N_rec, N_List, Rec_N_list, FS_list, Calculated_FS)
 100	  N_rec = N_rec + teststep
 	END DO
@@ -263,12 +254,8 @@
 					IF (.NOT. Take_it) GOTO 110
 				  END IF
 				  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx )
-				  IF (Info(7)) THEN
-!				    Distance between Tx and Rx is less than both service area radius.
-				    RETURN
-				  END IF
 				  IF (HCM_Error .EQ. 1028) GOTO 110	! Distance > 1000 km
-				  IF (HCM_Error .NE. 0) RETURN
+				  IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
 			  END IF
 			  CALL Manage_List (J, N_List1, Rec_N_list1, FS_list1, Calculated_FS)
 110			  CONTINUE
@@ -320,12 +307,8 @@
 					IF (.NOT. Take_it) GOTO 120
 				  END IF
 				  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx )
-				  IF (Info(7)) THEN
-!				    Distance between Tx and Rx is less than both service area radius.
-				    RETURN
-				  END IF
 				  IF (HCM_Error .EQ. 1028) GOTO 120	! Distance > 1000 km
-				  IF (HCM_Error .NE. 0) RETURN
+				  IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
 			  END IF
 			  CALL Manage_List (J, N_List, Rec_N_list, FS_list, Calculated_FS)
 120			  CONTINUE
@@ -358,12 +341,8 @@
 			IF (.NOT. Take_it) GOTO 130
 		  END IF
 		  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx )
-		  IF (Info(7)) THEN
-!		    Distance between Tx and Rx is less than both service area radius.
-		    RETURN
-		  END IF
 		  IF (HCM_Error .EQ. 1028) GOTO 130	! Distance > 1000 km
-		  IF (HCM_Error .NE. 0) RETURN
+		  IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
 !		  Find maximun of field strength:
 		  IF (Calculated_FS .GE. FS_x) THEN
 			FS_x = Calculated_FS

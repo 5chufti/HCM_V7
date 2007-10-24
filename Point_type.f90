@@ -122,9 +122,9 @@
 !
 !	split in Integer and Remainder
 	LOD = INT(Long)
-	LOR = ABS(NINT(MOD(Long,1D0)*3.6D3))
+	LOR = ANINT(MOD(Long,1D0)*3.6D3)
 	LAD = INT(Lat)
-	LAR = ABS(NINT(MOD(Lat,1D0)*3.6D3))
+	LAR = ANINT(MOD(Lat,1D0)*3.6D3)
 !
 	IF (LOR .GE. 3600) THEN
 	  LOR = 0
@@ -143,7 +143,7 @@
 	  END IF
 	END IF
 !
-	IF (abs(LAD) .LT. 50) THEN 
+	IF (ABS(LAD) .LT. 50) THEN 
 		RESH = 100 
 		FN(8:11) = '.33M'
 	  ELSE

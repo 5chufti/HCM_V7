@@ -34,8 +34,8 @@
 !	*******************************************************************
 !	prepare usefull values
 	N = 0
-	I = DNINT(4.5D0 / PD)
-	L = DNINT(2.5D1 / PD)
+	I = NINT(4.5D0 / PD)
+	L = NINT(2.5D1 / PD)
 !	Starting number of profile point 'PStart' and ending number 'PStop'
 !
 	IF (Distance .LE. 5.0D1) THEN
