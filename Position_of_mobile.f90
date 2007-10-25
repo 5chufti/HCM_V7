@@ -1,6 +1,6 @@
 !
 !	Position_of_mobile.f90								P. Benner		29.11.2004
-!														G.H.			24.10.2007
+!														G.H.			25.10.2007
 !
 !	Subroutine to calculate the new position of Tx (New_LongTx, New_LatTx)
 !	and/or Rx (New_LongRx, New_latRx) if at least one is a mobile and
@@ -89,6 +89,7 @@
 !			Calculate the new Rx co-ordinates:
 			CALL New_coordinates (LongRx, LatRx, Dir_Rx_Tx, Rx_serv_area, New_LongRx, New_LatRx)
 		  END IF
+		  CALL Calc_distance (New_LongTx, New_LatTx, New_LongRx, New_LatRx, Distance)
 	  END IF
 	  RETURN
 	END IF

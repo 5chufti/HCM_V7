@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			24.10.2007
+!														G.H.			01.06.2007
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -225,7 +225,6 @@
 !		Calculate new co-ordinates:
 		CALL Position_of_mobile ( LongTx, LatTx, LongRx, LatRx, &
 					New_LongTx, New_LatTx, New_LongRx, New_LatRx )
-		IF (HCM_Error .NE. 0) RETURN
 	ELSE
 		New_LongTx = LongTx
 		New_LatTx  = LatTx
@@ -235,6 +234,8 @@
 !
 	CALL CooConv (New_LongTx, New_LatTx, Coo_Tx_new)
 	CALL CooConv (New_LongRx, New_LatRx, Coo_Rx_new)
+	IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
+
 !
 !	GOTO 10
 !------- necessary to redo convertion due to rounding errors ------------

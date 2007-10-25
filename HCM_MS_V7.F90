@@ -501,6 +501,7 @@
 !	-2 = Coordination line calcul. GSM (h2 = 3m)
 		CASE (-2)
 			Perm_FS = 19.0
+			Time_percentage = 10
 			H_AntRx = 3
 !	-3 = Coordination line calcul. ERMES (h2 = 3m), EP = 12 dBuV/m, 10 %
 		CASE (-3)
@@ -524,7 +525,7 @@
 			H_AntRx = 3
 !	-7 = 380 - 400 MHz emergency / security services line calcl.
 		CASE (-7)
-			H_AntRx = 10
+!			nothing
 !	-8 = UMTS / IMT2000 line calcl.
 		CASE (-8)
 			Time_percentage = 10
