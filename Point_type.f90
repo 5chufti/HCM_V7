@@ -122,9 +122,9 @@
 !
 !	split in Integer and Remainder
 	LOD = INT(Long)
-	LOR = ANINT(MOD(Long,1D0)*3.6D3)
+	LOR = ABS(NINT(MOD(Long,1D0)*3.6D3))
 	LAD = INT(Lat)
-	LAR = ANINT(MOD(Lat,1D0)*3.6D3)
+	LAR = ABS(NINT(MOD(Lat,1D0)*3.6D3))
 !
 	IF (LOR .GE. 3600) THEN
 	  LOR = 0
