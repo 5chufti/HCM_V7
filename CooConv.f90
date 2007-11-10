@@ -1,5 +1,6 @@
 !
 !	CooConv.f90											P. Benner		15.12.2003
+!														G.Harasek       10.11.2008
 !
 !	This subroutine converts co-ordinates from numbers
 !	(longitude, latitude) to a string.
@@ -18,12 +19,11 @@
 	Lo = Long
 	La = Lat
 	Coo = '               '
-	IF (Lo .LT. 0.0D0) Lo = 3.6D2 + Lo
-	IF (Lo .LE. 1.8D2) THEN
+	IF (Lo .GE. 0D0) THEN
 		Coo(4:4) = 'E'
 	  ELSE
 		Coo(4:4) = 'W'
-		Lo = 3.6D2 - Lo
+		Lo = -1.0D0 * Lo
 	END IF               
 	IF (La .GE. 0.0D0) THEN
 		Coo(11:11) = 'N'

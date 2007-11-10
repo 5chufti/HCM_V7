@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			01.06.2007
+!														G.H.			10.11.2008
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -253,6 +253,7 @@
 	New_LatTx = New_LatTx + CI / 6.0D1
 	READ (Coo_Tx_new(14:15), '(F2.0)', IOSTAT = IOS) CI
 	New_LatTx = New_LatTx + CI / 3.6D3
+	IF (Coo_Tx_new(11:11) .EQ. 'S') New_LatTx = 0D0 - New_LatTx
 !
 !   Get the longitude of receiver 'LongRx':
 	READ (Coo_Rx_new(1:3), '(F3.0)', IOSTAT=IOS) New_LongRx
@@ -268,6 +269,7 @@
 	New_LatRx = New_LatRx + CI / 6.0D1
 	READ (Coo_Rx_new(14:15), '(F2.0)', IOSTAT=IOS) CI
 	New_LatRx = New_LatRx + CI / 3.6D3
+	IF (Coo_Rx_new(11:11) .EQ. 'S') New_LatRx = 0D0 - New_LatRx
 !
 !------------------------------------------------------------------------
 !
@@ -670,7 +672,7 @@
 	IF ((Distance .GT. 10.0) .AND. (D_sea_calculated .LT. Distance)) THEN
 !		Calculate delta-h
 		CALL Dh_calculation ()
-		CALL Dh_orrection (Dh, Distance, Tx_frequency, Dh_corr)
+		CALL Dh_Correction (Dh, Distance, Tx_frequency, Dh_corr)
 	  ELSE
 		Dh = 50.0
 		Dh_corr = 0.0

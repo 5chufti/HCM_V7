@@ -1,6 +1,6 @@
 !	
 !	HCMMS_V7.F90										P.Benner		23.02.2004
-!														G.H.			24.10.2007
+!														G.H.			10.11.2008
 !	Version 7					
 !
 !	Harmonized Calculation Method for mobile services
@@ -113,7 +113,7 @@
 !
 !	***************************************************************************
 !
-	Version = '7.14'
+	Version = '7.15'
 !
 	HCM_error = 0
 !
@@ -161,7 +161,7 @@
 	  RETURN
 	END IF
 	LongTx = LongTx + CI / 3.6D3
-	IF (Coo_Tx(4:4) .EQ. 'W') LongTx = 3.6D2 - LongTx
+	IF (Coo_Tx(4:4) .EQ. 'W') LongTx = 0D0 - LongTx
 	IF ((Coo_Tx(4:4).NE.'E') .AND. (Coo_Tx(4:4).NE.'W')) THEN
 	  HCM_error = 1004
 !	  Error in geographical coordinates (Tx longitude, E/W)
@@ -189,7 +189,8 @@
 	  RETURN
 	END IF
 	LatTx = LatTx + CI / 3.6D3
-	IF (Coo_Tx(11:11) .NE. 'N') THEN
+	IF (Coo_Tx(11:11) .EQ. 'S') LatTx = 0D0 - LatTx
+	IF ((Coo_Tx(11:11) .NE. 'N') .AND. (Coo_Tx(11:11) .NE. 'S')) THEN
 	  HCM_error = 1008
 !	  Error in geographical coordinates (Tx latitude, N/S)
 	  RETURN
@@ -291,7 +292,8 @@
 		RETURN
 	  END IF
 	  LatRx = LatRx + CI / 3.6D3
-	  IF (Coo_Rx(11:11) .NE. 'N') THEN
+	  IF (Coo_Rx(11:11) .EQ. 'S') LatRx = 0D0 - LatRx
+	  IF ((Coo_Rx(11:11) .NE. 'N') .AND. (Coo_Rx(11:11) .NE. 'S')) THEN
 		HCM_error = 1021
 !		Error in geographical coordinates (Rx latitude, N/S)
 		RETURN
