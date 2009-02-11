@@ -610,9 +610,8 @@
 	  	WRITE (2,*) " "
 	    WRITE (2,'(A34, I6)') "  Number of profile points       :", PN
 		WRITE (2,'(A31, F7.3, A3)') "  profile sampling distance  : ", PD, " km"
-	    WRITE (2,*) " (First value = Tx-height, last value = Rx-height !)"
 	    WRITE (2,*) " "
-	    WRITE (2,*) " Number of normalized profile heights [m]" 
+	    WRITE (2,*) " (p2p: normalized) profile heights Tx -> Rx [m]" 
 	    WRITE (2,*) " "    
 	    DO I = 1, PN, 10
          WRITE (2,'(A1, I6, A2, 10(I5))') " ", I, "  ", &
