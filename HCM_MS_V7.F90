@@ -27,6 +27,7 @@
 	DOUBLE PRECISION	CI, LongTx, LatTx, LongRx, LatRx
 	INTEGER*4			I, IOS, IMR
 	CHARACTER*376		Strings
+	LOGICAL				time50
 !
 	EQUIVALENCE			(Strings,Sea_temperature)
 !
@@ -578,6 +579,10 @@
 !
 !	Sea temparatur:
 	IF (Sea_temperature .NE. 'W') Sea_temperature = 'C'
+!
+!	50% time?
+	INQUIRE (FILE='HCM_T50',EXIST=time50)
+	IF (time50) Time_percentage = 50
 !
 !	**************************************************************
 !
