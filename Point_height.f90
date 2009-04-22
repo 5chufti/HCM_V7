@@ -1,6 +1,6 @@
 !
 !	Point_height.F90									P.Benner		20.11.2003
-!														G.H.			 7.11.2008
+!														G.H.			22.04.2009
 !
 !	Subroutine to read the height of a given point from the terrain-database.
 !
@@ -124,11 +124,11 @@
 	Height = -9999.9
 !
 !	convert Longitude, split in Integer and Remainder
-	Lo  = MOD(Long + 3.6D2,3.6D2)
-	LOR = NINT(MOD(Lo,1D0)*3.6D3)
+	Lo  = DMOD(Long + 3.6D2,3.6D2)
+	LOR = DNINT(DMOD(Lo,1D0)*3.6D3)
 	LOD = INT(Lo)
-	La  = MOD(Lat + 9D1,9D1)
-	LAR = NINT(MOD(La,1D0)*3.6D3)
+	La  = DMOD(Lat + 9D1,9D1)
+	LAR = DNINT(DMOD(La,1D0)*3.6D3)
 	LAD = INT(La)
 !
 	IF (LOR .GT. 3599) LOR = 3599
@@ -136,21 +136,21 @@
 !
 	IF (LOD .LT. 1.8D2) THEN
 		FN(1:1) = 'E'                     
-	    WRITE (FN(2:4), '(I3.3)') LOD
 	  ELSE
 		FN(1:1) = 'W'
-		WRITE (FN(2:4), '(I3.3)') 360-LOD
+		LOD = 360-LOD
 	END IF
+	WRITE (FN(2:4), '(I3.3)') LOD
 !
 	IF (Lat .GT. 0.0D0) THEN
 		FN(5:5) = 'N'
-		WRITE (FN(6:7), '(I2.2)') LAD
 	  ELSE
 		FN(5:5) = 'S'
-		WRITE (FN(6:7), '(I2.2)') 90-LAD
+		LAD = 90-LAD
 	END IF
+	WRITE (FN(6:7), '(I2.2)') LAD
 !
-	IF ((Lat .LT. 5D1) .AND. (Lat .GE. -5D1)) THEN 
+	IF (LAD .LT. 50) THEN 
 		RESH = 100  
 		FN(8:11) = '.33E'
 	  ELSE
@@ -193,8 +193,8 @@
 	END IF
 !
 !	coordinates of P relativ to P1
-	LORR = MOD(EH,1D0)
-	LARR = MOD(EV,1D0)
+	LORR = DMOD(EH,1D0)
+	LARR = DMOD(EV,1D0)
 !	calculate height P
 	H12 = DBLE(H1) + DBLE(H2 - H1) * LORR
 	H34 = DBLE(H3) + DBLE(H4 - H3) * LORR
