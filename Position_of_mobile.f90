@@ -1,6 +1,6 @@
 !
 !	Position_of_mobile.f90								P. Benner		29.11.2004
-!														G.H.			25.10.2007
+!														G.H.			08.05.2009
 !
 !	Subroutine to calculate the new position of Tx (New_LongTx, New_LatTx)
 !	and/or Rx (New_LongRx, New_latRx) if at least one is a mobile and
@@ -336,7 +336,7 @@
 	N_LONG = DACOSD(T)
 	IF (DIR .LT. 1.8D2) N_LONG = LONG + N_LONG
 	IF (DIR .GT. 1.8D2) N_LONG = LONG - N_LONG
-	IF (N_LONG .LT. 0.0D0) N_LONG = 3.6D2 + N_LONG
+!	IF (N_LONG .LT. 0.0D0) N_LONG = 3.6D2 + N_LONG
 !
 	RETURN
 !
