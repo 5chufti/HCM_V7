@@ -25,7 +25,11 @@
 !	calc dist
 	a = DSIND((ele - eleM) / 2D0)**2D0 + DCOSD(eleM) * DCOSD(ele) & 
 		* DSIND((azi - aziM) / 2D0)**2D0
-	d = 2D0 * DATAN2D(DSQRT(a), DSQRT(1D0 - a))
+	IF (a .GE. 1D0) THEN
+		d = 180D0
+	ELSE
+		d = 2D0 * DATAN2D(DSQRT(a), DSQRT(1D0 - a))
+	ENDIF
 !	calc bearing
 	b = DATAN2D(DSIND(azi - aziM) * DCOSD(ele), &
 		DCOSD(eleM) * DSIND(ele) - DSIND(eleM) * DCOSD(ele) * DCOSD(azi - aziM))

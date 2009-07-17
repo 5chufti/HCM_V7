@@ -1,6 +1,6 @@
 !
 !	Point_type.f90										P. Benner		09.10.2003
-!														G.H.			22.04.2009
+!														G.H.			17.07.2009
 !
 !	Subroutine to read the morphological type of a given point from the morpho-database.
 !
@@ -142,7 +142,7 @@
 	END IF
 	WRITE (FN(2:4), '(I3.3)') LOD
 !
-	IF (Lat .GT. 0.0D0) THEN
+	IF (Lat .GE. 0.0D0) THEN
 		FN(5:5) = 'N'
 	  ELSE
 		FN(5:5) = 'S'
@@ -150,7 +150,7 @@
 	END IF
 	WRITE (FN(6:7), '(I2.2)') LAD
 !
-	IF (LAD .LT. 50) THEN 
+	IF (LAD .LT. 5D1) THEN 
 		RESH = 100  
 		FN(8:11) = '.33M'
 	  ELSE

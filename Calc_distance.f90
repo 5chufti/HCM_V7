@@ -17,6 +17,9 @@
 !
 	T = DSIND((LatB - LatA) / 2D0)**2D0 + DCOSD(LatA) * DCOSD(LatB) &
 					* DSIND((LonB - LonA) / 2D0)**2D0
+!
+!	calculating between two antipodes will raise a runtime error because T=1
+!
 	D = 2D0 * 6.37129D3 * DATAN2(DSQRT(T), DSQRT(1D0 - T)) 
 !
 	RETURN
