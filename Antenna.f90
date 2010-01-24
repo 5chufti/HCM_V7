@@ -1,6 +1,6 @@
 !
 !	Antenna.f90											P. Benner		14.03.2000
-!														G.H.			 5.10.2005
+!														G.H.			22.01.2010
 !						                                
 !
 !	Subroutine to calculate the gain (loss) of an antenna.
@@ -172,7 +172,7 @@
 		  RHO   = SQRT(X)
 	  END IF
 !
-	ELSEIF (TPE .EQ. 'TA') THEN
+	ELSEIF ((TPE .EQ. 'TA') .OR. (TPE(1:1) .EQ. 'P')) THEN
      IF ((LEAD .LT. 1.0) .OR. (LEAD .GT. 890.0)) THEN
 		Error = 1038
 		RETURN

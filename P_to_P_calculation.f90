@@ -441,7 +441,8 @@
 !	  Add 10 m to all hz except the 1st and last km of the distance:
 !	  (If distance is less than 2 km, no addition is done !)
 !
-	  IF (Distance .GT. 2.0) THEN
+	  INQUIRE (FILE='HCM_SRTM',EXIST=null)
+	  IF ((Distance .GT. 2.0) .AND. (.NOT. null)) THEN
 		I1 = NINT(1D0 / PD)
 		I2 = NINT((Distance - 1D0) / PD)
 		DO I = I1, I2

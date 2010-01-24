@@ -1,6 +1,6 @@
 !
 !	Line_calculation.f90								P.Benner		23.11.2004
-!														G.H.			24.10.2007
+!														G.H.			22.01.2010
 !
 !	23.11.2004	Steps from 100 / 10 / 1 modified to 25 / 5 / 1
 !
@@ -356,25 +356,27 @@
 !
 !	5th: calculate to point of maximum field strength again to get all
 !		 output values:
-140	READ (3, REC=Rec_N_x, IOSTAT=IOS) C_Record
-	IF (IOS .NE. 0) THEN   
-	  HCM_Error = 1049
-!	  Error in line data
-	  RETURN
-	END IF
-	CLOSE (UNIT = 3)
-	LongRx = N_Record(Rec_x)   * RB
-	LatRx  = N_Record(Rec_x+1) * RB
-	Lo = LongTx
-	La = LatTx
-	IF (CBR) THEN
-	  CALL CBR_Coordinates (LongRx, LatRx, Lo, La, &
+140	IF (Rec_N_x .GT. 0) THEN
+	  READ (3, REC=Rec_N_x, IOSTAT=IOS) C_Record
+	  IF (IOS .NE. 0) THEN   
+		HCM_Error = 1049
+!		Error in line data
+		RETURN
+	  END IF
+	  CLOSE (UNIT = 3)
+	  LongRx = N_Record(Rec_x)   * RB
+	  LatRx  = N_Record(Rec_x+1) * RB
+	  Lo = LongTx
+	  La = LatTx
+	  IF (CBR) THEN
+		CALL CBR_Coordinates (LongRx, LatRx, Lo, La, &
 							  CBR_D, Tx_serv_area, Take_it)
-	  IF (.NOT. Take_it) RETURN
+	    IF (.NOT. Take_it) RETURN
+	  END IF
+	  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx )
+    ELSE
+	  HCM_Error = 1047
 	END IF
-	CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx )
-!
-	RETURN
 !
 	END SUBROUTINE Line_calculation
 !

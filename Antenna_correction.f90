@@ -1,6 +1,6 @@
 !
 !	Antenna_correction.f90
-!														G.H.			5.10.2005
+!														G.H.		22.01.2010
 !
 	SUBROUTINE Ctransf (azi,aziM,ele,eleM,hda,vda)
 !
@@ -69,21 +69,35 @@
 !
 	IMPLICIT	NONE
 !
+	CHARACTER*1			ty
 	CHARACTER*7			hCod, vCod
 	INTEGER*4			Error
 	REAL				hda, vda, a
-	DOUBLE PRECISION	azi, aziM, ele, eleM
+	DOUBLE PRECISION	azi, aziM, ele, eleM, Eele, Mele
 !
 	REAL				vfe, vbe, hb, vb, h, k
 	REAL				delv, w, w1, w2, vae, va0, ra
 !
 !	electrical or mechanical tilting needs different 'total' angle
 !
-	IF (vCod(4:5) .EQ. 'TA') THEN
-		hda = azi - aziM
-		vda = ele - eleM
+	a=1
+	ty = vCod(4:4)
+	IF ((ty .EQ. 'T') .OR. (ty .EQ. 'P')) THEN
+		IF (ty .EQ. 'T') THEN
+			Eele = eleM
+			Mele = 0.0
+		ELSE
+			Eele = 65-ICHAR(vCod(5:5))
+			Mele = eleM
+		ENDIF
+		CALL Ctransf (azi,aziM,ele,Mele,hda,vda)
+		CALL Antenna (hCod, hda, hb, Error)
+		CALL Antenna (vCod, (vda-Eele), vb, Error)
+        w = (1.0 + COSD(2.0 * vda)) / 2.0
+        a = (hb * w + (1.0 - w)) * vb
+		GOTO 10
 	ELSE
-		CALL Ctransf (azi,aziM,ele,eleM,hda,vda)
+		CALL Ctransf (azi,aziM,ele,Mele,hda,vda)
 	ENDIF
 !
 !	prepare needed values for further calculations
@@ -100,6 +114,8 @@
 		CALL Antenna (vCod, 180.0, vb, Error)
 	ENDIF
 !
+	IF (Error .NE. 0) RETURN
+!
 !	check if only vertical diagram relevant
 !
 	IF (hda .EQ. 0.0 .OR. hCod(4:5) .EQ. 'ND') THEN
@@ -111,13 +127,6 @@
 	ENDIF
 !
 	IF (Error .NE. 0) RETURN
-!
-	IF (vCod(4:5) .EQ. 'TA') THEN
-!
-!	no matching etc. needed for el. tilted antenna
-!
-		a = h * vfe
-	ELSE
 !
 !	match H and V backlobe
 !
@@ -168,8 +177,6 @@
 !	
 	  ra = h / va0
 	  a = vae * SQRT(SIND(vda)**2.0 + (ra * COSD(vda))**2.0)
-!
-	ENDIF
 !
 10	IF (a .LT. 0.01) a=0.01
 	IF (a .GT. 1.0) a=1.0
