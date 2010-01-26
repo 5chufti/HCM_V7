@@ -1,6 +1,6 @@
 !
 !	Antenna_correction.f90
-!														G.H.		22.01.2010
+!														G.H.		26.01.2010
 !
 	SUBROUTINE Ctransf (azi,aziM,ele,eleM,hda,vda)
 !
@@ -73,9 +73,10 @@
 	CHARACTER*7			hCod, vCod
 	INTEGER*4			Error
 	REAL				hda, vda, a
-	DOUBLE PRECISION	azi, aziM, ele, eleM, Eele, Mele
+	DOUBLE PRECISION	azi, aziM, ele, eleM
 !
-	REAL				vfe, vbe, hb, vb, h, k
+	DOUBLE PRECISION	Mele
+	REAL				vfe, vbe, hb, vb, h, k, Eele
 	REAL				delv, w, w1, w2, vae, va0, ra
 !
 !	electrical or mechanical tilting needs different 'total' angle
@@ -84,10 +85,10 @@
 	ty = vCod(4:4)
 	IF ((ty .EQ. 'T') .OR. (ty .EQ. 'P')) THEN
 		IF (ty .EQ. 'T') THEN
-			Eele = eleM
+			Eele = real(eleM)
 			Mele = 0.0
 		ELSE
-			Eele = 65-ICHAR(vCod(5:5))
+			Eele = real(65-ICHAR(vCod(5:5)))
 			Mele = eleM
 		ENDIF
 		CALL Ctransf (azi,aziM,ele,Mele,hda,vda)
