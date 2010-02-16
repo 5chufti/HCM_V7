@@ -1,6 +1,6 @@
 !
 !	Antenna_correction.f90
-!														G.H.		26.01.2010
+!														G.H.		16.02.2010
 !
 	SUBROUTINE Ctransf (azi,aziM,ele,eleM,hda,vda)
 !
@@ -69,65 +69,69 @@
 !
 	IMPLICIT	NONE
 !
-	CHARACTER*1			ty
 	CHARACTER*7			hCod, vCod
 	INTEGER*4			Error
 	REAL				hda, vda, a
 	DOUBLE PRECISION	azi, aziM, ele, eleM
 !
-	DOUBLE PRECISION	Mele
-	REAL				vfe, vbe, hb, vb, h, k, Eele
+	REAL				vfe, vbe, hb, vb, h, k, eleE, dEle
 	REAL				delv, w, w1, w2, vae, va0, ra
 !
-!	electrical or mechanical tilting needs different 'total' angle
+!	electrical or mechanical tilting needs different h/v smoothing
 !
-	a=1
-	ty = vCod(4:4)
-	IF ((ty .EQ. 'T') .OR. (ty .EQ. 'P')) THEN
-		IF (ty .EQ. 'T') THEN
-			Eele = real(eleM)
-			Mele = 0.0
-		ELSE
-			Eele = real(65-ICHAR(vCod(5:5)))
-			Mele = eleM
-		ENDIF
-		CALL Ctransf (azi,aziM,ele,Mele,hda,vda)
+	a=1.0
+	IF (vCod(4:4) .EQ. 'T') THEN
+		hda = REAL(azi-aziM)
+		vda =REAL(ele-eleM)
 		CALL Antenna (hCod, hda, hb, Error)
-		CALL Antenna (vCod, (vda-Eele), vb, Error)
-        w = (1.0 + COSD(2.0 * vda)) / 2.0
-        a = (hb * w + (1.0 - w)) * vb
-		GOTO 10
+		CALL Antenna (vCod, vda, vb, Error)
+		w = (1.0 + COSD(2.0 * ele)) / 2.0
+		a = (hb * w + (1.0 - w)) * vb
+	ELSEIF (vCod(4:4) .EQ. 'P') THEN
+		CALL Ctransf (azi,aziM,ele,eleM,hda,vda)
+		eleE = REAL(65-ICHAR(vCod(5:5)))
+		dEle = vda - eleE
+		CALL Antenna (hCod, hda, hb, Error)
+		CALL Antenna (vCod, dEle, vb, Error)
+		k = (90.0 + eleE) / 90.0
+		IF (dEle .GT. 0.0) THEN
+			w1 = dEle * k
+		ELSE
+			w1 = dEle / k
+		ENDIF
+		w = ((1.0 + COSD(2.0 * w1)) / 2.0) ** 6.0
+		CALL Antenna (vCod, 180.0, w2, Error)
+		a = MAX(hb*vb,(hb * w + (1.0 - w)) * w2)
 	ELSE
-		CALL Ctransf (azi,aziM,ele,Mele,hda,vda)
-	ENDIF
+	  CALL Ctransf (azi,aziM,ele,eleM,hda,vda)
 !
 !	prepare needed values for further calculations
 !
 !	check if only horizontal diagram relevant
 !
-	IF (vda .EQ. 0.0 .OR. vCod(4:5) .EQ. 'ND') THEN
+	  IF (vda .EQ. 0.0 .OR. vCod(4:5) .EQ. 'ND') THEN
 		vfe = 1.0
 		vbe = 1.0
 		vb = 1.0
-	ELSE
+	  ELSE
 		CALL Antenna (vCod, -vda, vfe, Error)
 		CALL Antenna (vCod, (180.0 + vda), vbe, Error)
 		CALL Antenna (vCod, 180.0, vb, Error)
-	ENDIF
+	  ENDIF
 !
-	IF (Error .NE. 0) RETURN
+	  IF (Error .NE. 0) RETURN
 !
 !	check if only vertical diagram relevant
 !
-	IF (hda .EQ. 0.0 .OR. hCod(4:5) .EQ. 'ND') THEN
+	  IF (hda .EQ. 0.0 .OR. hCod(4:5) .EQ. 'ND') THEN
 		h = 1.0
 		hb = 1.0
-	ELSE
+	  ELSE
 		CALL Antenna (hCod, hda, h, Error)
 		CALL Antenna (hCod, 180.0, hb, Error)
-	ENDIF
+	  ENDIF
 !
-	IF (Error .NE. 0) RETURN
+	  IF (Error .NE. 0) RETURN
 !
 !	match H and V backlobe
 !
@@ -179,7 +183,9 @@
 	  ra = h / va0
 	  a = vae * SQRT(SIND(vda)**2.0 + (ra * COSD(vda))**2.0)
 !
-10	IF (a .LT. 0.01) a=0.01
+	ENDIF
+!
+	IF (a .LT. 0.01) a=0.01
 	IF (a .GT. 1.0) a=1.0
 	a = -20.0 * LOG10(a)
 	RETURN
