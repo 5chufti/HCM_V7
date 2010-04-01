@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			10.11.2008
+!														G.H.			01.04.2010
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -669,7 +669,8 @@
 !	*								
 !	*****************************************************************
 !
-	IF ((Distance .GT. 10.0) .AND. (D_sea_calculated .LT. Distance)) THEN
+	IF ((Distance .GT. 10.0) .AND. (D_sea_calculated .LT. Distance) &
+		.AND. (C_Mode .GE. 0) .AND. (C_Mode .LT. 99)) THEN
 !		Calculate delta-h
 		CALL Dh_calculation ()
 		CALL Dh_Correction (Dh, Distance, Tx_frequency, Dh_corr)
