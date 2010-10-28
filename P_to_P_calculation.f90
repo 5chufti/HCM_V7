@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			01.04.2010
+!														G.H.			28.10.2010
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -234,7 +234,6 @@
 !
 	CALL CooConv (New_LongTx, New_LatTx, Coo_Tx_new)
 	CALL CooConv (New_LongRx, New_LatRx, Coo_Rx_new)
-	IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
 
 !
 !	GOTO 10
@@ -278,8 +277,11 @@
 !
 	IF (Distance .LT. PD) THEN
 !	  Distance between Tx and Rx = 0. Calculations not possible.
-	  HCM_error = 1000   
-	  RETURN
+		IF (C_mode .LT. 0) THEN
+			INFO(7) = .True.
+		ELSE
+			HCM_error = 1000   
+		END IF
 	END IF
 !
 	IF (Distance .GT. 1D3) THEN
@@ -288,6 +290,8 @@
 	  HCM_error = 1028
 	  RETURN
 	END IF
+!
+	IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
 !
 !	Calculate the direction from Rx to Tx:
 	CALL Calc_direction (New_LongRx, New_LatRx, New_LongTx, New_LatTx, Dir_Rx_Tx)
@@ -669,8 +673,7 @@
 !	*								
 !	*****************************************************************
 !
-	IF ((Distance .GT. 10.0) .AND. (D_sea_calculated .LT. Distance) &
-		.AND. (C_Mode .GE. 0) .AND. (C_Mode .LT. 99)) THEN
+	IF ((Distance .GT. 10.0) .AND. (D_sea_calculated .LT. Distance)) THEN
 !		Calculate delta-h
 		CALL Dh_calculation ()
 		CALL Dh_Correction (Dh, Distance, Tx_frequency, Dh_corr)

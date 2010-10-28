@@ -1,6 +1,6 @@
 !
 !	HCMMS_V7_DLL.F90									P. Benner		08.01.2004
-!														G.H.			01.04.2010
+!														G.H.			15.05.2007
 !	DLL to the HCMMS_V7 subroutuine (Berlin 2003)
 !
 	SUBROUTINE HCMMS_V7_DLL ( I_C_mode, I_bor_dis, I_PD, I_Distance, I_H_Datab_Tx, &
@@ -288,7 +288,6 @@
 !
 	I_str(403:417)     = Coo_Tx_new		 ! Calculated co-ordinates of the transmitter
 	I_str(418:432)     = Coo_Rx_new		 ! Calculated co-ordinates of the receiver
-	I_str(166:169)     = Depol_loss		 ! Depolarization loss
 !
 	I_Distance         = Distance		! Distance
 	I_H_Datab_Tx       = H_Datab_Tx		! Heigth of TX above sea level (terrain database)
@@ -446,12 +445,12 @@
 		  WRITE (2,'(A35, F7.1, A3)') "  Max. range of harmful interfer.: ", CBR_D, " km"
 		  WRITE (2,'(A35, F7.1, A4)') "  E.R.P of reference transmitter : ", ERP_ref_Tx, " dBW"
 		ELSE !	CMODE >= 0
+		  WRITE (2,'(A35, F7.3, A3)') "  Distance Tx -> Rx              : ", Distance, " km"
 		  WRITE (2,*) " Rx co-ordinates calculated     : ", Coo_Rx_new(1:8)," ",Coo_Rx_new(9:15)
 		  WRITE (2,'(A35, F7.1, A7)') "  Calculated field strength      : ", Calculated_FS, " dBuV/m"
 		  WRITE (2,'(A35, F7.1, A7)') "  Permissible field strength     : ", Perm_FS, " dBuV/m"
 		  WRITE (2,'(A19)') "  Protection margin"
 		  WRITE (2,'(A35, F7.1, A3)') "  (Perm_FS - Calculated_FS)      : ", Prot_margin, " dB"
-		  WRITE (2,'(A35, F7.3, A3)') "  Distance Tx -> Rx              : ", Distance, " km"
 		END IF ! CMODE
 		WRITE (2,'(A35, F7.1, A3)') "  Distance over sea              : ", D_sea_calculated, " km"
 		WRITE (2,*) " "
@@ -595,8 +594,6 @@
 		  WRITE (2,'(A35, F7.1, A3)') "  Correction factor Rx antenna   : ", Rx_ant_corr, " dB"
 		  WRITE (2,'(A35, F7.1, A3)') "  Corr. factor antenna type Rx   : ", Rx_ant_type_corr, " dB"
 		  WRITE (2,'(A35, F7.1, A4)') "  Delta frequency                : ", Delta_frequency/1000.0, " kHz"
- 		  WRITE (2,*) " Depolarization loss            :    ", Depol_loss, " dB"
-
 		END IF
 		WRITE (2,*) " Permissible field str. of table"
 		WRITE (2,'(A35, F7.1, A7)') "  (0, if there is an input)      : ", Perm_FS_from_table, " dbuV/m"

@@ -17,7 +17,7 @@
 !
 !
 !
-	SUBROUTINE Dh_orrection (Dh, Distance, Frequency, Dh_corr)
+	SUBROUTINE Dh_Correction (Dh, Distance, Frequency, Dh_corr)
 !
 	IMPLICIT		 NONE
 !
@@ -234,5 +234,5 @@
 !  
 	RETURN
 !
-	END SUBROUTINE Dh_orrection
+	END SUBROUTINE Dh_correction
 !

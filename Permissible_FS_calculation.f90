@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		17.10.2005
-!														G.H.			01.04.2010
+!														G.H.			10.07.2007
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -726,17 +726,6 @@
 	  HCM_Error = 1046
 !	  Error in input data of depolarization loss
 	  RETURN
-	END IF
-!	  automatic DPN calculation
-	IF (Depol_loss .EQ. '-9.9') THEN
-		X1 = Free_space_FS - Calculated_FS
-		IF ((X1 .LT. 50.0) .AND. (.NOT. INFO(7)) .AND. &
-			((Rx_ant_corr .LE. 10.0) .OR. (Tx_ant_corr .LE. 10.0)) ) THEN
-			DPN = 25.0 - 0.5*(X1)
-		ELSE
-			DPN = 0.0
-		END IF
-		WRITE (Depol_loss, '(F4.1)') DPN	
 	END IF
 !
 	Perm_FS = Perm_FS + DPN
