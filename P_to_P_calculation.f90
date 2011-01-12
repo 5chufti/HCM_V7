@@ -673,7 +673,8 @@
 !	*								
 !	*****************************************************************
 !
-	IF ((Distance .GT. 10.0) .AND. (D_sea_calculated .LT. Distance)) THEN
+	IF ((Distance .GT. 10.0) .AND. (D_sea_calculated .LT. Distance) &
+		.AND. (C_Mode .GE. 0) .AND. (C_Mode .LT. 99)) THEN
 !		Calculate delta-h
 		CALL Dh_calculation ()
 		CALL Dh_Correction (Dh, Distance, Tx_frequency, Dh_corr)
