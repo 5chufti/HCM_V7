@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		17.10.2005
-!														G.H.			01.04.2010
+!														G.H.			07.03.2011
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -545,8 +545,8 @@
 !	
 		Corr_delta_f = acorrsinus - (acorrsinus - acorrB1) * B2 / B1
 !
-!	WB/NB correction
-		IF ((Channel_sp_Tx .EQ. 0) .AND. (TX_DIG .OR. RX_DIG)) &
+!	WB/NB correction  according to Annex 1
+		IF ((Channel_sp_Tx .EQ. 0) .AND. (TX_DIG .OR. RX_DIG) .AND. (Tx_frequency .LE. 470.0)) &
 				Perm_FS = Perm_FS + 6*LOG10(REAL(CSXT)/25000.0)
 ! 
 	ELSE
