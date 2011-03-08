@@ -437,14 +437,14 @@
 	ELSEIF ((Tx_frequency .GE. 790.0) .AND. (Tx_frequency .LT. 862.0)) THEN
 	  Perm_FS = 26.0
 	  Info(4) = .FALSE.
+	ELSEIF ((Tx_frequency .GE. 880.0) .AND. (Tx_frequency .LE. 960.0) .AND. &
+	   ((C_mode .EQ. 9) .OR. (C_mode .EQ. -8))) THEN
+	  Perm_FS = 38.0
+	  Info(4) = .FALSE.
 	ELSEIF ((Tx_frequency .GE. 862.0) .AND. (Tx_frequency .LE. 960.0)) THEN
 	  Perm_FS = 26.0
 	  CBR_D = 30.0
 	  ERP_ref_Tx = 13.0
-	  Info(4) = .FALSE.
-	ELSEIF ((Tx_frequency .GE. 880.0) .AND. (Tx_frequency .LE. 960.0) .AND. &
-	   ((C_mode .EQ. 9) .OR. (C_mode .EQ. -8))) THEN
-	  Perm_FS = 38.0
 	  Info(4) = .FALSE.
 	ELSEIF ((Tx_frequency .GE. 1710.0) .AND. (Tx_frequency .LE. 1785.0)) THEN
 	  Perm_FS = 35.0
