@@ -1,6 +1,6 @@
 !	
 !	HCMMS_V7.F90										P.Benner		23.02.2004
-!														G.H.			07.03.2011
+!														G.H.			10.11.2008
 !	Version 7					
 !
 !	Harmonized Calculation Method for mobile services
@@ -434,39 +434,26 @@
 	  CBR_D = 50.0
 	  ERP_ref_Tx = 16.0
 	  Info(4) = .FALSE.
-	ELSEIF ((Tx_frequency .GE. 790.0) .AND. (Tx_frequency .LT. 862.0)) THEN
-	  Perm_FS = 26.0
-	  Info(4) = .FALSE.
-	ELSEIF ((Tx_frequency .GE. 880.0) .AND. (Tx_frequency .LE. 960.0) .AND. &
-	   ((C_mode .EQ. 9) .OR. (C_mode .EQ. -8))) THEN
-	  Perm_FS = 38.0
-	  Info(4) = .FALSE.
 	ELSEIF ((Tx_frequency .GE. 862.0) .AND. (Tx_frequency .LE. 960.0)) THEN
 	  Perm_FS = 26.0
 	  CBR_D = 30.0
 	  ERP_ref_Tx = 13.0
 	  Info(4) = .FALSE.
 	ELSEIF ((Tx_frequency .GE. 1710.0) .AND. (Tx_frequency .LE. 1785.0)) THEN
-	  Perm_FS = 35.0
+	  Perm_FS = 38.0
 	  CBR_D = 15.0
 	  ERP_ref_Tx = 13.0
 	  Info(4) = .FALSE.
 	ELSEIF ((Tx_frequency .GE. 1805.0) .AND. (Tx_frequency .LE. 1880.0)) THEN
-	  Perm_FS = 35.0
+	  Perm_FS = 42.0
 	  CBR_D = 15.0
 	  ERP_ref_Tx = 13.0
 	  Info(4) = .FALSE.
-	ELSEIF ((Tx_frequency .GE. 1900.0) .AND. (Tx_frequency .LE. 1980.0)) THEN
+	ELSEIF ((Tx_frequency .GE. 1885.0) .AND. (Tx_frequency .LE. 2025.0)) THEN
 	  Perm_FS = 21.0
 	  Info(4) = .FALSE.
-	ELSEIF ((Tx_frequency .GE. 2010.0) .AND. (Tx_frequency .LE. 2025.0)) THEN
+	ELSEIF ((Tx_frequency .GE. 2110.0) .AND. (Tx_frequency .LE. 2200.0)) THEN
 	  Perm_FS = 21.0
-	  Info(4) = .FALSE.
-	ELSEIF ((Tx_frequency .GE. 2110.0) .AND. (Tx_frequency .LE. 2170.0)) THEN
-	  Perm_FS = 21.0
-	  Info(4) = .FALSE.
-	ELSEIF ((Tx_frequency .GE. 2500.0) .AND. (Tx_frequency .LE. 2690.0)) THEN
-	  Perm_FS = 39.0
 	  Info(4) = .FALSE.
 	END IF
 !
@@ -518,7 +505,7 @@
 		CASE (-2)
 			Perm_FS = 19.0
 			Time_percentage = 10
-			H_AntRx = 10
+			H_AntRx = 3
 !	-3 = Coordination line calcul. ERMES (h2 = 3m), EP = 12 dBuV/m, 10 %
 		CASE (-3)
 			Perm_FS = 12.0
@@ -538,14 +525,14 @@
 		CASE (-6)
 			Perm_FS = 25.0
 			Time_percentage = 10
-			H_AntRx = 10
+			H_AntRx = 3
 !	-7 = 380 - 400 MHz emergency / security services line calcl.
 		CASE (-7)
-			H_AntRx = 10
+!			nothing
 !	-8 = UMTS / IMT2000 line calcl.
 		CASE (-8)
 			Time_percentage = 10
-			H_AntRx = 10
+			H_AntRx = 3
 !	C_mode is out of range
 		CASE DEFAULT
 			HCM_error = 1025

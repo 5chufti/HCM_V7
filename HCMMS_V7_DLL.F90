@@ -1,6 +1,6 @@
 !
 !	HCMMS_V7_DLL.F90									P. Benner		08.01.2004
-!														G.H.			01.04.2010
+!														G.H.			30.03.2011
 !	DLL to the HCMMS_V7 subroutuine (Berlin 2003)
 !
 	SUBROUTINE HCMMS_V7_DLL ( I_C_mode, I_bor_dis, I_PD, I_Distance, I_H_Datab_Tx, &
@@ -563,7 +563,7 @@
 		WRITE (2,*) " "
 		WRITE (2,*) "              Additional output :"
 		WRITE (2,*) " "
-		WRITE (2,'(A35,F6.3,A2)') "  Calc. Time                     : ", (Real(Te-Ta)/10000.0), " s"
+		WRITE (2,'(A35,F7.3,A2)') "  Calc. Time                     : ", (Real(Te-Ta)/10000.0), " s"
 		WRITE (2,'(A35, I7, A2)') "  Height of Tx (terrain database): ", H_Datab_Tx, " m"
 		WRITE (2,'(A35, F7.3, A7)') "  Transmitter clearance angle    : ", Tx_TCA, " degree"
 		WRITE (2,'(A35, F7.2, A3)') "  Tx clearance angle corr. factor: ", Tx_TCA_corr, " dB"
@@ -572,20 +572,21 @@
 		WRITE (2,'(A35, F7.1, A2)') "  Effective antenna height (CCIR): ", Heff, " m"
 		WRITE (2,'(A35, F7.1, A2)') "  Delta height  (CCIR)           : ", Dh, " m"
 		WRITE (2,'(A35, F7.1, A3)') "  Correct. factor delta h (CCIR) : ", Dh_corr, " dB"
+		WRITE (2,'(A18, I3, A8)')   "   Values from the", Time_percentage, "% curves"
 		WRITE (2,'(A35, F7.1, A7)') "  Land field strength            : ", Land_FS, " dBuV/m"
 		WRITE (2,'(A35, F7.1, A7)') "  Sea field strength             : ", Sea_FS, " dBuV/m"
 		WRITE (2,'(A35, F7.1, A3)') "  Correction factor Tx antenna   : ", Tx_ant_corr, " dB"
 		WRITE (2,'(A35, F7.1, A3)') "  Corr. factor antenna type Tx   : ", Tx_ant_type_corr, " dB"
-		WRITE (2,'(A37, A5, A7)')	 "  Azimuth of Tx antenna          :   ", Azi_Tx_input, " degree"
-		WRITE (2,'(A37, A5, A7)')	 "  Elevation of Tx antenna        :   ",	Ele_Tx_input, " degree"
+		WRITE (2,'(A35, A7, A7)')	"  Azimuth of Tx antenna          : ", Azi_Tx_input, " degree"
+		WRITE (2,'(A35, A7, A7)')	"  Elevation of Tx antenna        : ", Ele_Tx_input, " degree"
 		WRITE (2,'(A35, F7.1, A7)') "  Direction Tx -> Rx             : ", Dir_Tx_Rx, " degree"
 		WRITE (2,'(A35, F7.1, A7)') "  Angle vertical Tx to Rx        : ", V_angle_Tx_Rx, " degree"
 		WRITE (2,'(A35, F7.1, A7)') "  Diff.angle hori. (Tx->Rx - Azi): ", H_diff_angle_Tx_Rx, " degree"
 		WRITE (2,'(A35, F7.1, A7)') "  Diff.angle vert. (Tx->Rx - Ele): ", V_diff_angle_Tx_Rx, " degree"
 		IF (C_mode .GE. 0) THEN
-		  WRITE (2,'(A35, I7, A2)') "  Height of Rx (terrain database): ", H_Datab_Rx, " m" 
-		  WRITE (2,'(A37, A5, A7)')	 "  Azimuth of Rx antenna          :   ", Azi_Rx_input, " degree"
-		  WRITE (2,'(A37, A5, A7)')	 "  Elevation of Rx antenna        :   ", Ele_Rx_input, " degree"
+		  WRITE (2,'(A35, I7, A2)')   "  Height of Rx (terrain database): ", H_Datab_Rx, " m" 
+		  WRITE (2,'(A35, A7, A7)')   "  Azimuth of Rx antenna          : ", Azi_Rx_input, " degree"
+		  WRITE (2,'(A35, A7, A7)')   "  Elevation of Rx antenna        : ", Ele_Rx_input, " degree"
 		  WRITE (2,'(A35, F7.3, A7)') "  Receiver clearance angle       : ", Rx_TCA, " degree"
 		  WRITE (2,'(A35, F7.2, A3)') "  Rx clearance angle corr. factor: ", Rx_TCA_corr, " dB"
 		  WRITE (2,'(A35, F7.1, A7)') "  Direction Rx -> Tx             : ", Dir_Rx_Tx, " degree"
@@ -595,10 +596,10 @@
 		  WRITE (2,'(A35, F7.1, A3)') "  Correction factor Rx antenna   : ", Rx_ant_corr, " dB"
 		  WRITE (2,'(A35, F7.1, A3)') "  Corr. factor antenna type Rx   : ", Rx_ant_type_corr, " dB"
 		  WRITE (2,'(A35, F7.1, A4)') "  Delta frequency                : ", Delta_frequency/1000.0, " kHz"
- 		  WRITE (2,*) " Depolarization loss            :    ", Depol_loss, " dB"
+ 		  WRITE (2,'(A35, A7, A3)')   "  Depolarization loss            : ", Depol_loss, " dB"
 
 		END IF
-		WRITE (2,*) " Permissible field str. of table"
+		WRITE (2,*) "  Permissible field str. of table"
 		WRITE (2,'(A35, F7.1, A7)') "  (0, if there is an input)      : ", Perm_FS_from_table, " dbuV/m"
 		WRITE (2,'(A35, F7.1, A3)') "  Corr. factor according delta f : ", Corr_delta_f, " dB"
 		WRITE (2,'(A35, F7.1, A4)') "  Cannel spacing of Rx           : ", Channel_sp_Rx/1000.0, " kHz"
@@ -611,8 +612,8 @@
 		INQUIRE (FILE='HCM_PR',EXIST=doit)
 		IF (.NOT. doit) GOTO 10
 	  	WRITE (2,*) " "
-	    WRITE (2,'(A34, I6)') "  Number of profile points       :", PN
-		WRITE (2,'(A31, F7.3, A3)') "  profile sampling distance  : ", PD, " km"
+	    WRITE (2,'(A28, I6)')       "  Number of profile points  ", PN
+		WRITE (2,'(A27, F7.3, A3)') "  profile sampling distance", PD, " km"
 	    WRITE (2,*) " "
 	    WRITE (2,*) " (p2p: normalized) profile heights Tx -> Rx [m]" 
 	    WRITE (2,*) " "    
