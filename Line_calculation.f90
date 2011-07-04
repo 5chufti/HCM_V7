@@ -1,6 +1,6 @@
 !
 !	Line_calculation.f90								P.Benner		23.11.2004
-!														G.H.			22.01.2010
+!														G.H.			04.07.2011
 !
 !	23.11.2004	Steps from 100 / 10 / 1 modified to 25 / 5 / 1
 !
@@ -48,7 +48,7 @@
 	INTEGER				IOS, N_rec, N_List, Rec_N_list(3), N_cp
 	INTEGER				N_List1, Rec_N_list1(3), teststep
 	INTEGER				I, J, K, Rec_N_x, Rec_x
-	DOUBLE PRECISION	N_Record(22), RB, PI, Lo, La, Co_cp(10000,2)
+	DOUBLE PRECISION	N_Record(22), RB, PI, Lo, La, Co_cp(2000,2)
 	REAL				FS_list(3), FS_list1(3), FS_x
 	CHARACTER*8			C_Record(22)
 	CHARACTER*10		BorderFile
@@ -79,11 +79,11 @@
 	  BorderFile(8:10) = 'CBR'
 	END IF
 !	2. Border line:
-	IF (D_to_border .EQ. 0) THEN
-	  BorderFile(8:10) = '000'
-	END IF
+!	IF (D_to_border .EQ. 0) THEN
+!	  BorderFile(8:10) = '000'
+!	END IF
 !	3. x-km line:
-	IF (D_to_border .GT. 0) THEN
+	IF (D_to_border .GE. 0) THEN
 	  IF (D_to_border .GT. 999) THEN
 			HCM_Error = 1047
 !			Distance to borderline is too long
@@ -105,7 +105,7 @@
 		RETURN
 	  END IF                            
 !	  Store all center points table 'N_Record(i,j)':
-	  DO N_rec = 1, 10000      
+	  DO N_rec = 1, 2000      
 		READ (3, REC=N_rec, IOSTAT=IOS) C_Record
 !		End of file reached (or non existing record) ?
 		IF ((IOS .LT. 0) .OR. (IOS .EQ. 36)) EXIT
@@ -139,11 +139,11 @@
 !-----------------------------------------------------------------------
 !	Testroutine to calculate to each point:
 	FS_x = -999.9
-	DO J = 1, 30000
+	DO J = 1, 5000
 	  READ (3, REC=J, IOSTAT=IOS) C_Record
 !	  End of file reached (or non existing record) ?
 	  IF ((IOS .LT. 0) .OR. (IOS .EQ. 36)) EXIT ! end of file reached
-	  IF (IOS .NE. 0) THEN   
+	  IF (IOS .NE. 0) THEN
 		HCM_Error = 1049
 !		Error in line data
 		CLOSE (UNIT = 3)
@@ -162,8 +162,8 @@
 			IF (.NOT. Take_it) GOTO 70
 		  END IF
 		  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx)
-		  IF (HCM_Error .EQ. 1028) GOTO 70	! Distance > 1000 km
 		  IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
+		  IF (HCM_Error .EQ. 1028) GOTO 70	! Distance > 1000 km
 !		  Find maximun of field strength:
 		  IF (Calculated_FS .GE. FS_x) THEN
 			FS_x = Calculated_FS
@@ -172,17 +172,17 @@
 		  END IF
 70		  CONTINUE
 	  END DO	! K
-!
 	END DO	! J
-	GOTO 140
+!
+75	GOTO 140
 !	End of testroutine
 !-------------------------------------------------------------------------
 !	1st: calculate to every 15th centerpoint:
 !	Use 1st list:
 80	teststep = 15
 	N_rec = 8	! record number in file
-90	N_List = 0	! number of stored record numbers and field strength
-	IOS = 0
+	N_List = 0	! number of stored record numbers and field strength
+90	IOS = 0
 !
 	DO WHILE (IOS .EQ. 0)
 	  READ (3, REC=N_rec, IOSTAT=IOS) C_Record
@@ -205,8 +205,8 @@
 	  END IF
 	  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx )
 	  IF (HCM_Error .EQ. 1028) GOTO 100	! Distance > 1000 km
-	  IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
 	  CALL Manage_List (N_rec, N_List, Rec_N_list, FS_list, Calculated_FS)
+	  IF ((HCM_Error .NE. 0) .OR. INFO(7)) Goto 125
 100	  N_rec = N_rec + teststep
 	END DO
 !
@@ -255,7 +255,7 @@
 				  END IF
 				  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx )
 				  IF (HCM_Error .EQ. 1028) GOTO 110	! Distance > 1000 km
-				  IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
+!				  IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
 			  END IF
 			  CALL Manage_List (J, N_List1, Rec_N_list1, FS_list1, Calculated_FS)
 110			  CONTINUE
@@ -308,7 +308,7 @@
 				  END IF
 				  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx )
 				  IF (HCM_Error .EQ. 1028) GOTO 120	! Distance > 1000 km
-				  IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
+!				  IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
 			  END IF
 			  CALL Manage_List (J, N_List, Rec_N_list, FS_list, Calculated_FS)
 120			  CONTINUE
@@ -318,7 +318,7 @@
 	END IF
 !
 !	4th: calculate to all points inside the stored records:
-	FS_x = -999.9
+125	FS_x = -999.9
 	IF (N_List .GT. 0) THEN
 	  DO I = 1, N_List
 		J = Rec_N_list(I)
@@ -395,7 +395,7 @@
 !
 	INTEGER				I, N_cp
 	DOUBLE PRECISION	CX, CY, DX, DY, AX, AY, BX, BY, RT, RN, R, S
-	DOUBLE PRECISION	Co_cp(10000,2)
+	DOUBLE PRECISION	Co_cp(2000,2)
 !
 	COMMON /Co_ord_cp/	Co_cp, N_cp
 !

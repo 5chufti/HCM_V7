@@ -1,6 +1,6 @@
 !
 !	Position_of_mobile.f90								P. Benner		29.11.2004
-!														G.H.			28.10.2010
+!														G.H.			04.07.2011
 !
 !	Subroutine to calculate the new position of Tx (New_LongTx, New_LatTx)
 !	and/or Rx (New_LongRx, New_latRx) if at least one is a mobile and
@@ -37,6 +37,8 @@
 	New_LatTx  = LatTx  
 	New_LongRx = LongRx
 	New_LatRx  = LatRx
+	N_Cut_Rx = 0
+	N_Cut_Tx = 0
 !
 !	Calculate the distance 'Distance' between point A and B	
 	CALL Calc_distance (LongTx, LatTx, LongRx, LatRx, Distance)
@@ -47,16 +49,26 @@
 !	Calculate the direction from Tx to Rx:
 	CALL Calc_direction (LongTx, LatTx, LongRx, LatRx, Dir_Tx_Rx)
 !
-!	First select those cases, where no borderline is cut:
+!	special case calc mobile Tx on (border)line
+	IF ((Tx_serv_area .GT. 0.0) .AND. (C_mode .LT. 0)) THEN
+		CALL Calc_Tx_pos ( LongTx, LatTx, LongRx, LatRx, New_LongTx, New_LatTx )
+		RETURN
+	END IF
+!
+!Check if borderline is cut
 	IF (Tx_serv_area .GT. 0.0) THEN
 !	  Determine, if in direction of Rx, the Tx circle is cut:
 	  DP1 = Distance
 	  IF (DP1 .GT. Tx_serv_area) DP1 = Tx_serv_area
-	  CALL TestCut (Dir_Tx_Rx, LongTx, LatTx, DP1, N_Cut_Tx, HCM_error, Land_from)
-	  IF (HCM_error .NE. 0) THEN
-		HCM_error = 1036
+	  IF ((D_to_border .EQ. 0) .AND. (C_mode .LT. 0)) THEN
+		N_Cut_Tx = 1
+	  ELSE
+	    CALL TestCut (Dir_Tx_Rx, LongTx, LatTx, DP1, N_Cut_Tx, HCM_error, Land_from)
+	    IF (HCM_error .NE. 0) THEN
+		  HCM_error = 1036
 !		The 'xxx.ALL' borderline file for Tx is missing
-		RETURN
+		  RETURN
+	    END IF
 	  END IF
 	END IF
 !
@@ -71,6 +83,8 @@
 		RETURN
 	  END IF
 	END IF
+!
+!	First select those cases, where no borderline is cut:
 !
 	IF ((N_Cut_Tx .EQ. 0) .AND. (N_Cut_Rx .EQ. 0)) THEN
 !	no borderline cut
@@ -155,7 +169,7 @@
 	CHARACTER*176		BREC
 	INTEGER				I, T, IOS
 	DOUBLE PRECISION	BCOO(22), N_Long, N_Lat, PI, B
-	DOUBLE PRECISION	CX, CY, DX, DY, AX, AY, BX, BY, RT, RN, R, S
+	DOUBLE PRECISION	CX, CY, DX, DY, AX, AY, BX, BY, RT, RN, RS, R, S
 !
 	EQUIVALENCE (BREC, BCOO)
 !
@@ -178,53 +192,45 @@
 	  RETURN
 	END IF         
 	T = 1
-	I = 4
+	I = 3
 	READ (8, REC=T, IOSTAT=IOS) BREC
-	IF (IOS .NE. 0) THEN
-	  CLOSE (UNIT=8)
-	  RETURN
-	END IF
+	IF (IOS .NE. 0) Goto 80
 !
 !	Take first two points:
-	CX = BCOO(1) * B
-	CY = BCOO(2) * B
-	DX = BCOO(3) * B
-	DY = BCOO(4) * B
-!
-50	READ (8, REC=T, IOSTAT=IOS) BREC
-	IF (IOS .NE. 0) THEN
-	  CLOSE (UNIT=8)
-	  RETURN
-	END IF
+	DX = BCOO(1) * B
+	DY = BCOO(2) * B
+
+70	CX = DX
+	CY = DY
+	DX = BCOO(I) * B
+	I = I + 1
+	DY = BCOO(I) * B
 !
 !	Determine intersection:
-70	RT = (AY - CY) * (DX - CX) - (AX - CX) * (DY - CY)
+	RS = (AY - CY) * (BX - AX) - (AX - CX) * (BY - AY)
+	RT = (AY - CY) * (DX - CX) - (AX - CX) * (DY - CY)
 	RN = (BX - AX) * (DY - CY) - (BY - AY) * (DX - CX)
-	IF ((RN .NE. 0.0D0) .AND. (RT .NE. 0.0D0)) THEN
+
+	IF ((RN*RS*RT) .NE. 0.0D0) THEN
 	  R = RT / RN
-	  S = ((AY - CY) * (BX - AX) - (AX - CX) * (BY - AY)) / RN
+	  S = RS / RN
 	  IF ((R .GE. 0.0D0) .AND. (R .LE. 1.0D0) .AND. &
           (S .GE. 0.0D0) .AND. (S .LE. 1.0D0)) THEN
 	    N_Cut = N_Cut + 1
 	  END IF
 	END IF
-	CX = DX
-	CY = DY
 !
 !	Take next line point:
 	I = I + 1
-	IF (I .GE. 20) THEN
+	IF (I .EQ. 21) THEN
 		T = T + 1
-		I = 0
-		GOTO 50
-	  ELSE
-		DX = BCOO(I) * B
-		I = I + 1
-		DY = BCOO(I) * B
-		GOTO 70
+		READ (8, REC=T, IOSTAT=IOS) BREC
+		IF (IOS .NE. 0) Goto 80
+		I = 1
 	END IF
+	GOTO 70
 !	
-	CLOSE (UNIT=8)
+80	CLOSE (UNIT=8)
 !
 	RETURN
 !
