@@ -1,6 +1,6 @@
 !
 !	Position_of_mobile.f90								P. Benner		29.11.2004
-!														G.H.			04.07.2011
+!														G.H.			14.07.2011
 !
 !	Subroutine to calculate the new position of Tx (New_LongTx, New_LatTx)
 !	and/or Rx (New_LongRx, New_latRx) if at least one is a mobile and
@@ -211,7 +211,7 @@
 	RT = (AY - CY) * (DX - CX) - (AX - CX) * (DY - CY)
 	RN = (BX - AX) * (DY - CY) - (BY - AY) * (DX - CX)
 
-	IF ((RN*RS*RT) .NE. 0.0D0) THEN
+	IF (RN .NE. 0.0D0) THEN
 	  R = RT / RN
 	  S = RS / RN
 	  IF ((R .GE. 0.0D0) .AND. (R .LE. 1.0D0) .AND. &
