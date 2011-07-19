@@ -1,9 +1,8 @@
 !
 !	Line_calculation.f90								P.Benner		23.11.2004
-!														G.H.			18.07.2011
+!														G.H.			19.07.2011
 !
 !	23.11.2004	Steps from 100 / 10 / 1 modified to 25 / 5 / 1
-!	18.07.2011  Steps modified to 5 / 1
 !
 !	Subroutine to calculate the field strengs on a line
 !	or to calculate the cross border field strength.
@@ -166,7 +165,7 @@
 		  IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
 		  IF (HCM_Error .EQ. 1028) GOTO 70	! Distance > 1000 km
 !		  Find maximun of field strength:
-		  IF (Calculated_FS .GT. FS_x) THEN
+		  IF (Calculated_FS .GE. FS_x) THEN
 			FS_x = Calculated_FS
 			Rec_x = K
 			Rec_N_x = J
@@ -178,14 +177,11 @@
 75	GOTO 140
 !	End of testroutine
 !-------------------------------------------------------------------------
-!	1st: calculate to every 5th centerpoint:
+!	1st: calculate to every 15th centerpoint:
 !	Use 1st list:
-80	N_List = 0	! number of stored record numbers and field strength
-	teststep = 5
-	N_rec = 3	! record number in file
-!	for tests
-!	teststep = 1
-!	N_rec = 1	
+80	teststep = 15
+	N_rec = 8	! record number in file
+	N_List = 0	! number of stored record numbers and field strength
 90	IOS = 0
 !
 	DO WHILE (IOS .EQ. 0)
@@ -214,21 +210,71 @@
 100	  N_rec = N_rec + teststep
 	END DO
 !
-	IF (teststep .EQ. 5) THEN
-		IF (N_List .EQ. 0) THEN
-			teststep = 1
-			N_rec = 1
-			GOTO 90
-		ELSE
+	IF (N_List .EQ. 0) THEN
+	  IF (teststep .EQ. 15) THEN
+	    teststep = 5
+		N_rec = 3
+		GOTO 90
+	  END IF
+	  IF (teststep .EQ. 5) THEN
+	    teststep = 1
+		N_rec = 1
+	    GOTO 90
+	  END IF
+	END IF     
+!
+	IF (teststep .EQ. 15) THEN
+!		2nd: calculate to every 5th centerpoint +5/-5 neighbouring centerpoints
+!		of stored record-numbers:
+!		Use 2nd list:
+		N_List1 = 0	! number of stored records and field strength
+		IF (N_List .GT. 0) THEN
+		  DO I = 1, N_List
+			J = Rec_N_list(I)
+			DO J = (J-5),(J+5), 5
+			  IF (J .EQ. Rec_N_list(I)) THEN
+!				  This calculation is already done in the previous step!
+				  Calculated_FS = FS_list(I)
+				ELSE
+				  READ (3, REC=J, IOSTAT=IOS) C_Record
+				  IF ((IOS .LT. 0) .OR. (IOS .EQ. 36)) EXIT ! end of file reached
+				  IF (IOS .NE. 0) THEN   
+					HCM_Error = 1049
+!					Error in line data
+					CLOSE (UNIT = 3)
+					RETURN
+				  END IF
+				  LongRx = N_Record(21) * RB
+				  LatRx  = N_Record(22) * RB
+				  Lo = LongTx
+				  La = LatTx
+				  IF (CBR) THEN
+					CALL CBR_Coordinates (LongRx, LatRx, Lo, La, &
+								  CBR_D, Tx_serv_area, Take_it)
+					IF (.NOT. Take_it) GOTO 110
+				  END IF
+				  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx )
+				  IF (HCM_Error .EQ. 1028) GOTO 110	! Distance > 1000 km
+!				  IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
+			  END IF
+			  CALL Manage_List (J, N_List1, Rec_N_list1, FS_list1, Calculated_FS)
+110			  CONTINUE
+			END DO
+		  END DO
+		END IF
+	  ELSE
+		IF (teststep .EQ. 5) THEN
 		  N_List1 = N_List
 		  DO I = 1, 3
 		    Rec_N_list1(I) = Rec_N_list(I)
 		    FS_list1(I) = FS_list(I)
 		  END DO
 		END IF
+	END IF
 !
-!	2nd:  calculate to every +2/-2 neighbouring centerpoint of stored centerpoints
+!	3rd:  calculate to every +2/-2 neighbouring centerpoint of stored centerpoints
 !	Use 1st list again:
+	IF (teststep .NE. 1) THEN
 		N_List = 0	! number of stored records and field strength
 		DO I = 1,3
 		  FS_List(I) = 0.0
@@ -262,16 +308,16 @@
 				  END IF
 				  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx )
 				  IF (HCM_Error .EQ. 1028) GOTO 120	! Distance > 1000 km
+!				  IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
 			  END IF
 			  CALL Manage_List (J, N_List, Rec_N_list, FS_list, Calculated_FS)
-			  IF ((HCM_Error .NE. 0) .OR. INFO(7)) GOTO 125
 120			  CONTINUE
 			END DO
 		  END DO
 		END IF
 	END IF
 !
-!	3rd: calculate to all points inside the stored records:
+!	4th: calculate to all points inside the stored records:
 125	FS_x = -999.9
 	IF (N_List .GT. 0) THEN
 	  DO I = 1, N_List
@@ -296,19 +342,19 @@
 		  END IF
 		  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx )
 		  IF (HCM_Error .EQ. 1028) GOTO 130	! Distance > 1000 km
+		  IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
 !		  Find maximun of field strength:
 		  IF (Calculated_FS .GE. FS_x) THEN
 			FS_x = Calculated_FS
 			Rec_x = K
 			Rec_N_x = J
 		  END IF
-		  IF ((HCM_Error .NE. 0) .OR. INFO(7)) GOTO 140
 130		  CONTINUE
 		END DO
 	  END DO
 	END IF
 !
-!	4th: calculate to point of maximum field strength again to get all
+!	5th: calculate to point of maximum field strength again to get all
 !		 output values:
 140	IF (Rec_N_x .GT. 0) THEN
 	  READ (3, REC=Rec_N_x, IOSTAT=IOS) C_Record
@@ -348,7 +394,7 @@
 	INTEGER				N_cut
 !
 	INTEGER				I, N_cp
-	DOUBLE PRECISION	CX, CY, DX, DY, AX, AY, BX, BY, RS, RT, RN, R, S
+	DOUBLE PRECISION	CX, CY, DX, DY, AX, AY, BX, BY, RN, R, S
 	DOUBLE PRECISION	Co_cp(2000,2)
 !
 	COMMON /Co_ord_cp/	Co_cp, N_cp
@@ -368,13 +414,10 @@
 	DY = Co_cp(2,2)
 !
 !	Determine intersection:
-70	RS = ((AY - CY) * (BX - AX) - (AX - CX) * (BY - AY))
-	RT = (AY - CY) * (DX - CX) - (AX - CX) * (DY - CY)
-	RN = (BX - AX) * (DY - CY) - (BY - AY) * (DX - CX)
+70	RN = (BX - AX) * (DY - CY) - (BY - AY) * (DX - CX)
 	IF (RN .EQ. 0.0D0) GOTO 100
-!	IF (RT .EQ. 0.0D0) GOTO 100
-	R = RT / RN
-	S = RS / RN
+	R = ((AY - CY) * (DX - CX) - (AX - CX) * (DY - CY)) / RN
+	S = ((AY - CY) * (BX - AX) - (AX - CX) * (BY - AY)) / RN
 	IF ((R .GE. 0.0D0) .AND. (R .LE. 1.0D0) .AND. &
 		(S .GE. 0.0D0) .AND. (S .LE. 1.0D0)) THEN
 	  N_cut = N_cut + 1
@@ -443,6 +486,8 @@
 	  END IF
 	END IF
 !
+	RETURN
+!
 	END SUBROUTINE CBR_Coordinates
 !
 !	************************* Manage_List ***********************
@@ -464,23 +509,26 @@
 	  N_List = N_list + 1
 	  Rec_N_list(N_List) = N_rec
 	  FS_list(N_List) = Calculated_FS
-	ELSE
+	  RETURN
+	END IF
 !
 !	More than MAX enties:
 !	Find list-number of lowest fiel strength:
-	  J = 1
-	  FS_x = 999.9
-	  DO I = 1, 3
-	    IF (FS_list(I) .LT. FS_x) THEN
-	      J = I
-		  FS_x = FS_list(I)
-	    END IF
-	  END DO
-!	J = number of list entry with the lowest field strength
-	  IF (Calculated_FS .GT. FS_list(J)) THEN
-	    FS_list(J) = Calculated_FS
-	    Rec_N_list(J) = N_rec
+	J = 1
+	FS_x = 999.9
+	DO I = 1, 3
+	  IF (FS_list(I) .LT. FS_x) THEN
+	    J = I
+		FS_x = FS_list(I)
 	  END IF
+	END DO
+!	J = number of list entry with the lowest field strength
+	IF (Calculated_FS .GT. FS_list(J)) THEN
+	  FS_list(J) = Calculated_FS
+	  Rec_N_list(J) = N_rec
 	END IF
 !
+	RETURN
+!
 	END SUBROUTINE Manage_List
+!
