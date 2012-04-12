@@ -72,14 +72,12 @@
 !	'DA' distance in degrees,
 	DA = DIS / 1.112D2
 	SIDA  = DSIND(DA)
-!
-!	adjust PD to Distance
+!	number of segments
 	PN = NINT(DIS / PD)
-	PDa = DIS / DBLE(PN)
-!
+!	adjust PD to Distance
+!	PDa = DIS / DBLE(PN)
 !	Distance 'DP' between two points in degrees:
 	DPa   = DA / DBLE(PN)
-!
 !	number of points in profile
 	PN = PN + 1
 !	set END Marker
@@ -90,15 +88,15 @@
 	K = DBLE(H_Rx - H_Tx) / DA
 	slant = ((c_Mode .GE. 0) .AND. (c_Mode .LT. 99))
 !
-!	second part of profile RX to center
-		SILAA = DSIND(LatB)
-		COLAA = DCOSD(LatB)
-		SILAB = DSIND(LatA)
-		COLAB = DCOSD(LatA)
-		SILOA = DSIND(LongB)
-		COLOA = DCOSD(LongB)
-		SILOB = DSIND(LongA)
-		COLOB = DCOSD(LongA)
+!	part of profile RX to center
+	SILAA = DSIND(LatB)
+	COLAA = DCOSD(LatB)
+	SILAB = DSIND(LatA)
+	COLAB = DCOSD(LatA)
+	SILOA = DSIND(LongB)
+	COLOA = DCOSD(LongB)
+	SILOB = DSIND(LongA)
+	COLOB = DCOSD(LongA)
 !
 !	Loop for waypoints Rx to center
 	DO PC = PN, INT(REAL(PN)/2.0), -1
@@ -127,15 +125,15 @@
 		IF (HCM_Error .NE. 0) RETURN
 	END DO
 !
-!	first part of profile (TX to center)
-		SILAA = DSIND(LatA)
-		COLAA = DCOSD(LatA)
-		SILAB = DSIND(LatB)
-		COLAB = DCOSD(LatB)
-		SILOA = DSIND(LongA)
-		COLOA = DCOSD(LongA)
-		SILOB = DSIND(LongB)
-		COLOB = DCOSD(LongB)
+!	part of profile (TX to center)
+	SILAA = DSIND(LatA)
+	COLAA = DCOSD(LatA)
+	SILAB = DSIND(LatB)
+	COLAB = DCOSD(LatB)
+	SILOA = DSIND(LongA)
+	COLOA = DCOSD(LongA)
+	SILOB = DSIND(LongB)
+	COLOB = DCOSD(LongB)
 !
 !	Loop for waypoints Tx to center
 	DO PC = 1, PC, 1

@@ -594,7 +594,7 @@
 	IF (Heff_Rx .LT. 3.0) Heff_Rx = 3.0
 !
 !	heff for curves according to proceding table:
-!	value of 0.3m results from 3m/10, 3m is done as min in Heff_Xx calc.
+!	value of 0.9m results from 3*3/10, 3m is done as min in Heff_Xx calc.
 !
 	Heff = (Heff_Tx * Heff_Rx) / 10.0
 !
