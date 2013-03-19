@@ -48,7 +48,7 @@
 !
 	INTEGER				IOS, N_rec, N_List, Rec_N_list(3), N_cp
 	INTEGER				N_List1, Rec_N_list1(3), teststep
-	INTEGER				I, J, K, Rec_N_x, Rec_x
+	INTEGER				I, J, K, Rec_N_x, Rec_x, N_cut
 	DOUBLE PRECISION	N_Record(22), RB, PI, Lo, La, Co_cp(2000,2)
 	REAL				FS_list(3), FS_list1(3), FS_x
 	CHARACTER*8			C_Record(22)
@@ -94,9 +94,7 @@
 	  END IF
 	END IF
 !
-!	In case of CBR calculations, get additionally all centerpoint co-ordinates
-!	of the borderline file:
-	IF (CBR) THEN
+!	get additionally all borderline centerpoints of the affected coutry:
 	  OPEN (UNIT=3, FILE=TRIM(Border_path) // '\' // BorderFile(1:7) // '000', &
 			STATUS='OLD', ACCESS='DIRECT',RECL=176, MODE='READ', IOSTAT=IOS)
 !
@@ -123,10 +121,9 @@
 	  N_cp = N_rec -1
 !
 	  CLOSE (UNIT=3)
-	END IF
 !
 !	Open line file:
-	  OPEN (UNIT=3, FILE=TRIM(Border_path) // '\' // BorderFile, &
+	OPEN (UNIT=3, FILE=TRIM(Border_path) // '\' // BorderFile, &
 			STATUS='OLD', ACCESS='DIRECT',RECL=176, MODE='READ', IOSTAT=IOS)
 !
 	IF (IOS .NE. 0) THEN
@@ -153,25 +150,27 @@
 !
 !	  Calculate to all 10 points inside this record
 	  DO K = 1, 19, 2
-		  LongRx = N_Record(K)   * RB
-		  LatRx  = N_Record(K+1) * RB
-		  Lo = LongTx
-		  La = LatTx
-		  IF (CBR) THEN
-		    CALL CBR_Coordinates (LongRx, LatRx, Lo, La, &
-							  CBR_D, Tx_serv_area, Take_it)
-			IF (.NOT. Take_it) GOTO 70
-		  END IF
-		  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx)
-		  IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
-		  IF (HCM_Error .EQ. 1028) GOTO 70	! Distance > 1000 km
+		LongRx = N_Record(K)   * RB
+		LatRx  = N_Record(K+1) * RB
+		Lo = LongTx
+		La = LatTx
+		IF (CBR) CALL CBR_Coordinates (LongRx, LatRx, Lo, La, CBR_D, Tx_serv_area)
+!		check ctry affected if x-km or CBR
+		IF (D_to_border .NE. 0) THEN
+			CALL Test_cut1 (Lo, La, LongRx, LatRx, N_cut)
+			IF (N_cut .EQ. 0) GOTO 70
+		END IF
+!		  
+		CALL P_to_P_Calculation (Lo, La, LongRx, LatRx)
+		IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
+		IF (HCM_Error .EQ. 1028) GOTO 70	! Distance > 1000 km
 !		  Find maximun of field strength:
-		  IF (Calculated_FS .GT. FS_x) THEN
+		IF (Calculated_FS .GT. FS_x) THEN
 			FS_x = Calculated_FS
 			Rec_x = K
 			Rec_N_x = J
-		  END IF
-70		  CONTINUE
+		END IF
+70		CONTINUE
 	  END DO	! K
 	END DO	! J
 !
@@ -202,12 +201,14 @@
 	  LatRx  = N_Record(22) * RB
 	  Lo = LongTx
 	  La = LatTx
-	  IF (CBR) THEN
-	    CALL CBR_Coordinates (LongRx, LatRx, Lo, La, &
-							  CBR_D, Tx_serv_area, Take_it)
-		IF (.NOT. Take_it) GOTO 100
+	  IF (CBR) CALL CBR_Coordinates (LongRx, LatRx, Lo, La, CBR_D, Tx_serv_area)
+!		check ctry affected if x-km or CBR
+	  IF (D_to_border .NE. 0) THEN
+			CALL Test_cut1 (Lo, La, LongRx, LatRx, N_cut)
+			IF (N_cut .EQ. 0) GOTO 100
 	  END IF
-	  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx )
+!		  
+	  CALL P_to_P_Calculation (Lo, La, LongRx, LatRx)
 	  IF (HCM_Error .EQ. 1028) GOTO 100	! Distance > 1000 km
 	  CALL Manage_List (N_rec, N_List, Rec_N_list, FS_list, Calculated_FS)
 	  IF ((HCM_Error .NE. 0) .OR. INFO(7)) Goto 125
@@ -255,12 +256,13 @@
 				  LatRx  = N_Record(22) * RB
 				  Lo = LongTx
 				  La = LatTx
-				  IF (CBR) THEN
-				    CALL CBR_Coordinates (LongRx, LatRx, Lo, La, &
-								  CBR_D, Tx_serv_area, Take_it)
-					IF (.NOT. Take_it) GOTO 120
+!		check ctry affected if x-km or CBR
+				  IF (D_to_border .NE. 0) THEN
+					CALL Test_cut1 (Lo, La, LongRx, LatRx, N_cut)
+					IF (N_cut .EQ. 0) GOTO 120
 				  END IF
-				  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx )
+!		  
+				  CALL P_to_P_Calculation (Lo, La, LongRx, LatRx)
 				  IF (HCM_Error .EQ. 1028) GOTO 120	! Distance > 1000 km
 			  END IF
 			  CALL Manage_List (J, N_List, Rec_N_list, FS_list, Calculated_FS)
@@ -289,11 +291,12 @@
 		  LatRx  = N_Record(K+1) * RB
 		  Lo = LongTx
 		  La = LatTx
-		  IF (CBR) THEN
-		    CALL CBR_Coordinates (LongRx, LatRx, Lo, La, &
-							  CBR_D, Tx_serv_area, Take_it)
-			IF (.NOT. Take_it) GOTO 130
+!		check ctry affected if x-km or CBR
+		  IF (D_to_border .NE. 0) THEN
+			CALL Test_cut1 (Lo, La, LongRx, LatRx, N_cut)
+			IF (N_cut .EQ. 0) GOTO 130
 		  END IF
+!		  
 		  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx )
 		  IF (HCM_Error .EQ. 1028) GOTO 130	! Distance > 1000 km
 !		  Find maximun of field strength:
@@ -322,11 +325,7 @@
 	  LatRx  = N_Record(Rec_x+1) * RB
 	  Lo = LongTx
 	  La = LatTx
-	  IF (CBR) THEN
-		CALL CBR_Coordinates (LongRx, LatRx, Lo, La, &
-							  CBR_D, Tx_serv_area, Take_it)
-	    IF (.NOT. Take_it) RETURN
-	  END IF
+	  IF (CBR) CALL CBR_Coordinates (LongRx, LatRx, Lo, La, CBR_D, Tx_serv_area)
 	  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx )
     ELSE
 	  HCM_Error = 1047
@@ -374,7 +373,7 @@
 	S = ((AY - CY) * (BX - AX) - (AX - CX) * (BY - AY)) / RN
 	IF ((R .GE. 0.0D0) .AND. (R .LE. 1.0D0) .AND. &
 		(S .GE. 0.0D0) .AND. (S .LE. 1.0D0)) THEN
-	  N_cut = N_cut + 1
+	  N_cut = 1
 	  RETURN
 	END IF
 !
@@ -396,33 +395,19 @@
 !	*************************************************************
 !
 !
-	SUBROUTINE CBR_Coordinates (LongLi, LatLi, LongTx, LatTx, CBR_D, &
-								ServTx, Take_it)
+	SUBROUTINE CBR_Coordinates (LongLi, LatLi, LongTx, LatTx, CBR_D, ServTx)
 !
 	IMPLICIT			NONE
 !
 	DOUBLE PRECISION	LongLi, LatLi, LongTx, LatTx
 	REAL				CBR_D, ServTx
-	LOGICAL				Take_it
 !
 	DOUBLE PRECISION	Dir, Lo, La, D
-	INTEGER				N_cut
 !
-	Take_it = .TRUE.
-	IF ((LongTx .EQ. LongLi) .AND. (LatTx .EQ. LatLi)) THEN
-	  Take_it = .FALSE.
-	  RETURN
-	END IF
 	CALL Calc_direction (LongTx, LatTx, LongLi, LatLi, Dir)
 	Lo = LongLi
 	La = LatLi
 	CALL New_coordinates (Lo, La, Dir, CBR_D, LongLi, LatLi)
-!
-	CALL Test_cut1 (LongTx, LatTx, LongLi, LatLi, N_cut)
-	IF (N_cut .EQ. 0) THEN
-	  Take_it = .FALSE.
-	  RETURN
-	END IF
 !
 !	In case of Tx is a mobile, calculate new Tx co-ordinates:
 	IF (ServTx .GT. 0.0) THEN

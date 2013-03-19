@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		17.10.2005
-!														G.H.			01.04.2010
+!														G.H.			19.07.2011
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -308,26 +308,22 @@
 		END IF
 	END IF
 !
-!	catch "TETRA" or the like
-!	If at least one station is not digital modulation, use normal
-!	Vienna calculation.
-	IF (((C_Mode .EQ. 0) .AND. (RX_TETRA) .AND. (TX_TETRA)) .OR. &
-		((C_Mode .EQ. 8) .AND. (TX_DIG) .AND. (RX_DIG))) THEN 
-!		  Correction factors for the band 380 - 400 MHz are used.
-			Info(18) = .TRUE.
-			GOTO 70
-!
-!	Module normal Berlin:
-	ELSEIF ((C_Mode .EQ. 0) .OR. (C_Mode .EQ. 4) .OR. &
-		(C_Mode .EQ. 7) .OR. (C_Mode .EQ. 8)) GOTO 100
-!
 !	Module GSM 900:
-	ELSEIF ((C_Mode .EQ. 1) .OR. (C_Mode .EQ. 2) .OR. (C_Mode .EQ. 3)) GOTO 20
+	IF ((C_Mode .EQ. 1) .OR. (C_Mode .EQ. 2) .OR. (C_Mode .EQ. 3)) GOTO 20
 !
 !	Module GSM 1800:
-	ELSEIF ((C_Mode .EQ. 5) .OR. (C_Mode .EQ. 6)) GOTO 60
+	IF ((C_Mode .EQ. 5) .OR. (C_Mode .EQ. 6)) GOTO 60
 !
-	END IF
+!	catch "TETRA" or the like
+	IF	( ((C_Mode .EQ. 8) .OR. (C_Mode .EQ. 0)) .AND. &
+		( ((RX_TETRA) .AND. (TX_TETRA)) .OR. ((TX_DIG) .AND. (RX_DIG)) ) ) GOTO 70
+!
+!	If at least one station is not digital modulation, use normal
+!	Vienna calculation.
+!
+!	Module normal Berlin:
+	IF ((C_Mode .EQ. 0) .OR. (C_Mode .EQ. 4) .OR. &
+		(C_Mode .EQ. 7) .OR. (C_Mode .EQ. 8)) GOTO 100
 !
 	RETURN
 !
@@ -447,9 +443,11 @@
 !	*								
 !	*****************************************************************
 !
-70	IF ((C_mode .EQ. 8) .AND. &
-			(TX_TETRA) .AND. (RX_TETRA)) Time_percentage = 10
-!
+70	IF ((C_mode .EQ. 8) .AND. (TX_TETRA) .AND. (RX_TETRA)) THEN
+			Time_percentage = 10
+!		  Correction factors for the band 380 - 400 MHz are used.
+			Info(18) = .TRUE.
+	END IF
 	IF (CSXT .GT. CSXR) THEN
 		B1 = CSXT
 		B2 = CSXR
