@@ -1,6 +1,6 @@
 !
 !	Position_of_mobile.f90								P. Benner		29.11.2004
-!														G.H.			14.07.2011
+!														G.H.			25.03.2013
 !
 !	Subroutine to calculate the new position of Tx (New_LongTx, New_LatTx)
 !	and/or Rx (New_LongRx, New_latRx) if at least one is a mobile and
@@ -50,10 +50,10 @@
 	CALL Calc_direction (LongTx, LatTx, LongRx, LatRx, Dir_Tx_Rx)
 !
 !	special case calc mobile Tx on (border)line
-	IF ((Tx_serv_area .GT. 0.0) .AND. (C_mode .LT. 0)) THEN
-		CALL Calc_Tx_pos ( LongTx, LatTx, LongRx, LatRx, New_LongTx, New_LatTx )
-		RETURN
-	END IF
+!	IF ((Tx_serv_area .GT. 0.0) .AND. (C_mode .LT. 0)) THEN
+!		CALL Calc_Tx_pos ( LongTx, LatTx, LongRx, LatRx, New_LongTx, New_LatTx )
+!		RETURN
+!	END IF
 !
 !Check if borderline is cut
 	IF (Tx_serv_area .GT. 0.0) THEN
@@ -363,8 +363,8 @@
 	IF (DP1 .GT. Tx_serv_area) DP1 = Tx_serv_area
 	CALL TestCut (Dir_Tx_Rx, LongTx, LatTx, DP1, N_Cut, HCM_error, Land_from)
 !	If the number of (border-) line cuts (N_Cut) is odd, than the line is cutted
-!	(point is ouitside the closed line); if the number of cuts is even,
-!	than the point is inside the closed line:	
+!	(point is outside the closed line); if the number of cuts is even,
+!	then the point is inside the closed line:	
 !	Second: If not cutted, use circle point, if cutted, test all distances
 !	from Rx to line point and select the shortest distance:
 !	IF (REAL(N_Cut/2) .EQ. REAL(N_Cut)/2.0) THEN

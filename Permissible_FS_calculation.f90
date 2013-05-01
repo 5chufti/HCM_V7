@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		17.10.2005
-!														G.H.			19.07.2011
+!														G.H.			19.03.2013
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -443,12 +443,7 @@
 !	*								
 !	*****************************************************************
 !
-70	IF ((C_mode .EQ. 8) .AND. (TX_TETRA) .AND. (RX_TETRA)) THEN
-			Time_percentage = 10
-!		  Correction factors for the band 380 - 400 MHz are used.
-			Info(18) = .TRUE.
-	END IF
-	IF (CSXT .GT. CSXR) THEN
+70	IF (CSXT .GT. CSXR) THEN
 		B1 = CSXT
 		B2 = CSXR
 	  ELSE
@@ -724,7 +719,7 @@
 !	  automatic DPN calculation
 	IF (Depol_loss .EQ. '-9.9') THEN
 		X1 = Free_space_FS - Calculated_FS
-		IF ((X1 .LT. 50.0) .AND. (.NOT. INFO(7)) .AND. &
+		IF ((X1 .LT. 50.0) .AND. (H_AntRx .GT. 10) .AND. (H_AntTx .GT. 10) .AND. &
 			(Tx_serv_area + Rx_serv_area .EQ. 0.0) .AND. &
 			((Rx_ant_corr .LE. 10.0) .OR. (Tx_ant_corr .LE. 10.0)) ) THEN
 			DPN = 25.0 - 0.5*(X1)

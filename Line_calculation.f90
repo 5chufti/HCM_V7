@@ -1,6 +1,6 @@
 !
-!	Line_calculation.f90								P.Benner		23.11.2004
-!														G.H.			18.07.2011
+!	Line_calculation.f90							P.Benner		23.11.2004
+!													G.H.			23.03.2013
 !
 !	23.11.2004	Steps from 100 / 10 / 1 modified to 25 / 5 / 1
 !	18.07.2011  Steps modified to 5 / 1
@@ -34,10 +34,11 @@
 !	1049	Error in (border-) line data
 !            
 !	************************* Line_calculation ******************
-!	*	used by	:	HCM_MS_V7															
+!	*	used by	:	HCM_MS_V7			
 !	*	uses	:	Manage_List, CBR_Coordinates, 
-!	*				P_to_P_Calculation											
+!	*				P_to_P_Calculation		
 !	*************************************************************
+!
 	SUBROUTINE Line_calculation ( LongTx, LatTx, LongRx, LatRx)                
 !
 	IMPLICIT NONE
@@ -48,12 +49,12 @@
 !
 	INTEGER				IOS, N_rec, N_List, Rec_N_list(3), N_cp
 	INTEGER				N_List1, Rec_N_list1(3), teststep
-	INTEGER				I, J, K, Rec_N_x, Rec_x, N_cut
+	INTEGER				I, J, K, Rec_N_x, Rec_x
 	DOUBLE PRECISION	N_Record(22), RB, PI, Lo, La, Co_cp(2000,2)
-	REAL				FS_list(3), FS_list1(3), FS_x
+	REAL				FS_list(3), FS_list1(3), FS_x, d2b
 	CHARACTER*8			C_Record(22)
 	CHARACTER*10		BorderFile
-	LOGICAL				CBR, Take_it
+	LOGICAL				Take_it, Test_cut1
 !
 	EQUIVALENCE			(N_Record,C_Record)
 !
@@ -72,19 +73,11 @@
 	BorderFile(4:6) = Land_to
 	BorderFile(7:7) = '.'
 ! 
-	CBR = .FALSE.
-!
 !	1. Cross border range:
 	IF (D_to_border .LT. 0) THEN
-	  CBR = .TRUE.
+	  d2b = 0.0 - CBR_D
 	  BorderFile(8:10) = 'CBR'
-	END IF
-!	2. Border line:
-!	IF (D_to_border .EQ. 0) THEN
-!	  BorderFile(8:10) = '000'
-!	END IF
-!	3. x-km line:
-	IF (D_to_border .GE. 0) THEN
+	ELSE
 	  IF (D_to_border .GT. 999) THEN
 			HCM_Error = 1047
 !			Distance to borderline is too long
@@ -154,13 +147,9 @@
 		LatRx  = N_Record(K+1) * RB
 		Lo = LongTx
 		La = LatTx
-		IF (CBR) CALL CBR_Coordinates (LongRx, LatRx, Lo, La, CBR_D, Tx_serv_area)
+		CALL CBR_Coordinates (LongRx, LatRx, Lo, La, d2b)
 !		check ctry affected if x-km or CBR
-		IF (D_to_border .NE. 0) THEN
-			CALL Test_cut1 (Lo, La, LongRx, LatRx, N_cut)
-			IF (N_cut .EQ. 0) GOTO 70
-		END IF
-!		  
+		IF ((D_to_border .NE. 0) .AND. (Test_cut1 (LongRx, LatRx, Lo, La))) GOTO 70
 		CALL P_to_P_Calculation (Lo, La, LongRx, LatRx)
 		IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
 		IF (HCM_Error .EQ. 1028) GOTO 70	! Distance > 1000 km
@@ -201,13 +190,9 @@
 	  LatRx  = N_Record(22) * RB
 	  Lo = LongTx
 	  La = LatTx
-	  IF (CBR) CALL CBR_Coordinates (LongRx, LatRx, Lo, La, CBR_D, Tx_serv_area)
-!		check ctry affected if x-km or CBR
-	  IF (D_to_border .NE. 0) THEN
-			CALL Test_cut1 (Lo, La, LongRx, LatRx, N_cut)
-			IF (N_cut .EQ. 0) GOTO 100
-	  END IF
-!		  
+	  CALL CBR_Coordinates (LongRx, LatRx, Lo, La, d2b)
+!	check ctry affected if x-km or CBR
+	  IF ((D_to_border .NE. 0) .AND. (Test_cut1 (LongRx, LatRx, Lo, La))) GOTO 100
 	  CALL P_to_P_Calculation (Lo, La, LongRx, LatRx)
 	  IF (HCM_Error .EQ. 1028) GOTO 100	! Distance > 1000 km
 	  CALL Manage_List (N_rec, N_List, Rec_N_list, FS_list, Calculated_FS)
@@ -256,12 +241,9 @@
 				  LatRx  = N_Record(22) * RB
 				  Lo = LongTx
 				  La = LatTx
-!		check ctry affected if x-km or CBR
-				  IF (D_to_border .NE. 0) THEN
-					CALL Test_cut1 (Lo, La, LongRx, LatRx, N_cut)
-					IF (N_cut .EQ. 0) GOTO 120
-				  END IF
-!		  
+				  CALL CBR_Coordinates (LongRx, LatRx, Lo, La, d2b)
+!				check ctry affected if x-km or CBR
+				  IF ((D_to_border .NE. 0) .AND. (Test_cut1 (LongRx, LatRx, Lo, La))) GOTO 120
 				  CALL P_to_P_Calculation (Lo, La, LongRx, LatRx)
 				  IF (HCM_Error .EQ. 1028) GOTO 120	! Distance > 1000 km
 			  END IF
@@ -291,12 +273,9 @@
 		  LatRx  = N_Record(K+1) * RB
 		  Lo = LongTx
 		  La = LatTx
+		  CALL CBR_Coordinates (LongRx, LatRx, Lo, La, d2b)
 !		check ctry affected if x-km or CBR
-		  IF (D_to_border .NE. 0) THEN
-			CALL Test_cut1 (Lo, La, LongRx, LatRx, N_cut)
-			IF (N_cut .EQ. 0) GOTO 130
-		  END IF
-!		  
+		  IF ((D_to_border .NE. 0) .AND. (Test_cut1 (LongRx, LatRx, Lo, La))) GOTO 130
 		  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx )
 		  IF (HCM_Error .EQ. 1028) GOTO 130	! Distance > 1000 km
 !		  Find maximun of field strength:
@@ -325,7 +304,9 @@
 	  LatRx  = N_Record(Rec_x+1) * RB
 	  Lo = LongTx
 	  La = LatTx
-	  IF (CBR) CALL CBR_Coordinates (LongRx, LatRx, Lo, La, CBR_D, Tx_serv_area)
+	  CALL CBR_Coordinates (LongRx, LatRx, Lo, La, d2b)
+!	check ctry affected if x-km or CBR
+	  IF ((D_to_border .NE. 0) .AND. (Test_cut1 (LongRx, LatRx, Lo, La))) RETURN
 	  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx )
     ELSE
 	  HCM_Error = 1047
@@ -333,18 +314,16 @@
 !
 	END SUBROUTINE Line_calculation
 !
-!
 !	*********************** Test_cut1 ***************************
 !	*	used by	:	CBR_Coordinates
 !	*	uses	:
 !	*************************************************************
 !
-	SUBROUTINE Test_cut1 (LONG, LAT, N_LONG, N_LAT, N_cut)
+	LOGICAL FUNCTION Test_cut1 (LONG, LAT, N_LONG, N_LAT)
 !
 	IMPLICIT			NONE
 !
 	DOUBLE PRECISION	LONG, LAT, N_LONG, N_LAT
-	INTEGER				N_cut
 !
 	INTEGER				I, N_cp
 	DOUBLE PRECISION	CX, CY, DX, DY, AX, AY, BX, BY, RN, R, S
@@ -352,7 +331,7 @@
 !
 	COMMON /Co_ord_cp/	Co_cp, N_cp
 !
-	N_cut = 0
+	Test_cut1 = .TRUE.
 !
 	AX = LONG
 	AY = LAT
@@ -373,7 +352,7 @@
 	S = ((AY - CY) * (BX - AX) - (AX - CX) * (BY - AY)) / RN
 	IF ((R .GE. 0.0D0) .AND. (R .LE. 1.0D0) .AND. &
 		(S .GE. 0.0D0) .AND. (S .LE. 1.0D0)) THEN
-	  N_cut = 1
+	  Test_cut1 = .FALSE.
 	  RETURN
 	END IF
 !
@@ -386,50 +365,49 @@
 	DY = Co_cp(I,2)
 	GOTO 70
 !
-	END SUBROUTINE Test_cut1
+	END FUNCTION Test_cut1
 !
 !	************************* CBR_Coordinates *******************
-!	*	used by	:	Line_calculation															
+!	*	used by	:	Line_calculation		
 !	*	uses	:	Calc_Direction, Calc_Distance,
-!	*				New_coordinates, Test_cut1															
+!	*				Calc_Tx_pos, New_coordinates, Test_cut1	
 !	*************************************************************
 !
-!
-	SUBROUTINE CBR_Coordinates (LongLi, LatLi, LongTx, LatTx, CBR_D, ServTx)
+	SUBROUTINE CBR_Coordinates (LongLi, LatLi, LongTx, LatTx, d2b)
 !
 	IMPLICIT			NONE
+!	Include the interface definitions:
+	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
 	DOUBLE PRECISION	LongLi, LatLi, LongTx, LatTx
-	REAL				CBR_D, ServTx
+	REAL				d2b
 !
-	DOUBLE PRECISION	Dir, Lo, La, D
+	DOUBLE PRECISION	Lo, La
 !
-	CALL Calc_direction (LongTx, LatTx, LongLi, LatLi, Dir)
-	Lo = LongLi
-	La = LatLi
-	CALL New_coordinates (Lo, La, Dir, CBR_D, LongLi, LatLi)
+!	Calculate the direction from Tx to Rx:
+	CALL Calc_direction (LongTx, LatTx, LongLi, LatLi, Dir_Tx_Rx)
 !
 !	In case of Tx is a mobile, calculate new Tx co-ordinates:
-	IF (ServTx .GT. 0.0) THEN
-	  CALL Calc_distance (LongTx, LatTx, Lo, La, D)
-	  IF (D .LE. ServTx) THEN
-!		  Tx position = borderline point
-		  LongTx = Lo	! = borderline point
-		  LatTx  = La	! = borderline point
-	    ELSE
-!		  Calculate new Tx position
-		  Lo = LongTx	! starting point
-		  La = LatTx	! starting point
-!		  Ending point = LongTX, LatTx
-		  CALL New_coordinates (Lo, La, Dir, ServTx, LongTx, LatTx)
-	  END IF
+	IF (Tx_serv_area .GT. 0.0) THEN
+!	Calculate the distance 'Distance' between point A and B	
+		CALL Calc_distance (LongTx, LatTx, LongLi, LatLi, Distance)
+!	Calculate new Tx co-ordinates like p2p:
+		CALL Calc_Tx_pos (LongTx, LatTx, LongLi, LatLi, Lo, La)
+		LongTx = Lo
+		LatTx = La
+	END IF
+!
+	IF (d2b .LT. 0.0) THEN
+		Lo = LongLi
+		La = LatLi
+		CALL New_coordinates (Lo, La, Dir_Tx_Rx, -d2b, LongLi, LatLi)
 	END IF
 !
 	END SUBROUTINE CBR_Coordinates
 !
 !	************************* Manage_List ***********************
-!	*	used by	:	Line_calculation															
-!	*	uses	:												
+!	*	used by	:	Line_calculation				
+!	*	uses	:								
 !	*************************************************************
 !
 	SUBROUTINE Manage_List (N_rec, N_List, Rec_N_list, FS_list, Calculated_FS)

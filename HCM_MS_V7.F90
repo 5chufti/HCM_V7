@@ -1,6 +1,6 @@
 !	
 !	HCMMS_V7.F90										P.Benner		23.02.2004
-!														G.H.			10.11.2008
+!														G.H.			02.04.2013
 !	Version 7					
 !
 !	Harmonized Calculation Method for mobile services
@@ -114,7 +114,7 @@
 !
 !	***************************************************************************
 !
-	Version = '7.17b'
+	Version = '7.17'
 !
 	HCM_error = 0
 !
@@ -418,12 +418,16 @@
 	  CBR_D = 50.0
 	  ERP_ref_Tx = 14.0
 	  Info(4) = .FALSE.
+!	  Correction factors for the band 380 - 400 MHz are used.
+	  Info(18) = .TRUE.
 	ELSEIF ((Tx_frequency .GE. 390.0) .AND. (Tx_frequency .LE. 395.0) .AND. &
 	   ((C_mode .EQ. 8) .OR. (C_mode .EQ. -7))) THEN
 	  Perm_FS = 18.0
 	  CBR_D = 50.0
 	  ERP_ref_Tx = 14.0
 	  Info(4) = .FALSE.
+!	  Correction factors for the band 380 - 400 MHz are used.
+	  Info(18) = .TRUE.
 	ELSEIF ((Tx_frequency .GE. 406.1) .AND. (Tx_frequency .LE. 430.0)) THEN
 	  Perm_FS = 20.0
 	  CBR_D = 50.0
@@ -440,20 +444,14 @@
 	  ERP_ref_Tx = 13.0
 	  Info(4) = .FALSE.
 	ELSEIF ((Tx_frequency .GE. 1710.0) .AND. (Tx_frequency .LE. 1785.0)) THEN
-	  Perm_FS = 38.0
+	  Perm_FS = 35.0
 	  CBR_D = 15.0
 	  ERP_ref_Tx = 13.0
 	  Info(4) = .FALSE.
 	ELSEIF ((Tx_frequency .GE. 1805.0) .AND. (Tx_frequency .LE. 1880.0)) THEN
-	  Perm_FS = 42.0
+	  Perm_FS = 35.0
 	  CBR_D = 15.0
 	  ERP_ref_Tx = 13.0
-	  Info(4) = .FALSE.
-	ELSEIF ((Tx_frequency .GE. 1885.0) .AND. (Tx_frequency .LE. 2025.0)) THEN
-	  Perm_FS = 21.0
-	  Info(4) = .FALSE.
-	ELSEIF ((Tx_frequency .GE. 2110.0) .AND. (Tx_frequency .LE. 2200.0)) THEN
-	  Perm_FS = 21.0
 	  Info(4) = .FALSE.
 	END IF
 !
@@ -483,6 +481,7 @@
 		CASE (4)
 			Perm_FS = 32.0
 			Time_percentage = 10
+			H_AntRx = 3
 !	3 = GSM - NMT (10 %, EP = 32 dBuV/m)
 		CASE (3)
 			Perm_FS = 32.0
@@ -528,10 +527,9 @@
 			H_AntRx = 3
 !	-7 = 380 - 400 MHz emergency / security services line calcl.
 		CASE (-7)
-!			nothing
+			H_AntRx = 10
 !	-8 = UMTS / IMT2000 line calcl.
 		CASE (-8)
-			Time_percentage = 10
 			H_AntRx = 3
 !	C_mode is out of range
 		CASE DEFAULT
@@ -558,7 +556,7 @@
 		END IF
 	END IF                        
 !
-!	Input value MARAIN ?
+!	Input value Max_CBR_D ?
 	IF (Max_CBR_D_input .NE. '   ') THEN
 		READ (Max_CBR_D_input, '(I3)', IOSTAT = IOS) IMR
 		IF (IOS .NE. 0) THEN  
@@ -588,10 +586,10 @@
 !
 	IF (C_mode .LT. 0) THEN
 !		(Border-) line calculation:   
-		CALL Line_calculation ( LongTx, LatTx, LongRx, LatRx)
+		CALL Line_calculation (LongTx, LatTx, LongRx, LatRx)
 	  ELSE
 !		Point to point calculation:
-		CALL P_to_P_calculation ( LongTx, LatTx, LongRx, LatRx)
+		CALL P_to_P_calculation (LongTx, LatTx, LongRx, LatRx)
 		CALL Permissble_FS_calculation ()
 	END IF
 !

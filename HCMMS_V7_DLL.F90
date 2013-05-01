@@ -1,6 +1,6 @@
 !
 !	HCMMS_V7_DLL.F90									P. Benner		08.01.2004
-!														G.H.			30.03.2011
+!														G.H.			25.03.2013
 !	DLL to the HCMMS_V7 subroutuine (Berlin 2003)
 !
 	SUBROUTINE HCMMS_V7_DLL ( I_C_mode, I_bor_dis, I_PD, I_Distance, I_H_Datab_Tx, &
@@ -255,7 +255,8 @@
 			WRITE (2,*) " Input value of corr. f.delta f.: ", Cor_fact_frequ_diff, " dB"
 			WRITE (2,*) " Radius of the service area Rx  : ", Rad_of_Rx_serv_area, " km"
 		ELSE
-			WRITE (2,*) " Input value of max. crossb. r. : ", Max_CBR_D_input, " km"
+			WRITE (2,'(A35,I4,A3)') " Input value of dist. to border : ", D_to_border, " km"
+			WRITE (2,*) " Input value of max. crossb. r. :  ", Max_CBR_D_input, " km"
 		END IF
 		WRITE (2,*) " Input value of permissible fs. : ", Perm_FS_input, " dBµV/m"
 		WRITE (2,*) ""
