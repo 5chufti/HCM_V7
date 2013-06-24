@@ -74,12 +74,12 @@
 !	Include definitions:
 	INCLUDE			'HCM_MS_V7_definitions.F90'
 !
-	INTEGER*4		IOS, I, CSXR, CSXT, B1, B2
+	INTEGER*4		IOS, I, CSXR, CSXT
 !
 	LOGICAL			TX_TETRA, RX_TETRA, TX_DIG, RX_DIG, TXGSM
 !
 	REAL			acorrB1, FACTOR, OMEGA, acorrsinus
-	REAL			GANT, DPN
+	REAL			GANT, DPN, B1, B2
 	REAL			CS1(7), CS2(7), CS3(7), CS4(7), CS5(7)
 	REAL			CS6(7), CS7(7), CS8(7), CS9(7), CS10(7)
 	REAL			CS11(7), CS12(7), CS13(7), CS14(7), CS15(7) 
@@ -444,19 +444,19 @@
 !	*****************************************************************
 !
 70	IF (CSXT .GT. CSXR) THEN
-		B1 = CSXT
-		B2 = CSXR
+		B1 = REAL(CSXT)
+		B2 = REAL(CSXR)
 	  ELSE
-		B2 = CSXT
-		B1 = CSXR
+		B2 = REAL(CSXT)
+		B1 = REAL(CSXR)
 	END IF
 !
-	IF (Delta_frequency .LT. ((B1 + B2) / 2)) THEN
+	IF (Delta_frequency .LT. ((B1 + B2) / 2.0)) THEN
 		Corr_delta_f = 0.0
-	ELSEIF ((Delta_frequency .LE. ((B1 + 2 * B2) / 2)) .AND. & 
-		(Delta_frequency .GE. ((B1 + B2) / 2))) THEN
+	ELSEIF ((Delta_frequency .LE. ((B1 + 2.0 * B2) / 2.0)) .AND. & 
+		(Delta_frequency .GE. ((B1 + B2) / 2.0))) THEN
 			Corr_delta_f = 45.0
-	ELSEIF (Delta_frequency .GT. ((B1 + 2 * B2) / 2)) THEN
+	ELSEIF (Delta_frequency .GT. ((B1 + 2.0 * B2) / 2.0)) THEN
 	  Info(15) = .TRUE.
 !	  Frequency difference outside definition range!
 	  Corr_delta_f = 82.0
@@ -509,13 +509,13 @@
 !	Wideband:
 		Info(17) = .True.
 		IF (CSXR .GT. CSXT) THEN
-			OMEGA = Delta_frequency / CSXR
-			B1 = CSXR
-			B2 = CSXT
+			OMEGA = REAL(Delta_frequency) / REAL(CSXR)
+			B1 = REAL(CSXR)
+			B2 = REAL(CSXT)
 		  ELSE
-			OMEGA = Delta_frequency / CSXT
-			B1 = CSXT
-			B2 = CSXR
+			OMEGA = REAL(Delta_frequency) / REAL(CSXT)
+			B1 = REAL(CSXT)
+			B2 = REAL(CSXR)
 		END IF
 !
 !	acorrB1:
@@ -542,7 +542,7 @@
 !
 !	WB/NB correction
 		IF ((Channel_sp_Tx .EQ. 0) .AND. (TX_DIG) .AND. (Tx_frequency .LE. 470.0)) &
-				Perm_FS = Perm_FS + 6*LOG10(REAL(CSXT)/25000.0)
+				Perm_FS = Perm_FS + 6*LOG10(Real(CSXT)/25000.0)
 ! 
 	ELSE
 !	narrowband curves:
