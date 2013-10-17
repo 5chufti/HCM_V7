@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		17.10.2005
-!														G.H.			19.03.2013
+!														G.H.			16.10.2013
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -213,9 +213,11 @@
 !
 !	**************************************************************
 !
+	IF (C_Mode .EQ. 99) RETURN
 !
 !	Delta frequency in Hz:
 	Delta_frequency = DABS(DINT(Tx_frequency*1D6) - DINT(Rx_frequency*1D6))
+!
 !	Input value for correction factor according delta frequency ?
 	IF (Cor_fact_frequ_diff .NE. '    ') THEN
 	  Info(14) = .TRUE.
@@ -241,6 +243,29 @@
 				Corr_delta_f = 82.0
 		END SELECT
 	  GOTO 300
+	END IF
+!
+!	Module GSM 1800:
+	IF ((C_Mode .EQ. 5) .OR. (C_Mode .EQ. 6)) THEN
+!
+		IF (Delta_frequency .GT. 600000) THEN
+			Info(15) = .TRUE.
+!		Frequency difference outside definition range!
+			Corr_delta_f = 82
+			GOTO 300
+		END IF       
+!
+		SELECT CASE (Delta_frequency)
+			CASE (:100000)
+				Corr_delta_f = 0.0
+			CASE (100001:200000)
+				Corr_delta_f = REAL(Delta_frequency - 100000) * 0.00018
+			CASE (200001:400000)
+				Corr_delta_f = 18.0 + REAL(Delta_frequency - 200000) * 0.00016
+			CASE (400001:)
+				Corr_delta_f = 50.0 + REAL(Delta_frequency - 400000) * 0.00004
+		END SELECT
+		GOTO 300          
 	END IF
 !
 	TX_DIG = (INDEX('1279',Desig_of_Tx_emis(6:6)) .GT. 0)
@@ -309,160 +334,80 @@
 	END IF
 !
 !	Module GSM 900:
-	IF ((C_Mode .EQ. 1) .OR. (C_Mode .EQ. 2) .OR. (C_Mode .EQ. 3)) GOTO 20
-!
-!	Module GSM 1800:
-	IF ((C_Mode .EQ. 5) .OR. (C_Mode .EQ. 6)) GOTO 60
-!
-!	catch "TETRA" or the like
-	IF	( ((C_Mode .EQ. 8) .OR. (C_Mode .EQ. 0)) .AND. &
-		( ((RX_TETRA) .AND. (TX_TETRA)) .OR. ((TX_DIG) .AND. (RX_DIG)) ) ) GOTO 70
-!
-!	If at least one station is not digital modulation, use normal
-!	Vienna calculation.
-!
-!	Module normal Berlin:
-	IF ((C_Mode .EQ. 0) .OR. (C_Mode .EQ. 4) .OR. &
-		(C_Mode .EQ. 7) .OR. (C_Mode .EQ. 8)) GOTO 100
-!
-	RETURN
-!
-!	*****************************************************************
-!	*								
-!	*						Module GSM 900	
-!	*								
-!	*****************************************************************
+	IF ((C_Mode .EQ. 1) .OR. (C_Mode .EQ. 2) .OR. (C_Mode .EQ. 3)) THEN
 !     
 !	Tx - bandwidth > 100 kHz ?
 !
-20	TXGSM = (CSXT .GT. 100000)
+		TXGSM = (CSXT .GT. 100000)
 !
 !	Determine Corr_delta_f:
 !
-	IF ((C_Mode .EQ. 1) .AND. (.NOT. TXGSM)) THEN
-	  HCM_Error = 1041
+		IF ((C_Mode .EQ. 1) .AND. (.NOT. TXGSM)) THEN
+			HCM_Error = 1041
 !	  Channel spacing outside definition range (Tx)!
-	  RETURN
-	END IF
+			RETURN
+		END IF
 !
-	IF (C_Mode .EQ. 1) THEN 
+		IF (C_Mode .EQ. 1) THEN 
 !	  Determine Corr_delta_f
-		SELECT CASE (Delta_frequency)
-			CASE (0)
-				Corr_delta_f = 0.0
-			CASE (200000)
-				Corr_delta_f = 18.0
-			CASE (400000)
-				Corr_delta_f = 50.0
-			CASE DEFAULT
+			SELECT CASE (Delta_frequency)
+				CASE (0)
+					Corr_delta_f = 0.0
+				CASE (200000)
+					Corr_delta_f = 18.0
+				CASE (400000)
+					Corr_delta_f = 50.0
+				CASE DEFAULT
 !	  Frequency difference outside definition range!
-				Info(15) = .TRUE.
-				Corr_delta_f = 82
-		END SELECT
-		GOTO 300
-	END IF
+					Info(15) = .TRUE.
+					Corr_delta_f = 82
+			END SELECT
+		END IF
 !
-	IF (C_Mode .EQ. 2) THEN
+		IF (C_Mode .EQ. 2) THEN
 !	  GSM <-> TACS
-	  IF (TXGSM) THEN
+			IF (TXGSM) THEN
 !		  GSM interference to TACS
-		SELECT CASE (Delta_frequency)
-			CASE (:100000)
-				Corr_delta_f = -11.0
-			CASE (100001:200000)
-				Corr_delta_f = -11.0 + REAL(Delta_frequency - 100000) * 0.3 / 1000.0
-			CASE (200001:250000)
-				Corr_delta_f = 19.0 + REAL(Delta_frequency - 200000) * 3.0 / 50000.0
-			CASE (250001:)
-				Corr_delta_f = 22.0 + REAL(Delta_frequency - 250000) * 27.0 / 150000.0
-		END SELECT
-	  ELSE
+				SELECT CASE (Delta_frequency)
+					CASE (:100000)
+						Corr_delta_f = -11.0
+					CASE (100001:200000)
+						Corr_delta_f = -11.0 + REAL(Delta_frequency - 100000) * 0.3 / 1000.0
+					CASE (200001:250000)
+						Corr_delta_f = 19.0 + REAL(Delta_frequency - 200000) * 3.0 / 50000.0
+					CASE (250001:)
+						Corr_delta_f = 22.0 + REAL(Delta_frequency - 250000) * 27.0 / 150000.0
+				END SELECT
+			ELSE
 !		  TACS interference to GSM
-		  CALL TACSNMT (Delta_frequency, Corr_delta_f)
-		  IF (Delta_frequency .GT. 275000) Corr_delta_f = 51.0
-	  END IF
-	  GOTO 300	
-	END IF              
+				CALL TACSNMT (Delta_frequency, Corr_delta_f)
+				IF (Delta_frequency .GT. 275000) Corr_delta_f = 51.0
+			END IF
+		END IF              
 !
-	IF (C_Mode .EQ. 3) THEN
+		IF (C_Mode .EQ. 3) THEN
 !	  GSM <-> NMT
-	  IF (TXGSM) THEN
+			IF (TXGSM) THEN
 !		  GSM interference to NMT
-		SELECT CASE (Delta_frequency)
-			CASE (:100000)
-				Corr_delta_f = -10.0
-			CASE (100001:200000)
-				Corr_delta_f = -10.0 + REAL(Delta_frequency - 100000) * 0.3 / 1000.0
-			CASE (200001:250000)
-				Corr_delta_f = 20.0 + REAL(Delta_frequency - 200000) * 3.0 / 50000.0
-			CASE (250001:)
-				Corr_delta_f = 23.0 + REAL(Delta_frequency - 250000) * 27.0 / 150000.0
-		END SELECT
-	  ELSE
+				SELECT CASE (Delta_frequency)
+					CASE (:100000)
+						Corr_delta_f = -10.0
+					CASE (100001:200000)
+						Corr_delta_f = -10.0 + REAL(Delta_frequency - 100000) * 0.3 / 1000.0
+					CASE (200001:250000)
+						Corr_delta_f = 20.0 + REAL(Delta_frequency - 200000) * 3.0 / 50000.0
+					CASE (250001:)
+						Corr_delta_f = 23.0 + REAL(Delta_frequency - 250000) * 27.0 / 150000.0
+				END SELECT
+			ELSE
 !		  NMT interference to GSM
-		  CALL TACSNMT (Delta_frequency, Corr_delta_f)
-	  END IF
-	END IF              
+				CALL TACSNMT (Delta_frequency, Corr_delta_f)
+			END IF
+		END IF   
 !
-	GOTO 300          
-!
-!
-!
-!	*****************************************************************
-!	*								
-!	*						Module GSM 1800	
-!	*								
-!	*****************************************************************
-!
-60	IF (Delta_frequency .GT. 600000) THEN
-		Info(15) = .TRUE.
-!		Frequency difference outside definition range!
-		Corr_delta_f = 82
 		GOTO 300
-	END IF       
-!
-	SELECT CASE (Delta_frequency)
-		CASE (:100000)
-			Corr_delta_f = 0.0
-		CASE (100001:200000)
-			Corr_delta_f = REAL(Delta_frequency - 100000) * 0.00018
-		CASE (200001:400000)
-			Corr_delta_f = 18.0 + REAL(Delta_frequency - 200000) * 0.00016
-		CASE (400001:)
-			Corr_delta_f = 50.0 + REAL(Delta_frequency - 400000) * 0.00004
-	END SELECT
-!
-	GOTO 300          
-!	
-!	
-!
-!	*****************************************************************
-!	*								
-!	*			Module 380 - 400 MHz			
-!	*	(or Tx and Rx are digital systems)			
-!	*								
-!	*****************************************************************
-!
-70	IF (CSXT .GT. CSXR) THEN
-		B1 = REAL(CSXT)
-		B2 = REAL(CSXR)
-	  ELSE
-		B2 = REAL(CSXT)
-		B1 = REAL(CSXR)
 	END IF
 !
-	IF (Delta_frequency .LT. ((B1 + B2) / 2.0)) THEN
-		Corr_delta_f = 0.0
-	ELSEIF ((Delta_frequency .LE. ((B1 + 2.0 * B2) / 2.0)) .AND. & 
-		(Delta_frequency .GE. ((B1 + B2) / 2.0))) THEN
-			Corr_delta_f = 45.0
-	ELSEIF (Delta_frequency .GT. ((B1 + 2.0 * B2) / 2.0)) THEN
-	  Info(15) = .TRUE.
-!	  Frequency difference outside definition range!
-	  Corr_delta_f = 82.0
-	END IF  
-!
-	GOTO 300
 !
 !	*****************************************************************
 !	*								
@@ -471,9 +416,34 @@
 !	*	Determination of correction factor according to delta f	
 !	*								
 !	*****************************************************************
+
+	IF (Info(18) .AND. TX_DIG .AND. RX_DIG) THEN
+
+!	380 - 400 MHz (Tx and Rx are digital systems)			
 !
+		IF (CSXT .GT. CSXR) THEN
+			B1 = REAL(CSXT)
+			B2 = REAL(CSXR)
+		ELSE
+			B2 = REAL(CSXT)
+			B1 = REAL(CSXR)
+		END IF
 !
-100	SELECT CASE (CSXR)
+		IF (Delta_frequency .LT. ((B1 + B2) / 2.0)) THEN
+			Corr_delta_f = 0.0
+		ELSEIF ((Delta_frequency .LE. ((B1 + 2.0 * B2) / 2.0)) .AND. & 
+			(Delta_frequency .GE. ((B1 + B2) / 2.0))) THEN
+				Corr_delta_f = 45.0
+		ELSEIF (Delta_frequency .GT. ((B1 + 2.0 * B2) / 2.0)) THEN
+		Info(15) = .TRUE.
+!	  Frequency difference outside definition range!
+		  Corr_delta_f = 82.0
+		END IF  
+!
+	ELSE	
+!	everything except 380-400 MHz digital
+!
+	  SELECT CASE (CSXR)
 		CASE (:11000)
 			IF ((TX_TETRA) .AND. (.NOT. RX_TETRA) .AND. (CSXR .LE. 8800)) THEN
 				Channel_sp_Rx = 10000
@@ -482,13 +452,11 @@
 			END IF
 		CASE (11001:14000)
 			Channel_sp_Rx = 20000
-		CASE (14001:16000)
+		CASE (14001:)
 			Channel_sp_Rx = 25000
-		CASE (16001:)
-			Channel_sp_Rx = 0
-	END SELECT	
+	  END SELECT	
 !
-	SELECT CASE (CSXT)	
+	  SELECT CASE (CSXT)	
 		CASE (:4400) 
 			Channel_sp_Tx = 5000
 		CASE (4401:5500)
@@ -502,11 +470,17 @@
 		CASE (14001:16000)
 			Channel_sp_Tx = 25000
 		CASE (16001:)
-			Channel_sp_Tx = 0
-	END SELECT
+			IF (TX_DIG) THEN
+				Channel_sp_Tx = 0
+			ELSE
+				HCM_Error = 1041
+!			Channel spacing outside definition range (Tx)! 
+				RETURN
+			END IF
+	  END SELECT
 !
-	IF (Channel_sp_Rx * Channel_sp_Tx .EQ. 0) THEN
-!	Wideband:
+	  IF (TX_DIG) THEN
+!	digital:
 		Info(17) = .True.
 		IF (CSXR .GT. CSXT) THEN
 			OMEGA = REAL(Delta_frequency) / REAL(CSXR)
@@ -541,11 +515,11 @@
 		Corr_delta_f = acorrsinus - (acorrsinus - acorrB1) * B2 / B1
 !
 !	WB/NB correction
-		IF ((Channel_sp_Tx .EQ. 0) .AND. (TX_DIG) .AND. (Tx_frequency .LE. 470.0)) &
+		IF ((Channel_sp_Tx .EQ. 0) .AND. (Tx_frequency .LE. 470.0) .AND. (C_Mode .LT. 0) .AND. (Perm_FS_input .EQ. '     ')) &
 				Perm_FS = Perm_FS + 6*LOG10(Real(CSXT)/25000.0)
 ! 
-	ELSE
-!	narrowband curves:
+	  ELSE	! not TX_DIG
+!	analog curves:
 		SELECT CASE (Channel_sp_Rx)
 		  CASE (10000)
 		  	CSXX = CS19
@@ -653,7 +627,11 @@
 				  Corr_delta_f = 82.0
 		END SELECT
 !
-	END IF	! WB/NB
+	  END IF	! dig/ana
+	END IF		! Tetra/normal
+!
+!
+! common end for GSM/IMT/normal
 !
 300	Perm_FS = Perm_FS + Corr_delta_f
 !

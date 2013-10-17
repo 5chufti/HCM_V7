@@ -1,6 +1,6 @@
 !
 !	HCMMS_V7_DLL.F90									P. Benner		08.01.2004
-!														G.H.			25.03.2013
+!														G.H.			16.10.2013
 !	DLL to the HCMMS_V7 subroutuine (Berlin 2003)
 !
 	SUBROUTINE HCMMS_V7_DLL ( I_C_mode, I_bor_dis, I_PD, I_Distance, I_H_Datab_Tx, &
@@ -173,46 +173,58 @@
 		WRITE (2,*) ""
 		WRITE (2,'(A35,I4,A2,$)') &
 				"  Mode of calculation            : ", C_mode, " ("
-		SELECT CASE (C_mode)
-			CASE (99) 
-				WRITE (2,*) "Point to point like line calc.)"
-			CASE  (9) 
-				WRITE (2,*) "UMTS/IMT2000 point to p."
-			CASE  (8) 
-				WRITE (2,*) "380-400 MHz emerg./secur.)"
-			CASE  (7) 
-				WRITE (2,*) "Normal Agreement cov. 50% t.)"
-			CASE  (6) 
-				WRITE (2,*) "GSM1800 <-> GSM1800 ML 42 dBµV/m)"
-			CASE  (5) 
-				WRITE (2,*) "GSM1800 <-> GSM1800 FB 38 dBµV/m)"
-			CASE  (4) 
-				WRITE (2,*) "ERMES<->ERMES 32 dBµV/m)"
-			CASE  (3)
-				WRITE (2,*) "GSM900 <-> NMT)"
-			CASE  (2) 
-				WRITE (2,*) "GSM900 <-> TACS)"
-			CASE  (1) 
-				WRITE (2,*) "GSM900 <-> GSM900)"
-			CASE  (0) 
-				WRITE (2,*) "Normal Agreement)"
-			CASE (-1) 
-				WRITE (2,*) "Agreement line calc. h2=10m)"
-			CASE (-2) 
-				WRITE (2,*) "GSM900 line calc. h2=3m)"
-			CASE (-3) 
-				WRITE (2,*) "ERMES line calc.12 dbµV/m)"
-			CASE (-4) 
-				WRITE (2,*) "ERMES line calc.32 dbµV/m)"
-			CASE (-5) 
-				WRITE (2,*) "ERMES line calc.52 dbµV/m)"
-			CASE (-6) 
-				WRITE (2,*) "GSM1800 line calc. h2=3m)"
-			CASE (-7) 
-				WRITE (2,*) "380-400 MHz line calc.)"
-			CASE (-8) 
-				WRITE (2,*) "UMTS/IMT2000 line calc.)"
-		END SELECT
+	SELECT CASE (C_mode)
+		CASE (99) 
+			WRITE (2,*) "Point to point like line calc.)"
+		CASE  (12) 
+			WRITE (2,*) "p2p non strict HCM t%=1.)"
+		CASE  (11) 
+			WRITE (2,*) "p2p non strict HCM t%=50.)"
+		CASE  (10) 
+			WRITE (2,*) "p2p non strict HCM t%=10.)"
+		CASE  (9) 
+			WRITE (2,*) "UMTS/IMT2000 point to p.)"
+		CASE  (8) 
+			WRITE (2,*) "380-400 MHz emerg./secur.)"
+		CASE  (7) 
+			WRITE (2,*) "Normal Agreement cov. 50% t.)"
+		CASE  (6) 
+			WRITE (2,*) "GSM1800 <-> GSM1800 ML 42 dBµV/m)"
+		CASE  (5) 
+			WRITE (2,*) "GSM1800 <-> GSM1800 FB 38 dBµV/m)"
+		CASE  (4) 
+			WRITE (2,*) "ERMES<->ERMES 32 dBµV/m)"
+		CASE  (3)
+			WRITE (2,*) "GSM900 <-> NMT)"
+		CASE  (2) 
+			WRITE (2,*) "GSM900 <-> TACS)"
+		CASE  (1) 
+			WRITE (2,*) "GSM900 <-> GSM900)"
+		CASE  (0) 
+			WRITE (2,*) "Normal Agreement)"
+		CASE (-1) 
+			WRITE (2,*) "Agreement line calc. h2=10m)"
+		CASE (-2) 
+			WRITE (2,*) "GSM900 line calc. h2=3m)"
+		CASE (-3) 
+			WRITE (2,*) "ERMES line calc.12 dbµV/m)"
+		CASE (-4) 
+			WRITE (2,*) "ERMES line calc.32 dbµV/m)"
+		CASE (-5) 
+			WRITE (2,*) "ERMES line calc.52 dbµV/m)"
+		CASE (-6) 
+			WRITE (2,*) "GSM1800 line calc. h2=3m)"
+		CASE (-7) 
+			WRITE (2,*) "380-400 MHz line calc.)"
+		CASE (-8) 
+			WRITE (2,*) "UMTS/IMT2000 line calc.)"
+		CASE (-9) 
+			WRITE (2,*) "p2l non strict HCM t%=10 h2=3.)"
+		CASE (-10) 
+			WRITE (2,*) "p2l non strict HCM t%=10 h2=10.)"
+		CASE (-11) 
+			WRITE (2,*) "p2l non strict HCM t%=50 h2=3.)"
+	END SELECT
 		WRITE (2,*) ""
 		WRITE (2,*) "                     Input data :"
 		WRITE (2,*)
@@ -406,7 +418,7 @@
 		  CASE (1049)
 			WRITE (2,*) " Error in line data !"
 		  CASE (1050)
-			WRITE (2,*) " No Agreement frequency and important input is missing !"
+			WRITE (2,*) " No Agreement frequency or C_Mode and important input is missing !"
 		  CASE (2000:)
 			WRITE (2,*) " Error in looking up FS-figures !"
 		END SELECT
@@ -480,10 +492,9 @@
 		END IF
 !
 		IF (Info(4)) THEN
-			WRITE (2,*) " Transmitter frequency is outside the range of"
-			WRITE (2,*) " table in Annex 1! Permissible field strength,"
-			WRITE (2,*) " max. crossborder range and the ERP of the"
-			WRITE (2,*) " reference transmitter are set to 0!"
+			WRITE (2,*) " No HCM TX frequency or non strict C_Mode!"
+			WRITE (2,*) " Permissible field strength, max CBR and"
+			WRITE (2,*) " ERP of the ref. TX are taken from input!"
 			WRITE (2,*) " "   
 		END IF
 !

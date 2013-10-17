@@ -1,6 +1,6 @@
 !	
 !	HCMMS_V7.F90										P.Benner		23.02.2004
-!														G.H.			02.04.2013
+!														G.H.			16.10.2013
 !	Version 7					
 !
 !	Harmonized Calculation Method for mobile services
@@ -27,7 +27,6 @@
 	DOUBLE PRECISION	CI, LongTx, LatTx, LongRx, LatRx
 	INTEGER*4			I, IOS, IMR
 	CHARACTER*376		Strings
-	LOGICAL				time50
 !
 	EQUIVALENCE			(Strings,Sea_temperature)
 !
@@ -114,7 +113,7 @@
 !
 !	***************************************************************************
 !
-	Version = '7.17'
+	Version = '7.18b'
 !
 	HCM_error = 0
 !
@@ -460,6 +459,27 @@
 !	99 = line as P2P
 		CASE (99)
 !			nothing
+!	12 = P2P non strict HCM t%=1
+		CASE (12)
+			Time_percentage = 1
+			CBR_D      = -999.9
+			ERP_ref_Tx = -999.9
+			Perm_FS    = -999.9
+			Info(4) = .TRUE.
+!	11= P2P non strict HCM t%=50
+		CASE (11)
+			Time_percentage = 50
+			CBR_D      = -999.9
+			ERP_ref_Tx = -999.9
+			Perm_FS    = -999.9
+			Info(4) = .TRUE.
+!	10 = P2P non strict HCM t%=10
+		CASE (10)
+			Time_percentage = 10
+			CBR_D      = -999.9
+			ERP_ref_Tx = -999.9
+			Perm_FS    = -999.9
+			Info(4) = .TRUE.
 !	9 = UMTS / IMT2000 point to point calculations.
 		CASE (9)
 !			nothing
@@ -499,7 +519,7 @@
 !			nothing
 !	-1 = Coordination line calculation (h2 = 10m)
 		CASE (-1)
-			H_AntRx = 10
+!			nothing
 !	-2 = Coordination line calcul. GSM (h2 = 3m)
 		CASE (-2)
 			Perm_FS = 19.0
@@ -527,16 +547,43 @@
 			H_AntRx = 3
 !	-7 = 380 - 400 MHz emergency / security services line calcl.
 		CASE (-7)
-			H_AntRx = 10
+!			nothing
 !	-8 = UMTS / IMT2000 line calcl.
 		CASE (-8)
 			H_AntRx = 3
+!	-9 = P2L non strict HCM t%=10 h2=3
+		CASE (-9)
+			Time_percentage = 10
+			H_AntRx = 3
+			CBR_D      = -999.9
+			ERP_ref_Tx = -999.9
+			Perm_FS    = -999.9
+			Info(4) = .TRUE.
+!	-10 = P2L non strict HCM t%=10 h2=10
+		CASE (-10)
+			Time_percentage = 10
+			CBR_D      = -999.9
+			ERP_ref_Tx = -999.9
+			Perm_FS    = -999.9
+			Info(4) = .TRUE.
+!	-11 = P2L non strict HCM t%=50 h2=3
+		CASE (-11)
+			Time_percentage = 50
+			H_AntRx = 3
+			CBR_D      = -999.9
+			ERP_ref_Tx = -999.9
+			Perm_FS    = -999.9
+			Info(4) = .TRUE.
 !	C_mode is out of range
 		CASE DEFAULT
 			HCM_error = 1025
 			RETURN
 !
 	END SELECT
+!
+!	harmonized service in harmonized band ?
+	IF (Info(18) .AND. (Desig_of_Tx_emis(1:7) .EQ. '25K0G7W') .AND. &
+			(Desig_of_Rx_emis(1:7) .EQ. '25K0G7W')) Time_percentage = 10
 !
 	Perm_FS_from_table = Perm_FS
 !
@@ -577,10 +624,6 @@
 !
 !	Sea temparatur:
 	IF (Sea_temperature .NE. 'W') Sea_temperature = 'C'
-!
-!	50% time?
-	INQUIRE (FILE='HCM_T50',EXIST=time50)
-	IF (time50) Time_percentage = 50
 !
 !	**************************************************************
 !
