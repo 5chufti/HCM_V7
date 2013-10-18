@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		17.10.2005
-!														G.H.			16.10.2013
+!														G.H.			18.10.2013
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -213,8 +213,7 @@
 !
 !	**************************************************************
 !
-	IF (C_Mode .EQ. 99) RETURN
-!
+
 !	Delta frequency in Hz:
 	Delta_frequency = DABS(DINT(Tx_frequency*1D6) - DINT(Rx_frequency*1D6))
 !
@@ -273,36 +272,6 @@
 	TX_TETRA = (Desig_of_Tx_emis(1:7) .EQ. '25K0G7W')
 	RX_TETRA = (Desig_of_Rx_emis(1:7) .EQ. '25K0G7W')
 !
-!	Bandwidth of Rx:   
-	IF ((RX_TETRA) .AND. (.NOT. TX_TETRA)) THEN
-		CSXR = 16000
-	ELSE
-		DRX = Desig_of_Rx_emis(1:4)
-		I = INDEX(DRX,'K')
-		IF (I .EQ. 0) THEN
-			I = INDEX(DRX,'M')
-			IF (I .EQ. 0) THEN
-				HCM_Error = 1040
-!			Channel spacing outside definition range (Rx)! 
-				RETURN
-			ELSE 
-				FACTOR = 1000000.0
-			END IF
-		ELSE
-			FACTOR = 1000.0
-		END IF
-!	Replace 'K' or 'M' with '.':
-		DRX(I:I) = '.'   
-		READ (DRX, *, IOSTAT=IOS) X1
-		IF (IOS .NE. 0) THEN
-			HCM_Error = 1040
-!		Channel spacing outside definition range (Rx)!
-			RETURN
-		ELSE 
-			CSXR = NINT(X1 * FACTOR)
-		END IF
-	END IF
-!
 !	Bandwidth of TX:   
 	IF ((TX_TETRA) .AND. (.NOT. RX_TETRA)) THEN
 		CSXT = 16000
@@ -330,6 +299,39 @@
 			RETURN
 		ELSE 
 			CSXT = NINT(X1 * FACTOR)
+		END IF
+	END IF
+!
+!	bail out for line calculations
+	IF ((C_Mode .EQ. 99) .OR. (C_Mode .LT. 0)) GOTO 400
+!
+!	Bandwidth of Rx:   
+	IF ((RX_TETRA) .AND. (.NOT. TX_TETRA)) THEN
+		CSXR = 16000
+	ELSE
+		DRX = Desig_of_Rx_emis(1:4)
+		I = INDEX(DRX,'K')
+		IF (I .EQ. 0) THEN
+			I = INDEX(DRX,'M')
+			IF (I .EQ. 0) THEN
+				HCM_Error = 1040
+!			Channel spacing outside definition range (Rx)! 
+				RETURN
+			ELSE 
+				FACTOR = 1000000.0
+			END IF
+		ELSE
+			FACTOR = 1000.0
+		END IF
+!	Replace 'K' or 'M' with '.':
+		DRX(I:I) = '.'   
+		READ (DRX, *, IOSTAT=IOS) X1
+		IF (IOS .NE. 0) THEN
+			HCM_Error = 1040
+!		Channel spacing outside definition range (Rx)!
+			RETURN
+		ELSE 
+			CSXR = NINT(X1 * FACTOR)
 		END IF
 	END IF
 !
@@ -417,7 +419,7 @@
 !	*								
 !	*****************************************************************
 
-	IF (Info(18) .AND. TX_DIG .AND. RX_DIG) THEN
+	IF ((Info(18) .AND. TX_DIG .AND. RX_DIG) .OR. (TX_TETRA .AND. RX_TETRA)) THEN
 
 !	380 - 400 MHz (Tx and Rx are digital systems)			
 !
@@ -514,10 +516,6 @@
 !	
 		Corr_delta_f = acorrsinus - (acorrsinus - acorrB1) * B2 / B1
 !
-!	WB/NB correction
-		IF ((Channel_sp_Tx .EQ. 0) .AND. (Tx_frequency .LE. 470.0) .AND. (C_Mode .LT. 0) .AND. (Perm_FS_input .EQ. '     ')) &
-				Perm_FS = Perm_FS + 6*LOG10(Real(CSXT)/25000.0)
-! 
 	  ELSE	! not TX_DIG
 !	analog curves:
 		SELECT CASE (Channel_sp_Rx)
@@ -709,6 +707,11 @@
 !
 	Perm_FS = Perm_FS + DPN
 !
+!	WB/NB correction
+400		IF (TX_DIG .AND. (Channel_sp_Tx .EQ. 0) .AND. (Tx_frequency .LE. 470.0) .AND. & 
+			(C_Mode .LT. 0) .AND. (Perm_FS_input .EQ. '     ')) &
+				Perm_FS = Perm_FS + 6*LOG10(Real(CSXT)/25000.0)
+! 
 	RETURN
 !
 	END SUBROUTINE Permissble_FS_calculation

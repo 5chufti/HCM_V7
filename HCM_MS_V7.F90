@@ -1,6 +1,6 @@
 !	
 !	HCMMS_V7.F90										P.Benner		23.02.2004
-!														G.H.			16.10.2013
+!														G.H.			18.10.2013
 !	Version 7					
 !
 !	Harmonized Calculation Method for mobile services
@@ -337,6 +337,10 @@
 	  ELSE
 		Rx_serv_area = 0.0
 	  END IF
+	ELSE
+		Rx_frequency = 0
+		Desig_of_Rx_emis = '       '
+		Cor_fact_frequ_diff = '    '
 	END IF
 !	end of point to point data
 !
@@ -411,16 +415,14 @@
 	  CBR_D = 80.0
 	  ERP_ref_Tx = 12.0
 	  Info(4) = .FALSE.
-	ELSEIF ((Tx_frequency .GE. 380.0) .AND. (Tx_frequency .LE. 385.0) .AND. &
-	   ((C_mode .EQ. 8) .OR. (C_mode .EQ. -7))) THEN 
+	ELSEIF ((Tx_frequency .GE. 380.0) .AND. (Tx_frequency .LE. 385.0)) THEN 
 	  Perm_FS = 18.0
 	  CBR_D = 50.0
 	  ERP_ref_Tx = 14.0
 	  Info(4) = .FALSE.
 !	  Correction factors for the band 380 - 400 MHz are used.
 	  Info(18) = .TRUE.
-	ELSEIF ((Tx_frequency .GE. 390.0) .AND. (Tx_frequency .LE. 395.0) .AND. &
-	   ((C_mode .EQ. 8) .OR. (C_mode .EQ. -7))) THEN
+	ELSEIF ((Tx_frequency .GE. 390.0) .AND. (Tx_frequency .LE. 395.0)) THEN
 	  Perm_FS = 18.0
 	  CBR_D = 50.0
 	  ERP_ref_Tx = 14.0
@@ -633,8 +635,9 @@
 	  ELSE
 !		Point to point calculation:
 		CALL P_to_P_calculation (LongTx, LatTx, LongRx, LatRx)
-		CALL Permissble_FS_calculation ()
 	END IF
+!
+	CALL Permissble_FS_calculation ()
 !
 	Prot_margin = Perm_FS - Calculated_FS
 !	
