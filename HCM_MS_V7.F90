@@ -1,6 +1,6 @@
 !	
 !	HCMMS_V7.F90										P.Benner		23.02.2004
-!														G.H.			18.10.2013
+!														G.H.			30.10.2013
 !	Version 7					
 !
 !	Harmonized Calculation Method for mobile services
@@ -26,7 +26,7 @@
 !
 	DOUBLE PRECISION	CI, LongTx, LatTx, LongRx, LatRx
 	INTEGER*4			I, IOS, IMR
-	CHARACTER*376		Strings
+	CHARACTER*233		Strings
 !
 	EQUIVALENCE			(Strings,Sea_temperature)
 !
@@ -119,7 +119,7 @@
 !
 !	Convert strings to uppercase and remove chr(0)
 !
-	DO I = 1, 376
+	DO I = 1, 233
 	  IMR = ICHAR(STRINGS(I:I))		
       IF ((IMR .GE. 97) .AND. (IMR .LE. 122)) STRINGS(I:I) = CHAR(IMR - 32)
 	  IF (IMR .EQ. 0) STRINGS(I:I) = CHAR(32)

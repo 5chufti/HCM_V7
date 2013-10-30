@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		17.10.2005
-!														G.H.			18.10.2013
+!														G.H.			30.10.2013
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -88,6 +88,14 @@
 	REAL			CS26(7), CS27(7), CS28(7), CSXX(7), X1
 	CHARACTER*4		DRX, DTX
 !
+	V_angle_Rx_Tx = 0.0
+	Rx_ant_corr  = 0.0
+	H_diff_angle_Rx_Tx = 0.0
+	V_diff_angle_Rx_Tx = 0.0
+	Channel_sp_Tx = 0
+	Channel_sp_Rx = 0
+	Corr_delta_f = 0.0
+	Rx_ant_type_corr = 0.0
 !
 !	**************************************************************
 !
@@ -215,7 +223,7 @@
 !
 
 !	Delta frequency in Hz:
-	Delta_frequency = DABS(DINT(Tx_frequency*1D6) - DINT(Rx_frequency*1D6))
+	Delta_frequency = IABS(INT(Tx_frequency*1D6) - INT(Rx_frequency*1D6))
 !
 !	Input value for correction factor according delta frequency ?
 	IF (Cor_fact_frequ_diff .NE. '    ') THEN
@@ -303,7 +311,14 @@
 	END IF
 !
 !	bail out for line calculations
-	IF ((C_Mode .EQ. 99) .OR. (C_Mode .LT. 0)) GOTO 400
+	IF ((C_Mode .EQ. 99) .OR. (C_Mode .LT. 0)) THEN
+		Delta_frequency = 0
+!	WB/NB correction
+		IF (TX_DIG .AND. (Channel_sp_Tx .EQ. 0) .AND. (Tx_frequency .LE. 470.0) .AND. & 
+			(C_Mode .LT. 0) .AND. (Perm_FS_input .EQ. '     ')) &
+				Perm_FS = Perm_FS + 6*LOG10(Real(CSXT)/25000.0)
+		RETURN
+	END IF
 !
 !	Bandwidth of Rx:   
 	IF ((RX_TETRA) .AND. (.NOT. TX_TETRA)) THEN
@@ -638,9 +653,9 @@
 	V_angle_Rx_Tx = ATAN2D (dfloat(H_Tx + H_AntTx - (H_Rx + H_AntRx)),(1D3 * Distance))
 	IF ((C_mode .EQ. 99) .OR. &
 		((Ant_typ_V_Rx .EQ. '000ND00') .AND. (Ant_typ_H_Rx .EQ. '000ND00'))) THEN
-		Rx_ant_corr  = 0.0
-		H_diff_angle_Rx_Tx = 0.0
-		V_diff_angle_Rx_Tx = 0.0
+!		Rx_ant_corr  = 0.0
+!		H_diff_angle_Rx_Tx = 0.0
+!		V_diff_angle_Rx_Tx = 0.0
 	ELSE
 		READ (Ele_Rx_input, *, IOSTAT=IOS) Rx_Elevation
 		IF ((IOS .NE. 0) .AND. (Ant_typ_V_Rx .NE. '000ND00')) THEN
@@ -707,11 +722,6 @@
 !
 	Perm_FS = Perm_FS + DPN
 !
-!	WB/NB correction
-400		IF (TX_DIG .AND. (Channel_sp_Tx .EQ. 0) .AND. (Tx_frequency .LE. 470.0) .AND. & 
-			(C_Mode .LT. 0) .AND. (Perm_FS_input .EQ. '     ')) &
-				Perm_FS = Perm_FS + 6*LOG10(Real(CSXT)/25000.0)
-! 
 	RETURN
 !
 	END SUBROUTINE Permissble_FS_calculation
