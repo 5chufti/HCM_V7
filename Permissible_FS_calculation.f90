@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		17.10.2005
-!														G.H.			30.10.2013
+!														G.H.			16.01.2014
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -315,8 +315,7 @@
 		Delta_frequency = 0
 !	WB/NB correction
 		IF (TX_DIG .AND. (Channel_sp_Tx .EQ. 0) .AND. (Tx_frequency .LE. 470.0) .AND. & 
-			(C_Mode .LT. 0) .AND. (Perm_FS_input .EQ. '     ')) &
-				Perm_FS = Perm_FS + 6*LOG10(Real(CSXT)/25000.0)
+			(Perm_FS_input .EQ. '     ')) Perm_FS = Perm_FS + 6*LOG10(Real(CSXT)/25000.0)
 		RETURN
 	END IF
 !
@@ -448,10 +447,9 @@
 !
 		IF (Delta_frequency .LT. ((B1 + B2) / 2.0)) THEN
 			Corr_delta_f = 0.0
-		ELSEIF ((Delta_frequency .LE. ((B1 + 2.0 * B2) / 2.0)) .AND. & 
-			(Delta_frequency .GE. ((B1 + B2) / 2.0))) THEN
+		ELSEIF (Delta_frequency .LE. ((B1 + 2.0 * B2) / 2.0)) THEN
 				Corr_delta_f = 45.0
-		ELSEIF (Delta_frequency .GT. ((B1 + 2.0 * B2) / 2.0)) THEN
+		ELSE
 		Info(15) = .TRUE.
 !	  Frequency difference outside definition range!
 		  Corr_delta_f = 82.0
@@ -512,20 +510,20 @@
 !	acorrB1:
 		IF (OMEGA .LT. 0.5) THEN
 			acorrB1 = 0.0
-		ELSEIF ((OMEGA .GE. 0.5) .AND. (OMEGA .LT. 2.0)) THEN
+		ELSEIF (OMEGA .LT. 2.0) THEN
 			acorrB1 = OMEGA * 33.3 - 16.7
-		ELSEIF (OMEGA .GE. 2.0) THEN
+		ELSE
 			acorrB1 = OMEGA * 10.0 + 30.0
 		END IF
 !
 !	acorrsinus:
 		IF (OMEGA .LT. 0.5) THEN
 			acorrsinus = 0.0
-		ELSEIF ((OMEGA .GE. 0.5) .AND. (OMEGA .LT. 1.25)) THEN
+		ELSEIF (OMEGA .LT. 1.25) THEN
 			acorrsinus = OMEGA * 66.7 - 33.3
-		ELSEIF ((OMEGA .GE. 1.25) .AND. (OMEGA .LT. 1.75)) THEN
+		ELSEIF (OMEGA .LT. 1.75) THEN
 			acorrsinus = OMEGA * 20.0 + 25.0
-		ELSEIF (OMEGA .GE. 1.75) THEN
+		ELSE
 			acorrsinus = OMEGA * 4.8 + 51.6
 		END IF
 !	
