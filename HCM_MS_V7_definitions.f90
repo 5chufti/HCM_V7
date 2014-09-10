@@ -3,7 +3,8 @@
 !
 	INTEGER*2			T_Prof(10002), M_Prof(10002), H_X(10201), PN, H_Datab_Tx, H_Datab_Rx
 	INTEGER*4			HCM_error, Time_percentage, C_mode, D_to_border, OLD_T
-	INTEGER*4			H_AntTx, H_AntRx, H_Tx, H_Rx, Delta_frequency, Channel_sp_Rx, Channel_sp_Tx
+	INTEGER*4			H_AntTx, H_AntRx, H_Tx, H_Rx, Channel_sp_Rx, Channel_sp_Tx
+	INTEGER*8			Delta_frequency
 !
 	REAL				Heff, TCA, TCA_corr
 	REAL				Dh, Dh_corr, Calculated_FS, Perm_FS, Prot_margin

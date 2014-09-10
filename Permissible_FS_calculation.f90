@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		17.10.2005
-!														G.H.			16.01.2014
+!														G.H.			10.09.2014
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -223,7 +223,8 @@
 !
 
 !	Delta frequency in Hz:
-	Delta_frequency = IABS(INT(Tx_frequency*1D6) - INT(Rx_frequency*1D6))
+	Delta_frequency = (INT(Tx_frequency*1D5) - INT(Rx_frequency*1D5))
+	Delta_frequency = IABS(Delta_frequency*10)
 !
 !	Input value for correction factor according delta frequency ?
 	IF (Cor_fact_frequ_diff .NE. '    ') THEN
@@ -729,7 +730,7 @@
 !
 	SUBROUTINE TACSNMT (DFI, CDF)
 !
-	INTEGER*4			DFI
+	INTEGER*8			DFI
 	REAL				CDF
 !
 	DOUBLE PRECISION	DF

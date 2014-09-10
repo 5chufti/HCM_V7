@@ -325,7 +325,7 @@
 	I_D_sea_calculated = D_sea_calculated ! Distance over sea calculated
 	I_Rx_ant_corr      = Rx_ant_corr	 ! Correction according Rx antenna (H + V)
 	I_Rx_ant_type_corr = Rx_ant_type_corr ! Correction according antenna type (E/I) Rx
-	I_Delta_frequency  = Delta_frequency ! Frequency difference (kHz)
+	I_Delta_frequency  = Delta_frequency ! Frequency difference (Hz)
 	I_Corr_delta_f     = Corr_delta_f	 ! Correction factor according frequency difference
 	I_Calculated_FS    = Calculated_FS	 ! Calculated field strength
 	I_Perm_FS          = Perm_FS		 ! Permissible field strength
