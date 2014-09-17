@@ -1,6 +1,6 @@
 !
 !	Point_type.f90										P. Benner		09.10.2003
-!														G.H.			17.07.2009
+!														G.H.			17.09.2014
 !
 !	Subroutine to read the morphological type of a given point from the morpho-database.
 !
@@ -135,27 +135,27 @@
 	IF (LAR .GT. 3599) LAR = 3599
 !
 	IF (LOD .LT. 1.8D2) THEN
-		FN(1:1) = 'E'                     
+		FN(1:1) = 'e'                     
 	  ELSE
-		FN(1:1) = 'W'
+		FN(1:1) = 'w'
 		LOD = 360-LOD
 	END IF
 	WRITE (FN(2:4), '(I3.3)') LOD
 !
 	IF (Lat .GE. 0.0D0) THEN
-		FN(5:5) = 'N'
+		FN(5:5) = 'n'
 	  ELSE
-		FN(5:5) = 'S'
+		FN(5:5) = 's'
 		LAD = 90-LAD
 	END IF
 	WRITE (FN(6:7), '(I2.2)') LAD
 !
 	IF (LAD .LT. 5D1) THEN 
 		RESH = 100  
-		FN(8:11) = '.33M'
+		FN(8:11) = '.33m'
 	  ELSE
 		RESH = 50
-		FN(8:11) = '.63M'
+		FN(8:11) = '.63m'
 	END IF
 !
 !	coordinates of block containing P
@@ -170,7 +170,7 @@
 	IF ((FN .EQ. O_FN) .AND. (R .EQ. OLD_T)) GOTO 200
 	IF (FN .EQ. O_FN) GOTO 100
 !	point in new file
-	OPEN (UNIT=6, FILE=TRIM(Morpho_path) // '\' // FN(1:4) // '\' // FN,  &
+	OPEN (UNIT=6, FILE=TRIM(Morpho_path) // '/' // FN(1:4) // '/' // FN,  &
 			ACCESS='DIRECT',RECL=202*(RESH+1), STATUS='OLD', &
 			ERR=400, MODE='READ')
 !      

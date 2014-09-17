@@ -1,6 +1,6 @@
 !
 !	HCMMS_V7_DLL.F90									P. Benner		08.01.2004
-!														G.H.			30.10.2013
+!														G.H.			17.09.2014
 !	DLL to the HCMMS_V7 subroutuine (Berlin 2003)
 !
 	SUBROUTINE HCMMS_V7_DLL ( I_C_mode, I_bor_dis, I_PD, I_Distance, I_H_Datab_Tx, &
@@ -33,6 +33,7 @@
 	INTEGER				I, J, IOS
 	CHARACTER*(*)		I_str 
 	LOGICAL				DEBUG, doit
+	BYTE				IMR
 !
 !
 !	***********************************************************************
@@ -45,6 +46,14 @@
 	  I_HCM_error = 3000
 	  RETURN
 	END IF
+!
+!	Convert strings to uppercase and replace chr(0)
+!
+	DO I = 1, J
+	  IMR = ICHAR(I_str(I:I))		
+      IF ((IMR .GE. 97) .AND. (IMR .LE. 122)) I_str(I:I) = CHAR(IMR - 32)
+	  IF (IMR .EQ. 0) I_str(I:I) = CHAR(32)
+	END DO
 !
 !	Geogr. cooordinates of TX
 	Coo_Tx = I_str(1:15)
@@ -267,6 +276,7 @@
 			WRITE (2,*) " Input value of corr. f.delta f.: ", Cor_fact_frequ_diff, " dB"
 			WRITE (2,*) " Radius of the service area Rx  : ", Rad_of_Rx_serv_area, " km"
 		ELSE
+			WRITE (2,*) " Country code to calc. to       : ", Land_to
 			WRITE (2,'(A35,I4,A3)') " Input value of dist. to border : ", D_to_border, " km"
 			WRITE (2,*) " Input value of max. crossb. r. :  ", Max_CBR_D_input, " km"
 		END IF
@@ -445,8 +455,6 @@
           WRITE (2, '(A35, F7.2, A6)') "  line point                     : ", Dir_Tx_Rx, " degr."
           WRITE (2, '(A35, F7.1, A8)') "  Permissible field strength     : ", Perm_FS, " dBµV/m."
           WRITE (2, '(A35, F7.1, A4)') "  The protection margin is       : ", Prot_margin, " dB."
-		  WRITE (2, '(A35, A3)') "  Land of transmitter            : ", Land_from
-		  WRITE (2, '(A35, A3)') "  Land to calculate to           : ", Land_to
 		  IF (D_to_border .EQ. 0) THEN
 			WRITE (2,*) " Calculation is performed on the borderline."
 		  END IF

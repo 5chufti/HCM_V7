@@ -1,6 +1,6 @@
 !
 !	Line_calculation.f90							P.Benner		23.11.2004
-!													G.H.			23.03.2013
+!													G.H.			17.09.2014
 !
 !	23.11.2004	Steps from 100 / 10 / 1 modified to 25 / 5 / 1
 !	18.07.2011  Steps modified to 5 / 1
@@ -76,7 +76,7 @@
 !	1. Cross border range:
 	IF (D_to_border .LT. 0) THEN
 	  d2b = 0.0 - CBR_D
-	  BorderFile(8:10) = 'CBR'
+	  BorderFile(8:10) = 'cbr'
 	ELSE
 	  IF (D_to_border .GT. 999) THEN
 			HCM_Error = 1047
@@ -88,7 +88,7 @@
 	END IF
 !
 !	get additionally all borderline centerpoints of the affected coutry:
-	  OPEN (UNIT=3, FILE=TRIM(Border_path) // '\' // BorderFile(1:7) // '000', &
+	  OPEN (UNIT=3, FILE=TRIM(Border_path) // '/' // BorderFile(1:7) // '000', &
 			STATUS='OLD', ACCESS='DIRECT',RECL=176, MODE='READ', IOSTAT=IOS)
 !
 	  IF (IOS .NE. 0) THEN
@@ -116,7 +116,7 @@
 	  CLOSE (UNIT=3)
 !
 !	Open line file:
-	OPEN (UNIT=3, FILE=TRIM(Border_path) // '\' // BorderFile, &
+	OPEN (UNIT=3, FILE=TRIM(Border_path) // '/' // BorderFile, &
 			STATUS='OLD', ACCESS='DIRECT',RECL=176, MODE='READ', IOSTAT=IOS)
 !
 	IF (IOS .NE. 0) THEN
@@ -427,7 +427,7 @@
 	ELSE
 !
 !	More than MAX enties:
-!	Find list-number of lowest fiel strength:
+!	Find list-number of lowest field strength:
 	  J = 1
 	  FS_x = 999.9
 	  DO I = 1, 3

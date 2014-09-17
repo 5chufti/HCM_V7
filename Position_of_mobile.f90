@@ -1,6 +1,6 @@
 !
 !	Position_of_mobile.f90								P. Benner		29.11.2004
-!														G.H.			25.03.2013
+!														G.H.			17.09.2014
 !
 !	Subroutine to calculate the new position of Tx (New_LongTx, New_LatTx)
 !	and/or Rx (New_LongRx, New_latRx) if at least one is a mobile and
@@ -185,7 +185,7 @@
 	BX = N_Long
 	BY = N_Lat
 !
-	OPEN (UNIT=8, FILE=TRIM(Border_path) // '\' // Country // '.ALL', &
+	OPEN (UNIT=8, FILE=TRIM(Border_path) // '/' // Country // '.all', &
           STATUS='OLD', ACCESS='DIRECT',RECL=176, MODE='READ', IOSTAT=IOS)
 	IF (IOS .NE. 0) THEN
 	  Error = 1
@@ -257,7 +257,7 @@
 	B = 1.8D2 / PI
 	MAXDI = 1.0D7
 !
-	OPEN (UNIT=8, FILE=TRIM(Border_path) // '\' // Country // '.ALL', &
+	OPEN (UNIT=8, FILE=TRIM(Border_path) // '/' // Country // '.all', &
 		STATUS='OLD', ACCESS='DIRECT',RECL=176, MODE='READ', IOSTAT=IOS)
 	IF (IOS .NE. 0) RETURN
 !
