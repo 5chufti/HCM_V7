@@ -315,7 +315,7 @@
 	IF ((C_Mode .EQ. 99) .OR. (C_Mode .LT. 0)) THEN
 		Delta_frequency = 0
 !	WB/NB correction
-		IF (TX_DIG .AND. (Channel_sp_Tx .EQ. 0) .AND. (Tx_frequency .LE. 470.0) .AND. & 
+		IF (TX_DIG .AND. (CSXT .GT. 16000) .AND. (Tx_frequency .LE. 470.0) .AND. & 
 			(Perm_FS_input .EQ. '     ')) Perm_FS = Perm_FS + 6*LOG10(Real(CSXT)/25000.0)
 		RETURN
 	END IF
