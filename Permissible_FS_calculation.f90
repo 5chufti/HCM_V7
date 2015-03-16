@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		17.10.2005
-!														G.H.			14.10.2014
+!														G.H.			16.03.2015
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -76,10 +76,10 @@
 !
 	INTEGER*4		IOS, I, CSXR, CSXT
 !
-	LOGICAL			TX_TETRA, RX_TETRA, TX_DIG, RX_DIG, TXGSM
+	LOGICAL			TX_TETRA, RX_TETRA, TX_DIG, RX_DIG
 !
 	REAL			acorrB1, FACTOR, OMEGA, acorrsinus
-	REAL			GANT, DPN, B1, B2, X1
+	REAL			GANT, DPN, B1, B2, X1, CDFN, CDFW
 	CHARACTER*4		DRX, DTX
 !
 	V_angle_Rx_Tx = 0.0
@@ -94,8 +94,9 @@
 !	**************************************************************
 !
 !	Delta frequency in Hz:
-	Delta_frequency = (INT(Tx_frequency*1D5) - INT(Rx_frequency*1D5))
-	Delta_frequency = IABS(Delta_frequency*10)
+	Delta_frequency = DINT(Tx_frequency*1D6 - Rx_frequency*1D6)
+!	Delta_frequency = INT(Rx_frequency*1D5) - INT(Rx_frequency*1D5)
+	Delta_frequency = IABS(Delta_frequency) 
 !
 !	Input value for correction factor according delta frequency ?
 	IF (Cor_fact_frequ_diff .NE. '    ') THEN
@@ -155,6 +156,20 @@
 		RETURN
 	END IF
 !
+!	shortcut for TETRA <> TETRA	
+	IF (TX_TETRA .AND. RX_TETRA) THEN
+!	Annex3.4.3
+		SELECT CASE (delta_frequency)
+			CASE (:24999)
+				Corr_delta_f = 0.0
+			CASE (25000:50000)
+				Corr_delta_f = 45.0
+			CASE (50001:)
+				Corr_delta_f = 70.0
+		END SELECT
+		GOTO 300
+	END IF
+!
 !	Bandwidth of Rx:   
 	IF ((RX_TETRA) .AND. (.NOT. TX_TETRA)) THEN
 		CSXR = 16000
@@ -187,128 +202,131 @@
 !
 !	*****************************************************************
 !	*								
-!	*					Module normal Agreement	
-!	*								
-!	*	Determination of correction factor according to delta f	
+!	*	new Annex3 							
 !	*								
 !	*****************************************************************
-
-	IF ((Info(18) .AND. TX_DIG .AND. RX_DIG) .OR. (TX_TETRA .AND. RX_TETRA)) THEN
-
-!	380 - 400 MHz (Tx and Rx are digital systems)			
 !
-		IF (CSXT .GT. CSXR) THEN
-			B1 = REAL(CSXT)
-			B2 = REAL(CSXR)
-		ELSE
-			B2 = REAL(CSXT)
-			B1 = REAL(CSXR)
-		END IF
+!	Annex3.2
+	IF (CSXT .GT. CSXR) THEN
+		B1 = REAL(CSXT)
+		B2 = REAL(CSXR)
+	ELSE
+		B2 = REAL(CSXT)
+		B1 = REAL(CSXR)
+	END IF
 !
-		IF (Delta_frequency .LT. ((B1 + B2) / 2.0)) THEN
-			Corr_delta_f = 0.0
-		ELSEIF (Delta_frequency .LE. ((B1 + 2.0 * B2) / 2.0)) THEN
-				Corr_delta_f = 45.0
-		ELSE
-		Info(15) = .TRUE.
-!	  Frequency difference outside definition range!
-		  Corr_delta_f = 82.0
-		END IF  
+	OMEGA = REAL(Delta_frequency) / B1
 !
-	ELSE	
-!	everything except 380-400 MHz digital
-!
-	  SELECT CASE (CSXR)
-		CASE (:11000)
-			IF ((TX_TETRA) .AND. (.NOT. RX_TETRA) .AND. (CSXR .LE. 8800)) THEN
-				Channel_sp_Rx = 10000
-			ELSE
-				Channel_sp_Rx = 12500
-			END IF
-		CASE (11001:14000)
-			Channel_sp_Rx = 20000
-		CASE (14001:)
-			Channel_sp_Rx = 25000
-	  END SELECT	
-!
-	  SELECT CASE (CSXT)	
-		CASE (:4400) 
-			Channel_sp_Tx = 5000
-		CASE (4401:5500)
-			Channel_sp_Tx = 6250
-		CASE (5501:8800)
-			Channel_sp_Tx = 10000
-		CASE (8801:11000)
-			Channel_sp_Tx = 12500
-		CASE (11001:14000)
-			Channel_sp_Tx = 20000
-		CASE (14001:16000)
-			Channel_sp_Tx = 25000
-		CASE (16001:)
-			IF (TX_DIG) THEN
-				Channel_sp_Tx = 0
-			ELSE
-				HCM_Error = 1041
-!			Channel spacing outside definition range (Tx)! 
-				RETURN
-			END IF
-	  END SELECT
-!
-	  IF (TX_DIG) THEN
-!	digital:
-		Info(17) = .True.
-		IF (CSXR .GT. CSXT) THEN
-			OMEGA = REAL(Delta_frequency) / REAL(CSXR)
-			B1 = REAL(CSXR)
-			B2 = REAL(CSXT)
-		  ELSE
-			OMEGA = REAL(Delta_frequency) / REAL(CSXT)
-			B1 = REAL(CSXT)
-			B2 = REAL(CSXR)
-		END IF
-!
+!	Annex3.4.1	TETRA Tx vs. narrowband Rx
+	IF (TX_TETRA .AND. (CSXR .LE. 25000)) THEN
 !	acorrB1:
 		IF (OMEGA .LT. 0.5) THEN
 			acorrB1 = 0.0
-		ELSEIF (OMEGA .LT. 2.0) THEN
-			acorrB1 = OMEGA * 33.3 - 16.7
+		ELSEIF (OMEGA .LE. 1.0) THEN
+			acorrB1 = 32.0 * OMEGA - 16.0
+		ELSEIF (OMEGA .LE. 1.4) THEN
+			acorrB1 = 112.0 * OMEGA - 96.0
 		ELSE
-			acorrB1 = OMEGA * 10.0 + 30.0
+			acorrB1 = 41.0 * OMEGA
 		END IF
 !
 !	acorrsinus:
-		IF (OMEGA .LT. 0.5) THEN
+		IF (OMEGA .LT. 0.4) THEN
 			acorrsinus = 0.0
-		ELSEIF (OMEGA .LT. 1.25) THEN
-			acorrsinus = OMEGA * 66.7 - 33.3
-		ELSEIF (OMEGA .LT. 1.75) THEN
-			acorrsinus = OMEGA * 20.0 + 25.0
+		ELSEIF (OMEGA .LE. 0.7) THEN
+			acorrsinus = 50.0 * OMEGA - 21.0
+		ELSEIF(OMEGA .LE. 1.0) THEN
+			acorrsinus = 225.0 * OMEGA - 145.0
 		ELSE
-			acorrsinus = OMEGA * 4.8 + 51.6
+			acorrB1 = -20.0 * OMEGA + 100.0
 		END IF
-!	
-		Corr_delta_f = acorrsinus - (acorrsinus - acorrB1) * B2 / B1
+		Corr_delta_f = MIN(acorrsinus - (acorrsinus - acorrB1) * B2 / B1, 70.0)
+		GOTO 300
+	END IF 
 !
-	  ELSE	! not TX_DIG
-!	analog curves:
+!	Annex3.4.2	narrowband Tx vs. TETRA Rx
+	IF (RX_TETRA .AND. (CSXT .LE. 25000)) THEN
+!	acorrB1:
+		IF (OMEGA .LT. 0.45) THEN
+			acorrB1 = 0.0
+		ELSEIF (OMEGA .LE. 0.63) THEN
+			acorrB1 = 55.0 * OMEGA - 23.0
+		ELSEIF (OMEGA .LE. 0.93) THEN
+			acorrB1 = 180.0 * OMEGA - 100.0
+		ELSE
+			acorrB1 = 12.5 * OMEGA + 57.0
+		END IF
 !
-	  END IF	! dig/ana
-	END IF		! Tetra/normal
+!	acorrsinus:
+		IF (OMEGA .LT. 0.45) THEN
+			acorrsinus = 0.0
+		ELSEIF (OMEGA .LE. 0.7) THEN
+			acorrsinus = 225.0 * OMEGA - 101.0
+		ELSE
+			acorrsinus = 13.0 * OMEGA + 58.0
+		END IF
+		Corr_delta_f = MIN(acorrsinus - (acorrsinus - acorrB1) * B2 / B1, 70.0)
+		GOTO 300
+	END IF 
 !
+!	Annex3.3	narrowband w/o TETRA
+!	acorrB1:
+	IF (OMEGA .LT. 0.5) THEN
+		acorrB1 = 0.0
+	ELSEIF (OMEGA .LE. 1.0) THEN
+		acorrB1 = 47.0 * OMEGA - 24.0
+	ELSEIF (OMEGA .LE. 1.3) THEN
+		acorrB1 = 80.0 * OMEGA - 55.0
+	ELSE
+		acorrB1 = 38.0 * OMEGA
+	END IF
 !
-! common end for GSM/IMT/normal
+!	acorrsinus:
+	IF (OMEGA .LT. 0.5) THEN
+		acorrsinus = 0.0
+	ELSEIF (OMEGA .LE. 1.3) THEN
+		acorrsinus = 88.0 * OMEGA - 44.0
+	ELSE
+		acorrsinus = 12.0 * OMEGA + 55.0
+	END IF
+	Corr_delta_f = MIN(acorrsinus - (acorrsinus - acorrB1) * B2 / B1, 70.0)
+	IF ((CSXT .LE. 25000) .AND. (CSXR .LE. 25000)) GOTO 300
+	CDFN = Corr_delta_f
 !
+!	Annex3.5	wideband
+!	acorrB1:
+	IF (OMEGA .LT. 0.5) THEN
+		acorrB1 = 0.0
+	ELSEIF (OMEGA .LE. 2.0) THEN
+		acorrB1 = 33.3 * OMEGA - 16.7
+	ELSE
+		acorrB1 = 10.0 * OMEGA + 30.0
+	END IF
+!
+!	acorrsinus:
+	IF (OMEGA .LT. 0.5) THEN
+		acorrsinus = 0.0
+	ELSEIF (OMEGA .LE. 1.25) THEN
+		acorrsinus = 66.7 * OMEGA - 33.3
+	ELSEIF (OMEGA .LE. 1.75) THEN
+		acorrsinus = 20.0 * OMEGA + 25.0
+	ELSE
+		acorrsinus = 4.8 * OMEGA + 51.6
+	END IF
+	Corr_delta_f = MIN(acorrsinus - (acorrsinus - acorrB1) * B2 / B1, 70.0)
+	IF ((CSXR .GE. 200000) .OR. (CSXT .GE. 200000)) GOTO 300
+	CDFW = Corr_delta_f
+!
+!	Annex3.6
+	Corr_delta_f = CDFN + ((CDFW - CDFN) / 175.0) * (B1/1000.0 - 25.0)
+!
+! common end for p2p
 300	Perm_FS = Perm_FS + Corr_delta_f
 !
 !	Calculation of antenna correction factors "Rx_ant_corr" and "Rx_ant_type_corr":
 !
 	V_angle_Rx_Tx = ATAN2D (dfloat(H_Tx + H_AntTx - (H_Rx + H_AntRx)),(1D3 * Distance))
-	IF ((C_mode .EQ. 99) .OR. &
-		((Ant_typ_V_Rx .EQ. '000ND00') .AND. (Ant_typ_H_Rx .EQ. '000ND00'))) THEN
-!		Rx_ant_corr  = 0.0
-!		H_diff_angle_Rx_Tx = 0.0
-!		V_diff_angle_Rx_Tx = 0.0
-	ELSE
+	IF ((Ant_typ_V_Rx .NE. '000ND00') .OR. (Ant_typ_H_Rx .NE. '000ND00')) THEN
 		READ (Ele_Rx_input, *, IOSTAT=IOS) Rx_Elevation
 		IF ((IOS .NE. 0) .AND. (Ant_typ_V_Rx .NE. '000ND00')) THEN
 		  HCM_Error = 1042

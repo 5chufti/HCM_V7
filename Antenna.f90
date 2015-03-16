@@ -35,7 +35,7 @@
 !
 	PI    = 3.14159265
 	TPE	  = A_typ(4:5)
-    RHO = 1.0
+	RHO = 1.0
 !
 	IF (TPE .EQ. 'ND') RETURN
 !
@@ -57,7 +57,7 @@
 	END IF
 	TRAIL = TRAIL / 100.0
 	COLEA = COSD (LEAD)
-	TERM1 = 1.0 - COLEA ** 2
+	TERM1 = 1.0 - COLEA ** 2.0
 	COAL  = COSD (Alpha)
 !
 	IF (TPE .EQ. 'EA') THEN
@@ -65,9 +65,9 @@
 		  Error = 1038
 		  RETURN
 		ELSE
-		  TERM2 = 1.0 - (SQRT (2.0) * COLEA - 1.0) ** 2
+		  TERM2 = 1.0 - (SQRT (2.0) * COLEA - 1.0) ** 2.0
 		  B = 0.5 * TERM1 / TERM2
-		  RHO = 4.0 * B * COAL / ((4.0 * B - 1.0) * COAL**2 + 1.0)
+		  RHO = 4.0 * B * COAL / ((4.0 * B - 1.0) * COAL**2.0 + 1.0)
 	  END IF
 !
 	ELSEIF (TPE .EQ. 'EB') THEN
@@ -75,11 +75,11 @@
 		  Error = 1038
 		  RETURN
 		ELSE
-		  TERM2 = 1.44 - (SQRT (2.0) * COLEA - 0.8) ** 2
+		  TERM2 = 1.44 - (SQRT (2.0) * COLEA - 0.8) ** 2.0
 		  B = 0.72 * TERM1 / TERM2
-		  X = B*(B-0.2)*COAL**2+0.2*B
+		  X = B*(B-0.2)*COAL**2.0+0.2*B
 		  IF (X .LT. 0.0) X = 0.0
-		  RHO = (1.6*B*COAL+2.4*SQRT(X)) / ((4.0 * B - 1.44) * COAL ** 2 + 1.44)
+		  RHO = (1.6*B*COAL+2.4*SQRT(X))/((4.0*B -1.44)*COAL**2.0+1.44)
 	  END IF
 !
 	ELSEIF (TPE .EQ. 'EC') THEN
@@ -87,11 +87,11 @@
 		  Error = 1038
 		  RETURN
 		ELSE
-		  TERM2 = 1.96 - (SQRT (2.0) * COLEA - 0.6) ** 2
+		  TERM2 = 1.96 - (SQRT (2.0) * COLEA - 0.6) ** 2.0
 		  B = 0.98 * TERM1 / TERM2
-		  X = B*(B-0.4)*COAL**2+0.4*B
+		  X = B*(B-0.4)*COAL**2.0+0.4*B
 		  IF (X .LT. 0.0) X = 0.0
-		  RHO = (1.2*B*COAL+2.8*SQRT(X)) / ((4.0 * B - 1.96) * COAL ** 2 + 1.96)
+		  RHO = (1.2*B*COAL+2.8*SQRT(X))/((4.0*B-1.96)*COAL**2.0+1.96)
 	  END IF
 !
 	ELSEIF (TPE .EQ. 'DE') THEN
@@ -99,9 +99,9 @@
 		  Error = 1038
 		  RETURN
 		ELSE
-		  TERM2 = 2.0 - (2.0 * COLEA - SQRT (2.0)) ** 2
+		  TERM2 = 2.0 - (2.0 * COLEA - SQRT (2.0)) ** 2.0
 		  B = TERM1 / TERM2
-		  RHO = ABS (4.0*B*COAL/((4.0*B-1.0)*COAL**2+1.0))
+		  RHO = ABS (4.0*B*COAL/((4.0*B-1.0)*COAL**2.0+1.0))
 	  END IF
 !
 	ELSEIF (TPE .EQ. 'LA') THEN
@@ -124,7 +124,7 @@
 		  RETURN
 		ELSE
 		  B = LEAD / 100.0
-		  X = (1.0 - B) ** 2 * COAL ** 2 + 4.0 * B
+		  X = (1.0 - B) ** 2.0 * COAL ** 2.0 + 4.0 * B
 		  IF (X .LT. 0.0) X = 0.0
 		  TERM2 = SQRT (X)
 		  RHO   = ((1.0 - B) * COAL + TERM2) / 2.0
@@ -136,10 +136,10 @@
 		  RETURN
 		ELSE
 		  B = LEAD / 100.0
-		  X = (1.0-B**2)**2*(COS(Alpha*PI/90.0))**2+4.0*B**2
+		  X = (1.0-B**2.0)**2.0*(COS(Alpha*PI/90.0))**2.0+4.0*B**2.0
 		  IF (X .LT. 0.0) X = 0.0
 		  TERM2 = SQRT(X)
-		  X = ((1.0-B**2) * COS(Alpha*PI/90.0)+TERM2) / 2.0
+		  X = ((1.0-B**2.0) * COS(Alpha*PI/90.0)+TERM2) / 2.0
 		  IF (X .LT. 0.0) X = 0.0
 		  RHO   = SQRT(X)
 	  END IF
@@ -150,10 +150,10 @@
 		  RETURN
 		ELSE
 		  B = LEAD / 100.0
-		  X = (1.0-B**2)**2*(COS(Alpha*PI/60.0))**2+4.0*B**2
+		  X = (1.0-B**2.0)**2.0*(COS(Alpha*PI/60.0))**2.0+4.0*B**2.0
 		  IF (X .LT. 0.0) X = 0.0
 		  TERM2 = SQRT(X)
-		  X = ((1.0-B**2)*COS(Alpha*PI/60.0)+TERM2) / 2.0
+		  X = ((1.0-B**2.0)*COS(Alpha*PI/60.0)+TERM2) / 2.0
 		  IF (X .LT. 0.0) X = 0.0
 		  RHO   = SQRT(X)
 	  END IF
@@ -164,7 +164,7 @@
 		  RETURN
 		ELSE
 		  B = LEAD / 100.0
-		  X = (1.0-B**2)**2*(COS(Alpha*PI/45.0))**2+4.0*B**2
+		  X = (1.0-B**2.0)**2.0*(COS(Alpha*PI/45.0))**2.0+4.0*B**2.0
 		  IF (X .LT. 0.0) X = 0.0
 		  TERM2 = SQRT(X)
 		  X =  ((1.0-B**2) * COS(Alpha*PI/45.0)+TERM2)/ 2.0 
@@ -173,7 +173,7 @@
 	  END IF
 !
 	ELSEIF ((TPE .EQ. 'TA') .OR. (TPE(1:1) .EQ. 'P')) THEN
-     IF ((LEAD .LT. 1.0) .OR. (LEAD .GT. 890.0)) THEN
+	 IF ((LEAD .LT. 1.0) .OR. (LEAD .GT. 890.0)) THEN
 		Error = 1038
 		RETURN
 	 ELSE
@@ -183,15 +183,15 @@
 		ELSE
 			RHO=0.01
 		END IF
-     END IF
+	END IF
 !
 	ELSEIF (A_typ(4:4) .EQ. 'V' .OR. A_typ(4:4) .EQ. 'W') THEN
-	  READ(A_typ(1:1),'(I1), IOSTAT=IOS') M
+	  READ(A_typ(1:1),'(I1)', IOSTAT=IOS) M
 	  IF (IOS .NE. 0) THEN
 		Error = 1038
 		RETURN
 	  END IF
-	  READ(A_typ(2:3),'(I2), IOSTAT=IOS') N
+	  READ(A_typ(2:3),'(I2)', IOSTAT=IOS) N
 	  IF (IOS .NE. 0) THEN
 		Error = 1038
 		RETURN
@@ -211,25 +211,25 @@
 		Error = 1038
 		RETURN
 	  END IF
-	  K5 = ((1.0 + E)/2.0)**2
-	  B  = K5/2.0*(1-COSD(FLOAT(A))**2)/(K5-(COSD(FLOAT(A))/SQRT(2.0)-(1.0-E)/2.0)**2)
+	  K5 = ((1.0 + E)/2.0)**2.0
+	  B  = K5/2.0*(1.0-COSD(FLOAT(A))**2)/(K5-(COSD(FLOAT(A))/SQRT(2.0)-(1.0-E)/2.0)**2.0)
 	  K4 = B - K5
 	  K3 = B * E * K5
 	  K2 = B**2 * K5 - K3
 	  K1 = B * (1.0 - E)/2.0
-	  R1 = (K1 * COAL + SQRT(K2 * COAL**2 + K3))/(K4 * COAL**2 + K5)
+	  R1 = (K1 * COAL + SQRT(K2 * COAL**2.0 + K3))/(K4 * COAL**2.0 + K5)
 	  COAX  = COSD((Alpha-2.0*FLOAT(N)))
-	  R2 = (K1 * COAX + SQRT(K2 * COAX**2 + K3))/(K4 * COAX**2 + K5)
+	  R2 = (K1 * COAX + SQRT(K2 * COAX**2.0 + K3))/(K4 * COAX**2.0 + K5)
 	  RHO = R1
 	  IF (RHO .LT. R2) RHO = R2
 !		2nd lobe for W-type
 	  IF (A_typ(4:4) .EQ. 'W') THEN
-	    READ(A_typ(6:6),'(I1), IOSTAT=IOS') R
+	    READ(A_typ(6:6),'(I1)', IOSTAT=IOS) R
 	    IF (IOS .NE. 0) THEN
 		  Error = 1038
 		  RETURN
 	    END IF
-	    READ(A_typ(7:7),'(I1), IOSTAT=IOS') P
+	    READ(A_typ(7:7),'(I1)', IOSTAT=IOS) P
 	    IF (IOS .NE. 0) THEN
 		  Error = 1038
 		  RETURN

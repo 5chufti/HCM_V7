@@ -276,7 +276,7 @@
 			WRITE (2,*) " Input value of corr. f.delta f.: ", Cor_fact_frequ_diff, " dB"
 			WRITE (2,*) " Radius of the service area Rx  : ", Rad_of_Rx_serv_area, " km"
 		ELSE
-			WRITE (2,*) " Country code to calc. to       : ", Land_to
+			WRITE (2,*) " Country (code) to calc. to     : ", Land_to
 			WRITE (2,'(A35,I4,A3)') " Input value of dist. to border : ", D_to_border, " km"
 			WRITE (2,*) " Input value of max. crossb. r. :  ", Max_CBR_D_input, " km"
 		END IF
