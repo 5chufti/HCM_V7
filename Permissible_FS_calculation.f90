@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		17.10.2005
-!														G.H.			16.03.2015
+!														G.H.			18.03.2015
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -238,9 +238,9 @@
 		ELSEIF(OMEGA .LE. 1.0) THEN
 			acorrsinus = 225.0 * OMEGA - 145.0
 		ELSE
-			acorrB1 = -20.0 * OMEGA + 100.0
+			acorrsinus = -20.0 * OMEGA + 100.0
 		END IF
-		Corr_delta_f = MIN(acorrsinus - (acorrsinus - acorrB1) * B2 / B1, 70.0)
+		Corr_delta_f = MIN(acorrsinus - (acorrsinus - acorrB1) * (B2 / B1), 70.0)
 		GOTO 300
 	END IF 
 !
@@ -265,7 +265,7 @@
 		ELSE
 			acorrsinus = 13.0 * OMEGA + 58.0
 		END IF
-		Corr_delta_f = MIN(acorrsinus - (acorrsinus - acorrB1) * B2 / B1, 70.0)
+		Corr_delta_f = MIN(acorrsinus - (acorrsinus - acorrB1) * (B2 / B1), 70.0)
 		GOTO 300
 	END IF 
 !
@@ -289,7 +289,7 @@
 	ELSE
 		acorrsinus = 12.0 * OMEGA + 55.0
 	END IF
-	Corr_delta_f = MIN(acorrsinus - (acorrsinus - acorrB1) * B2 / B1, 70.0)
+	Corr_delta_f = MIN(acorrsinus - (acorrsinus - acorrB1) * (B2 / B1), 70.0)
 	IF ((CSXT .LE. 25000) .AND. (CSXR .LE. 25000)) GOTO 300
 	CDFN = Corr_delta_f
 !
@@ -313,7 +313,7 @@
 	ELSE
 		acorrsinus = 4.8 * OMEGA + 51.6
 	END IF
-	Corr_delta_f = MIN(acorrsinus - (acorrsinus - acorrB1) * B2 / B1, 70.0)
+	Corr_delta_f = MIN(acorrsinus - (acorrsinus - acorrB1) * (B2 / B1), 70.0)
 	IF ((CSXR .GE. 200000) .OR. (CSXT .GE. 200000)) GOTO 300
 	CDFW = Corr_delta_f
 !
