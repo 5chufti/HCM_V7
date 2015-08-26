@@ -13,8 +13,8 @@
 							  I_Calculated_FS, I_Perm_FS, I_CBR_D, I_ERP_ref_Tx, &
 							  I_Prot_margin, I_str)
 !
-	!DEC$  ATTRIBUTES DLLEXPORT::HCMMS_V7_DLL
-	!DEC$  ATTRIBUTES ALIAS:'HCMMS_V7_DLL'::HCMMS_V7_DLL
+	!DEC$  ATTRIBUTES ALIAS:"HCMMS_V7_DLL",DLLEXPORT::HCMMS_V7_DLL
+
 !
 	IMPLICIT	NONE
 !	Include the interface definitions:
