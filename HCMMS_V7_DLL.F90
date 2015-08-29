@@ -191,42 +191,10 @@
 			WRITE (2,*) "p2p non strict HCM t%=50.)"
 		CASE  (10) 
 			WRITE (2,*) "p2p non strict HCM t%=10.)"
-		CASE  (9) 
-			WRITE (2,*) "UMTS/IMT2000 point to p.)"
-		CASE  (8) 
-			WRITE (2,*) "380-400 MHz emerg./secur.)"
-		CASE  (7) 
-			WRITE (2,*) "Normal Agreement cov. 50% t.)"
-		CASE  (6) 
-			WRITE (2,*) "GSM1800 <-> GSM1800 ML 42 dBµV/m)"
-		CASE  (5) 
-			WRITE (2,*) "GSM1800 <-> GSM1800 FB 38 dBµV/m)"
-		CASE  (4) 
-			WRITE (2,*) "ERMES<->ERMES 32 dBµV/m)"
-		CASE  (3)
-			WRITE (2,*) "GSM900 <-> NMT)"
-		CASE  (2) 
-			WRITE (2,*) "GSM900 <-> TACS)"
-		CASE  (1) 
-			WRITE (2,*) "GSM900 <-> GSM900)"
 		CASE  (0) 
 			WRITE (2,*) "Normal Agreement)"
 		CASE (-1) 
 			WRITE (2,*) "Agreement line calc. h2=10m)"
-		CASE (-2) 
-			WRITE (2,*) "GSM900 line calc. h2=3m)"
-		CASE (-3) 
-			WRITE (2,*) "ERMES line calc.12 dbµV/m)"
-		CASE (-4) 
-			WRITE (2,*) "ERMES line calc.32 dbµV/m)"
-		CASE (-5) 
-			WRITE (2,*) "ERMES line calc.52 dbµV/m)"
-		CASE (-6) 
-			WRITE (2,*) "GSM1800 line calc. h2=3m)"
-		CASE (-7) 
-			WRITE (2,*) "380-400 MHz line calc.)"
-		CASE (-8) 
-			WRITE (2,*) "UMTS/IMT2000 line calc.)"
 		CASE (-9) 
 			WRITE (2,*) "p2l non strict HCM t%=10 h2=3.)"
 		CASE (-10) 

@@ -72,28 +72,15 @@
 !	PD					Point distace for the profile (km)
 !
 !	C_mode				Mode of calculation                 
-!						 9 = UMTS / IMT2000 point to point calculations.
-!						 8 = 380 - 400 MHz emergency / security services calcl.
-!						 7 = normal Vienna Agreement coverage calcl. (50% time)
-!						 6 = DCS - DCS ML (10 %, EP = 42 dBuV/m)
-!						 5 = DCS - DCS FB (10 %, EP = 38 dBuV/m)
-!						 4 = ERMES - ERMES (10 %, EP = 32 dBuV/m)
-!						 3 = GSM - NMT (10 %, EP = 32 dBuV/m)
-!						 2 = GSM - TACS (10 %, EP = 32 dBuV/m)
-!						 1 = GSM - GSM (10 %, EP = 32 dBuV/m)
+!						99 = line as P2P
+!						12 = P2P non strict HCM t%=1
+!						11= P2P non strict HCM t%=50
+!						10 = P2P non strict HCM t%=10
 !						 0 = normal Vienna Agreement
 !						-1 = Coordination line calculation (h2 = 10m)
-!						-2 = Coordination line calcul. GSM (h2 = 3m)
-!						-3 = Coordination line calcul. ERMES
-!							 (h2 = 3m), EP = 12 dBuV/m, 10 %
-!						-4 = Coordination line calcul. ERMES
-!							 (h2 = 3m), EP = 32 dBuV/m, 10 %
-!						-5 = Coordination line calcul. ERMES
-!							 (h2 = 3m), EP = 52 dBuV/m, 50 %
-!						-6 = Coordination line calcul. DCS
-!							 (h2 = 3m), EP = 25 dBuV/m, 10 %
-!						-7 = 380 - 400 MHz emergency / security services line calcl.
-!						-8 = UMTS / IMT2000 line calcl.
+!						-9 = P2L non strict HCM t%=10 h2=3
+!						-10 = P2L non strict HCM t%=10 h2=10
+!						-11 = P2L non strict HCM t%=50 h2=3
 !
 !	Land_to				Land to calculate to (Preface to the IFL)
 !	Land_from			Land to calculate from (Preface to the IFL)
@@ -473,77 +460,12 @@
 			ERP_ref_Tx = -999.9
 			Perm_FS    = -999.9
 			Info(4) = .TRUE.
-!	9 = UMTS / IMT2000 point to point calculations.
-		CASE (9)
-!			nothing
-!	8 = 380 - 400 MHz emergency / security services calcl.
-		CASE (8)
-!			nothing
-!	7 = normal Vienna Agreement coverage calcl. (50% time)
-		CASE (7)
-			Time_percentage = 50
-!	6 = DCS - DCS ML (10 %, EP = 42 dBuV/m)
-		CASE (6)
-			Perm_FS = 42.0
-			Time_percentage = 10
-!	5 = DCS - DCS FB (10 %, EP = 38 dBuV/m)
-		CASE (5)
-			Perm_FS = 38.0
-			Time_percentage = 10
-!	4 = ERMES - ERMES (10 %, EP = 32 dBuV/m)
-		CASE (4)
-			Perm_FS = 32.0
-			Time_percentage = 10
-			H_AntRx = 3
-!	3 = GSM - NMT (10 %, EP = 32 dBuV/m)
-		CASE (3)
-			Perm_FS = 32.0
-			Time_percentage = 10
-!	2 = GSM - TACS (10 %, EP = 32 dBuV/m)
-		CASE (2)
-			Perm_FS = 32.0
-			Time_percentage = 10
-!	1 = GSM - GSM (10 %, EP = 32 dBuV/m)
-		CASE (1)
-			Perm_FS = 32.0
-			Time_percentage = 10
 !	0 = normal Vienna Agreement
 		CASE (0)
 !			nothing
 !	-1 = Coordination line calculation (h2 = 10m)
 		CASE (-1)
 !			nothing
-!	-2 = Coordination line calcul. GSM (h2 = 3m)
-		CASE (-2)
-			Perm_FS = 19.0
-			Time_percentage = 10
-			H_AntRx = 3
-!	-3 = Coordination line calcul. ERMES (h2 = 3m), EP = 12 dBuV/m, 10 %
-		CASE (-3)
-			Perm_FS = 12.0
-			Time_percentage = 10
-			H_AntRx = 3
-!	-4 = Coordination line calcul. ERMES (h2 = 3m), EP = 32 dBuV/m, 10 %
-		CASE (-4)
-			Perm_FS = 32.0
-			Time_percentage = 10
-			H_AntRx = 3
-!	-5 = Coordination line calcul. ERMES (h2 = 3m), EP = 52 dBuV/m, 50 %
-		CASE (-5)
-			Perm_FS = 52.0
-			Time_percentage = 50
-			H_AntRx = 3
-!	-6 = Coordination line calcul. DCS (h2 = 3m), EP = 25 dBuV/m, 10 %
-		CASE (-6)
-			Perm_FS = 25.0
-			Time_percentage = 10
-			H_AntRx = 3
-!	-7 = 380 - 400 MHz emergency / security services line calcl.
-		CASE (-7)
-!			nothing
-!	-8 = UMTS / IMT2000 line calcl.
-		CASE (-8)
-			H_AntRx = 3
 !	-9 = P2L non strict HCM t%=10 h2=3
 		CASE (-9)
 			Time_percentage = 10
