@@ -1,6 +1,6 @@
 !	
 !	HCMMS_V7.F90										P.Benner		23.02.2004
-!														G.H.			14.10.2014
+!														G.H.			30.09.2015
 !	Version 7					
 !
 !	Harmonized Calculation Method for mobile services
@@ -210,6 +210,34 @@
 	  RETURN
 	END IF
 !
+!	get power
+	READ (Max_power, '(F6.1)', IOSTAT=IOS) MaxPow
+	IF (IOS .NE. 0) THEN
+	  HCM_Error = 1034
+!	  Error in power.
+	  RETURN
+	END IF
+!
+!	Calculate 'Tx_ant_type_corr':
+	IF (Type_of_Tx_ant .EQ. 'E') THEN
+		Tx_ant_type_corr = 0.0
+	ELSEIF (Type_of_Tx_ant .EQ. 'I') THEN
+		Tx_ant_type_corr = 2.1
+	ELSE
+		HCM_Error = 1033
+!		Error in typ of Tx antenna (E/I)
+		RETURN
+	END IF
+!
+	MaxPow = MaxPow - Tx_ant_type_corr
+!
+!	Channel occupation:
+	IF (Chan_occup .EQ. '1') THEN
+		Time_percentage = 1
+	  ELSE
+		Time_percentage = 10
+	END IF      
+!
 !	Default receiver antenna height:
 	H_AntRx = 10
 !
@@ -321,34 +349,6 @@
 		Cor_fact_frequ_diff = '    '
 	END IF
 !	end of point to point data
-!
-!	get power
-	READ (Max_power, '(F6.1)', IOSTAT=IOS) MaxPow
-	IF (IOS .NE. 0) THEN
-	  HCM_Error = 1034
-!	  Error in power.
-	  RETURN
-	END IF
-!
-!	Calculate 'Tx_ant_type_corr':
-	IF (Type_of_Tx_ant .EQ. 'E') THEN
-		Tx_ant_type_corr = 0.0
-	ELSEIF (Type_of_Tx_ant .EQ. 'I') THEN
-		Tx_ant_type_corr = 2.1
-	ELSE
-		HCM_Error = 1033
-!		Error in typ of Tx antenna (E/I)
-		RETURN
-	END IF
-!
-	MaxPow = MaxPow - Tx_ant_type_corr
-!
-!	Channel occupation:
-	IF (Chan_occup .EQ. '1') THEN
-		Time_percentage = 1
-	  ELSE
-		Time_percentage = 10
-	END IF      
 !
 !	Test point distance (if <30, set it to 100 m):
 	IF (PD .LT. 3.0D-2) PD = 1.0D-1
@@ -510,6 +510,7 @@
 		IF (IOS .NE. 0) THEN
 			HCM_error = 1026
 !			Error in input value of permissible field strength
+			RETURN
 		END IF
 	ELSE
 		IF (INFO(4)) THEN

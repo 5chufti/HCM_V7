@@ -95,7 +95,6 @@
 !
 !	Delta frequency in Hz:
 	Delta_frequency = DINT(Tx_frequency*1D6 - Rx_frequency*1D6)
-!	Delta_frequency = INT(Rx_frequency*1D5) - INT(Rx_frequency*1D5)
 	Delta_frequency = IABS(Delta_frequency) 
 !
 !	Input value for correction factor according delta frequency ?
