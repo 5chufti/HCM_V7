@@ -6,7 +6,7 @@
 	INTEGER*4			H_AntTx, H_AntRx, H_Tx, H_Rx, Channel_sp_Rx, Channel_sp_Tx
 	INTEGER*8			Delta_frequency
 !
-	REAL				Heff, TCA, TCA_corr
+	REAL				Heff, TCA, TCA_corr, aLatM
 	REAL				Dh, Dh_corr, Calculated_FS, Perm_FS, Prot_margin
 	REAL				ERP_ref_Tx, CBR_D, Tx_TCA, Rx_TCA, Tx_TCA_corr, Rx_TCA_corr
 	REAL				Heff_Tx, Heff_Rx, Land_FS, Sea_FS
@@ -55,7 +55,7 @@
 						Power_to_Rx, Free_space_FS, Tx_serv_area, Rx_serv_area, MaxPow, &
 						H_diff_angle_Rx_Tx, V_diff_angle_Rx_Tx, H_diff_angle_Tx_Rx, V_diff_angle_Tx_Rx, &
 !
-						HCM_error, Time_percentage, C_mode, D_to_border, OLD_T, &
+						HCM_error, Time_percentage, aLatM, C_mode, D_to_border, OLD_T, &
 						H_AntTx, H_AntRx, H_Tx, H_Rx, Delta_frequency, Channel_sp_Rx, Channel_sp_Tx, &
 !
 						Info, &

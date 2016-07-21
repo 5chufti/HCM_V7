@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			25.03.2013
+!														G.H.			09.06.2016
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -406,7 +406,7 @@
 	  Calculated_FS = Free_space_FS
 	  Info(11) = .TRUE.
 !	  Free space field strength used because distance < 1km.
-	  RETURN
+!	  RETURN
 	END IF
 !
 !	*****************************************************************
@@ -480,7 +480,7 @@
 !		Free space field strength is used
 		Calculated_FS = Free_space_FS
 		Info(12) = .TRUE.
-		RETURN
+!		RETURN
 	  END IF
 	END IF
 !
@@ -700,31 +700,34 @@
 !	Clearance angle corrections and delta h correction:
 	Land_FS = Land_FS + Tx_TCA_corr + Rx_TCA_corr - Dh_corr
 !
-	IF (D_sea_calculated .EQ. 0.0) THEN
+	IF (Info(11) .OR. Info(12)) THEN
+	ELSE
+	  IF (D_sea_calculated .EQ. 0.0) THEN
 		Calculated_FS = Land_FS
-		RETURN
+!		RETURN
 	  ELSE
 !		Mixed path calculation:
 		IF (Time_percentage .LT. 10) THEN
-!			Apply Annex 5, section 3.6 a
-			Factor_of_path_over_sea = D_sea_calculated / Distance
-			X  = Factor_of_path_over_sea * 10.0
-			A1 = A(INT(X)+1)
-			IF (X .LT. 10.0) THEN
-				A2 = A(INT(X)+2)
-			  ELSE
-				A2 = A1
-			END IF
-			X = X - INT(X)
-			Ax = A1 + X * (A2 - A1)
-			Calculated_FS  = Land_FS + Ax * (Sea_FS - Land_FS)
-			RETURN
+!		  Apply Annex 5, section 3.6 a
+		  Factor_of_path_over_sea = D_sea_calculated / Distance
+		  X  = Factor_of_path_over_sea * 10.0
+		  A1 = A(INT(X)+1)
+		  IF (X .LT. 10.0) THEN
+			  A2 = A(INT(X)+2)
 		  ELSE
-!			Apply Annex 5, section 3.6 b
-			Calculated_FS = Land_FS * (Distance - D_sea_calculated) / &
-					Distance + Sea_FS * D_sea_calculated / Distance
-			RETURN
+			A2 = A1
+		  END IF
+		  X = X - INT(X)
+		  Ax = A1 + X * (A2 - A1)
+		  Calculated_FS = Land_FS + Ax * (Sea_FS - Land_FS)
+!		  RETURN
+		ELSE
+!		  Apply Annex 5, section 3.6 b
+		  Calculated_FS = Land_FS * (Distance - D_sea_calculated) / &
+			Distance + Sea_FS * D_sea_calculated / Distance
+!		  RETURN
 		END IF
+	  END IF	
 	END IF
 !
 	END SUBROUTINE P_to_P_calculation

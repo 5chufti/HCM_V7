@@ -1,6 +1,6 @@
 !
-!	Get_FS_from_figures.f90						P. Benner
-!												19.04.2006
+!	Get_FS_from_figures.f90						P. Benner	19.04.2006
+!												G.Harasek	12.07.2016
 !
 !	SUBROUTINE Get_FS_from_figures ( Land_FS_1kW, Sea_FS_1kW )
 !
@@ -30,11 +30,6 @@
 !							   0	no error
 !							1028	Distance is > 1000 km, calculations not possible
 !							1000	Distance is <=   0 km, calculations not possible
-!							2000	wrong Figure_frequency (from Get_figure_FS_value)
-!							2001	wrong Time_percentage  (from Get_figure_FS_value)
-!							2002	wrong Sea_temperature  (from Get_figure_FS_value)
-!							2003	wrong Figure_Heff      (from Get_figure_FS_value)
-!							2004	wrong Figure_distance  (from Get_figure_FS_value)
 !
 !
 !	Called subroutine(s):	Get_figure_FS_value
@@ -47,7 +42,6 @@
 !
 	INCLUDE				'HCM_MS_V7_definitions.f90'
 !
-	INTEGER*4			Error
 	INTEGER*4			Distances(78), d_inf, d_sup, f_inf, f_sup, I
 	REAL				dh1, dh10
 	REAL				Land_FS_1kW, Sea_FS_1kW
@@ -123,54 +117,16 @@
 	IF (Heff .GE. 10.0) THEN
 !		Case Heff =  10 - 3000 m
 !
-		CALL Get_figure_FS_value (f_inf, Time_percentage, Sea_temperature, &
-								  h_inf, d_inf, L_Eiii, S_Eiii, Error)
-		IF (Error .NE. 0) THEN
-		  HCM_error = Error
-		  RETURN
-		END IF
-		CALL Get_figure_FS_value (f_inf, Time_percentage, Sea_temperature, &
-								  h_inf, d_sup, L_Eiis, S_Eiis, Error)
-		IF (Error .NE. 0) THEN
-		  HCM_error = Error
-		  RETURN
-		END IF
-		CALL Get_figure_FS_value (f_inf, Time_percentage, Sea_temperature, &
-								  h_sup, d_inf, L_Eisi, S_Eisi, Error)
-		IF (Error .NE. 0) THEN
-		  HCM_error = Error
-		  RETURN
-		END IF
-		CALL Get_figure_FS_value (f_inf, Time_percentage, Sea_temperature, &
-								  h_sup, d_sup, L_Eiss, S_Eiss, Error)
-		IF (Error .NE. 0) THEN
-		  HCM_error = Error
-		  RETURN
-		END IF
-		CALL Get_figure_FS_value (f_sup, Time_percentage, Sea_temperature, &
-								  h_inf, d_inf, L_Esii, S_Esii, Error)
-		IF (Error .NE. 0) THEN
-		  HCM_error = Error
-		  RETURN
-		END IF
-		CALL Get_figure_FS_value (f_sup, Time_percentage, Sea_temperature, &
-								  h_inf, d_sup, L_Esis, S_Esis, Error)
-		IF (Error .NE. 0) THEN
-		  HCM_error = Error
-		  RETURN
-		END IF
-		CALL Get_figure_FS_value (f_sup, Time_percentage, Sea_temperature, &
-								  h_sup, d_inf, L_Essi, S_Essi, Error)
-		IF (Error .NE. 0) THEN
-		  HCM_error = Error
-		  RETURN
-		END IF
-		CALL Get_figure_FS_value (f_sup, Time_percentage, Sea_temperature, &
-								  h_sup, d_sup, L_Esss, S_Esss, Error)
-		IF (Error .NE. 0) THEN
-		  HCM_error = Error
-		  RETURN
-		END IF
+		CALL Get_figure_FS_value (f_inf, h_inf, d_inf, L_Eiii, S_Eiii)
+		CALL Get_figure_FS_value (f_inf, h_inf, d_sup, L_Eiis, S_Eiis)
+		CALL Get_figure_FS_value (f_inf, h_sup, d_inf, L_Eisi, S_Eisi)
+		CALL Get_figure_FS_value (f_inf, h_sup, d_sup, L_Eiss, S_Eiss)
+		CALL Get_figure_FS_value (f_sup, h_inf, d_inf, L_Esii, S_Esii)
+		CALL Get_figure_FS_value (f_sup, h_inf, d_sup, L_Esis, S_Esis)
+		CALL Get_figure_FS_value (f_sup, h_sup, d_inf, L_Essi, S_Essi)
+		CALL Get_figure_FS_value (f_sup, h_sup, d_sup, L_Esss, S_Esss)
+		IF (HCM_error .NE. 0) RETURN
+!		
 		L_E_ii = L_Eiii + (L_Eisi - L_Eiii) * LOG10(Heff/h_inf) / LOG10(h_sup/h_inf)
 		S_E_ii = S_Eiii + (S_Eisi - S_Eiii) * LOG10(Heff/h_inf) / LOG10(h_sup/h_inf)
 		L_E_is = L_Eiis + (L_Eiss - L_Eiis) * LOG10(Heff/h_inf) / LOG10(h_sup/h_inf)
@@ -220,31 +176,13 @@
 !
 !			Calculate E10d:
 !			Get field strength for f_inf:
-			CALL Get_figure_FS_value (f_inf, Time_percentage, Sea_temperature, &
-									  h10, d_inf, L_E_ii, S_E_ii, Error)
-			IF (Error .NE. 0) THEN
-			  HCM_error = Error
-			  RETURN
-			END IF
-			CALL Get_figure_FS_value (f_inf, Time_percentage, Sea_temperature, &
-									  h10, d_sup, L_E_is, S_E_is, Error)
-			IF (Error .NE. 0) THEN
-			  HCM_error = Error
-			  RETURN
-			END IF
+			CALL Get_figure_FS_value (f_inf, h10, d_inf, L_E_ii, S_E_ii)
+			CALL Get_figure_FS_value (f_inf, h10, d_sup, L_E_is, S_E_is)
 !			Get field strength for f_sup:
-			CALL Get_figure_FS_value (f_sup, Time_percentage, Sea_temperature, &
-									  h10, d_inf, L_E_si, S_E_si, Error)
-			IF (Error .NE. 0) THEN
-			  HCM_error = Error
-			  RETURN
-			END IF
-			CALL Get_figure_FS_value (f_sup, Time_percentage, Sea_temperature, &
-									  h10, d_sup, L_E_ss, S_E_ss, Error)
-			IF (Error .NE. 0) THEN
-			  HCM_error = Error
-			  RETURN
-			END IF
+			CALL Get_figure_FS_value (f_sup, h10, d_inf, L_E_si, S_E_si)
+			CALL Get_figure_FS_value (f_sup, h10, d_sup, L_E_ss, S_E_ss)
+			IF (HCM_error .NE. 0) RETURN
+!
 !			Interpolation of field strength as a function of the distance:
 			IF (d_sup .EQ. d_inf) THEN
 				L_E10d_i = L_E_ii
@@ -280,31 +218,13 @@
 			d_inf = 12
 			d_sup = 13
 !			Get field strength for f_inf:
-			CALL Get_figure_FS_value (f_inf, Time_percentage, Sea_temperature, &
-									  h10, d_inf, L_E_ii, S_E_ii, Error)
-			IF (Error .NE. 0) THEN
-			  HCM_error = Error
-			  RETURN
-			END IF
-			CALL Get_figure_FS_value (f_inf, Time_percentage, Sea_temperature, &
-									  h10, d_sup, L_E_is, S_E_is, Error)
-			IF (Error .NE. 0) THEN
-			  HCM_error = Error
-			  RETURN
-			END IF
+			CALL Get_figure_FS_value (f_inf, h10, d_inf, L_E_ii, S_E_ii)
+			CALL Get_figure_FS_value (f_inf, h10, d_sup, L_E_is, S_E_is)
 !			Get field strength for f_sup:
-			CALL Get_figure_FS_value (f_sup, Time_percentage, Sea_temperature, &
-									  h10, d_inf, L_E_si, S_E_si, Error)
-			IF (Error .NE. 0) THEN
-			  HCM_error = Error
-			  RETURN
-			END IF
-			CALL Get_figure_FS_value (f_sup, Time_percentage, Sea_temperature, &
-									  h10, d_sup, L_E_ss, S_E_ss, Error)
-			IF (Error .NE. 0) THEN
-			  HCM_error = Error
-			  RETURN
-			END IF
+			CALL Get_figure_FS_value (f_sup, h10, d_inf, L_E_si, S_E_si)
+			CALL Get_figure_FS_value (f_sup, h10, d_sup, L_E_ss, S_E_ss)
+			IF (HCM_error .NE. 0) RETURN
+!
 !			Interpolation of field strength as a function of the distance:
 			IF (d_sup .EQ. d_inf) THEN
 				L_E10dh10_i = L_E_ii
@@ -349,31 +269,13 @@
 				  END IF
 				END DO
 !				Get field strength for f_inf:
-				CALL Get_figure_FS_value (f_inf, Time_percentage, Sea_temperature, &
-										  h10, d_inf, L_E_ii, S_E_ii, Error)
-				IF (Error .NE. 0) THEN
-				  HCM_error = Error
-				  RETURN
-				END IF
-				CALL Get_figure_FS_value (f_inf, Time_percentage, Sea_temperature, &
-										  h10, d_sup, L_E_is, S_E_is, Error)
-				IF (Error .NE. 0) THEN
-				  HCM_error = Error
-				  RETURN
-				END IF
+				CALL Get_figure_FS_value (f_inf, h10, d_inf, L_E_ii, S_E_ii)
+				CALL Get_figure_FS_value (f_inf, h10, d_sup, L_E_is, S_E_is)
 !				Get field strength for f_sup:
-				CALL Get_figure_FS_value (f_sup, Time_percentage, Sea_temperature, &
-										  h10, d_inf, L_E_si, S_E_si, Error)
-				IF (Error .NE. 0) THEN
-				  HCM_error = Error
-				  RETURN
-				END IF
-				CALL Get_figure_FS_value (f_sup, Time_percentage, Sea_temperature, &
-										  h10, d_sup, L_E_ss, S_E_ss, Error)
-				IF (Error .NE. 0) THEN
-				  HCM_error = Error
-				  RETURN
-				END IF
+				CALL Get_figure_FS_value (f_sup, h10, d_inf, L_E_si, S_E_si)
+				CALL Get_figure_FS_value (f_sup, h10, d_sup, L_E_ss, S_E_ss)
+				IF (HCM_error .NE. 0) RETURN
+!
 !				Interpolation of field strength as a function of the distance:
 				IF (d_sup .EQ. d_inf) THEN
 					L_E10dh1_i = L_E_ii
@@ -424,31 +326,13 @@
 				  END IF
 				END DO
 !				Get field strength for f_inf:
-				CALL Get_figure_FS_value (f_inf, Time_percentage, Sea_temperature, &
-										  h10, d_inf, L_E_ii, S_E_ii, Error)
-				IF (Error .NE. 0) THEN
-				  HCM_error = Error
-				  RETURN
-				END IF
-				CALL Get_figure_FS_value (f_inf, Time_percentage, Sea_temperature, &
-										  h10, d_sup, L_E_is, S_E_is, Error)
-				IF (Error .NE. 0) THEN
-				  HCM_error = Error
-				  RETURN
-				END IF
+				CALL Get_figure_FS_value (f_inf, h10, d_inf, L_E_ii, S_E_ii)
+				CALL Get_figure_FS_value (f_inf, h10, d_sup, L_E_is, S_E_is)
 !				Get field strength for f_sup:
-				CALL Get_figure_FS_value (f_sup, Time_percentage, Sea_temperature, &
-										  h10, d_inf, L_E_si, S_E_si, Error)
-				IF (Error .NE. 0) THEN
-				  HCM_error = Error
-				  RETURN
-				END IF
-				CALL Get_figure_FS_value (f_sup, Time_percentage, Sea_temperature, &
-										  h10, d_sup, L_E_ss, S_E_ss, Error)
-				IF (Error .NE. 0) THEN
-				  HCM_error = Error
-				  RETURN
-				END IF
+				CALL Get_figure_FS_value (f_sup, h10, d_inf, L_E_si, S_E_si)
+				CALL Get_figure_FS_value (f_sup, h10, d_sup, L_E_ss, S_E_ss)
+				IF (HCM_error .NE. 0)  RETURN
+!
 !				Interpolation of field strength as a function of the distance:
 				IF (d_sup .EQ. d_inf) THEN
 					L_E10dhx_i = L_E_ii

@@ -1,6 +1,6 @@
 !
 !	HCMMS_V7_DLL.F90									P. Benner		08.01.2004
-!														G.H.			30.08.2015
+!														G.H.			21.07.2016
 !	DLL to the HCMMS_V7 subroutuine (Berlin 2003)
 !
 	SUBROUTINE HCMMS_V7_DLL ( I_C_mode, I_bor_dis, I_PD, I_Distance, I_H_Datab_Tx, &
@@ -248,7 +248,7 @@
 			WRITE (2,'(A35,I4,A3)') " Input value of dist. to border : ", D_to_border, " km"
 			WRITE (2,*) " Input value of max. crossb. r. :  ", Max_CBR_D_input, " km"
 		END IF
-		WRITE (2,*) " Input value of permissible fs. : ", Perm_FS_input, " dBµV/m"
+		WRITE (2,*) " Input value of permissible fs. : ", Perm_FS_input, " dBuV/m"
 		WRITE (2,*) ""
 		WRITE (2,*) "" 
 	END IF
@@ -280,6 +280,7 @@
 	I_str(403:417)     = Coo_Tx_new		 ! Calculated co-ordinates of the transmitter
 	I_str(418:432)     = Coo_Rx_new		 ! Calculated co-ordinates of the receiver
 	I_str(166:169)     = Depol_loss		 ! Depolarization loss
+	I_str(91:91)	   = Sea_temperature ! calculated Sea temperature
 !
 	I_Distance         = Distance		! Distance
 	I_H_Datab_Tx       = H_Datab_Tx		! Heigth of TX above sea level (terrain database)
@@ -421,7 +422,7 @@
           WRITE (2, '(A35, F7.2, A4)') "  line point is                  : ", Distance, " km."
           WRITE (2,*) " Direction to the (border-)"   
           WRITE (2, '(A35, F7.2, A6)') "  line point                     : ", Dir_Tx_Rx, " degr."
-          WRITE (2, '(A35, F7.1, A8)') "  Permissible field strength     : ", Perm_FS, " dBµV/m."
+          WRITE (2, '(A35, F7.1, A8)') "  Permissible field strength     : ", Perm_FS, " dBuV/m."
           WRITE (2, '(A35, F7.1, A4)') "  The protection margin is       : ", Prot_margin, " dB."
 		  IF (D_to_border .EQ. 0) THEN
 			WRITE (2,*) " Calculation is performed on the borderline."
@@ -560,9 +561,9 @@
 		WRITE (2,'(A35, F7.1, A2)') "  Effective antenna height (CCIR): ", Heff, " m"
 		WRITE (2,'(A35, F7.1, A2)') "  Delta height  (CCIR)           : ", Dh, " m"
 		WRITE (2,'(A35, F7.1, A3)') "  Correct. factor delta h (CCIR) : ", Dh_corr, " dB"
-		WRITE (2,'(A18, I3, A8)')   "   Values from the", Time_percentage, "% curves"
-		WRITE (2,'(A35, F7.1, A7)') "  Land field strength            : ", Land_FS, " dBuV/m"
-		WRITE (2,'(A35, F7.1, A7)') "  Sea field strength             : ", Sea_FS, " dBuV/m"
+		WRITE (2,'(A17, I3, A8, A1)')   "  Values from the", Time_percentage, "% curves"
+		WRITE (2,'(A35, F7.1, A7)') "   Land field strength           : ", Land_FS, " dBuV/m"
+		WRITE (2,'(A28, A1, A6, F7.1, A7)') "   Sea field strength (temp=", Sea_temperature, ")   : ", Sea_FS, " dBuV/m"
 		WRITE (2,'(A35, F7.1, A3)') "  Correction factor Tx antenna   : ", Tx_ant_corr, " dB"
 		WRITE (2,'(A35, F7.1, A3)') "  Corr. factor antenna type Tx   : ", Tx_ant_type_corr, " dB"
 		WRITE (2,'(A35, F7.1, A7)') "  Direction Tx -> Rx             : ", Dir_Tx_Rx, " degree"
@@ -587,9 +588,9 @@
 
 		END IF
 		WRITE (2,*) "  Permissible field str. of table"
-		WRITE (2,'(A35, F7.1, A7)') "  (0, if there is an input)      : ", Perm_FS_from_table, " dbuV/m"
+		WRITE (2,'(A35, F7.1, A7)') "  (0, if there is an input)      : ", Perm_FS_from_table, " dBuV/m"
 		WRITE (2,'(A35, F7.1, A4)') "  Power in direction of Rx       : ", Power_to_Rx, " dBW"
-		WRITE (2,'(A35, F7.1, A7)') "  Free space field strength      : ", Free_space_FS, " dbuV/m"
+		WRITE (2,'(A35, F7.1, A7)') "  Free space field strength      : ", Free_space_FS, " dBuV/m"
 		WRITE (2,*) ""
 !	-------------------------------------------------------
 !	profilepoints?

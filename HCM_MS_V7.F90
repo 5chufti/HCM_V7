@@ -1,6 +1,6 @@
 !	
 !	HCMMS_V7.F90										P.Benner		23.02.2004
-!														G.H.			30.09.2015
+!														G.H.			21.07.2016
 !	Version 7					
 !
 !	Harmonized Calculation Method for mobile services
@@ -24,7 +24,7 @@
 !
 	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
-	DOUBLE PRECISION	CI, LongTx, LatTx, LongRx, LatRx
+	DOUBLE PRECISION	LongTx, LatTx, LongRx, LatRx, CI
 	INTEGER*4			I, IOS, IMR
 !
 !
@@ -97,7 +97,7 @@
 !
 !	***************************************************************************
 !
-	Version = '7.20'
+	Version = '7.994'
 !
 	HCM_error = 0
 !
@@ -539,7 +539,12 @@
 	END IF  
 !
 !	Sea temparatur:
-	IF (Sea_temperature .NE. 'W') Sea_temperature = 'C'
+	IF ((Sea_temperature .NE. 'W') .AND. (Sea_temperature .NE. 'C')) THEN
+		aLatM = ABS(LatTx + LatRx) / 2.0
+		Sea_temperature = 'C'
+		IF (aLatM .LT. 56.0) Sea_temperature = 'I'
+		IF (aLatM .LE. 35.0) Sea_temperature = 'W'
+	END IF
 !
 !	**************************************************************
 !

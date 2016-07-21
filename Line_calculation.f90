@@ -1,9 +1,10 @@
 !
 !	Line_calculation.f90							P.Benner		23.11.2004
-!													G.H.			17.09.2014
+!													G.H.			06.04.2016
 !
 !	23.11.2004	Steps from 100 / 10 / 1 modified to 25 / 5 / 1
 !	18.07.2011  Steps modified to 5 / 1
+!	06.04.2016  for x-km modified filter: 1.centrepoints 2.all points from 3 highest records
 !
 !	Subroutine to calculate the field strengs on a line
 !	or to calculate the cross border field strength.
@@ -120,10 +121,12 @@
 			STATUS='OLD', ACCESS='DIRECT',RECL=176, MODE='READ', IOSTAT=IOS)
 !
 	IF (IOS .NE. 0) THEN
-	  HCM_Error= 1048
+	  HCM_Error = 1048
 !	  Selected line data not available
 	  RETURN
-	END IF                            
+	END IF                          
+!
+	N_List = 0	! number of stored record numbers and field strength
 !	all linepoints?
 	INQUIRE (FILE='HCM_LP',EXIST=Take_it)
 	IF (.NOT. Take_it) GOTO 80
@@ -166,14 +169,17 @@
 75	GOTO 140
 !	End of testroutine
 !-------------------------------------------------------------------------
-!	1st: calculate to every 5th centerpoint:
-!	Use 1st list:
-80	N_List = 0	! number of stored record numbers and field strength
-	teststep = 5
-	N_rec = 3	! record number in file
-!	for tests
-!	teststep = 1
-!	N_rec = 1	
+!	1st: calculate to 
+!	cbr, border: every 5th centerpoint:
+!	x-km: each centerpoint
+80	IF (D_to_border .GT. 0) THEN
+		teststep = 1
+		N_rec = 1
+	ELSE
+		teststep = 5
+		N_rec = 3	! start record number in file
+	END IF
+	
 90	IOS = 0
 !
 	DO WHILE (IOS .EQ. 0)

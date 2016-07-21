@@ -1,33 +1,33 @@
 !
 !	Get_figure_FS_value.f90								P.Benner		06.10.2003
-!														G.H.			02.04.2013
+!														G.H.			12.07.2016
 !												
 !
-!	SUBROUTINE Get_figure_FS_value (Figure_frequency, Time_percentage, Sea_temperature, &
-!									Figure_Heff, Figure_distance, Land_figure_FS, &
-!									Sea_figure_FS, Error)
+!	SUBROUTINE Get_figure_FS_value (Figure_frequency, Figure_Heff, Figure_distance,
+!									Land_figure_FS, Sea_figure_FS)
 !
 !
 !	Input values:							possible values
 !
 !			Figure_frequency	in MHz		100, 600 or 2000				INTEGER*4
-!			Time_percentage		in %		1, 10 or 50						INTEGER*4
-!			Sea_temperature					C, c, W or w (cold or warm)		CHARACTER*1
+!			Time_percentage*	in %		1, 10 or 50						INTEGER*4
+!			Sea_temperature*				C, W or I (cold, warm or inter)	CHARACTER*1
 !			Figure_Heff			in m		10 to 1200 (see list)			REAL
 !			Figure_distance		in km		1 to 1000 (see list)			INTEGER*4
-!
+!			aLatM*															REAL
+!			* in COMMON
 !
 !	Output values:
 !
-!			Error							   0 = no error					INTEGER*4				
+!			Land_figure_FS		in dBµV/m	(for 1 kW)						REAL
+!			Sea_figure_FS		in dBµV/m	(for 1 kW)						REAL
+!
+!	Error values 							   0 = no error					INTEGER*4				
 !											2000 = wrong Figure_frequency	
 !											2001 = wrong Time_percentage
 !											2002 = wrong Sea_temperature
 !											2003 = wrong Figure_Heff
 !											2004 = wrong Figure_distance
-!			Land_figure_FS		in dBµV/m	(for 1 kW)						REAL
-!			Sea_figure_FS		in dBµV/m	(for 1 kW)						REAL
-!
 !
 !	Eff. antenna heights:
 !	10, 20, 37.5, 75, 150, 300, 600, 1200 m and	the maximum field strength (for 1kW).
@@ -43,21 +43,21 @@
 !
 !	*************************************************************************************
 !
-	SUBROUTINE Get_figure_FS_value (Figure_frequency, Time_percentage, Sea_temperature, &
-									Figure_Heff, Figure_distance, Land_figure_FS, &
-									Sea_figure_FS, Error)
+	SUBROUTINE Get_figure_FS_value (Figure_frequency, Figure_Heff, Figure_distance, &
+									Land_figure_FS, Sea_figure_FS)
 !
 	IMPLICIT	NONE
 !
-	INTEGER*4	Figure_frequency, Time_percentage, Figure_distance, Error
-	REAL		Figure_Heff, Land_figure_FS, Sea_figure_FS
-	CHARACTER*1	Sea_temperature
+	INCLUDE				'HCM_MS_V7_definitions.f90'
+!
+	INTEGER*4	Figure_frequency, Figure_distance
+	REAL		Figure_Heff, Land_figure_FS, Sea_figure_FS, SF_C, SF_W
 !
 	INTEGER*4	I, J
 	INTEGER*4	Distances(78)
 	LOGICAL*4	Found
 !
-	REAL	Heff_values(8), FXX(702)
+	REAL	Heff_values(8)
 !
 	REAL	F01(702), F02(702), F03(702), F04(702), F05(702), F06(702), F07(702), F08(702) 
 	REAL	F09(702), F10(702), F11(702), F12(702), F13(702), F14(702), F15(702), F16(702) 
@@ -2008,25 +2008,19 @@
 !	*************************************************************************************
 !
 !	Set default values:
-	Error = 0
 	Land_figure_FS = 0.0
 	Sea_figure_FS  = 0.0
 !
 !	Test input values:
 	IF ((Figure_frequency .NE. 100) .AND. (Figure_frequency .NE. 600) .AND. &
 		(Figure_frequency .NE. 2000)) THEN
-		Error = 2000	! Wrong Figure_frequency
+		HCM_error = 2000	! Wrong Figure_frequency
 		RETURN
 	END IF
 !
 	IF ((Time_percentage .NE. 1) .AND. (Time_percentage .NE. 10) .AND. &
 		(Time_percentage .NE. 50)) THEN
-		Error = 2001	! Wrong Time_percentage
-		RETURN
-	END IF
-!
-	IF ((Sea_temperature .NE. "C") .AND. (Sea_temperature .NE. "W")) THEN
-		Error = 2002	! Wrong Sea_temperature
+		HCM_error = 2001	! Wrong Time_percentage
 		RETURN
 	END IF
 !
@@ -2038,7 +2032,7 @@
 	  END IF
 	END DO
 	IF (.NOT. Found) THEN
-		Error = 2003	! Wrong Figure_Heff
+		HCM_error = 2003	! Wrong Figure_Heff
 		RETURN
 	END IF
 !	I = number in list of Heff
@@ -2051,7 +2045,7 @@
 	  END IF
 	END DO
 	IF (.NOT. Found) THEN
-		Error = 2004	! Wrong Figure_Distance
+		HCM_error = 2004	! Wrong Figure_distance
 		RETURN
 	END IF
 !	J = number in list of distances
@@ -2059,100 +2053,81 @@
 !	Get Land_figure_FS
 	IF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 50)) THEN
 !	  Use FIGURE1
-	  FXX = F01
+	  Land_figure_FS = F01((J-1)*9+I)
 	ELSEIF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 10)) THEN
 !	  Use FIGURE2
-	  FXX = F02
+	  Land_figure_FS = F02((J-1)*9+I)
 	ELSEIF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 1)) THEN
 !	  Use FIGURE3
-	  FXX = F03
+	  Land_figure_FS = F03((J-1)*9+I)
 	ELSEIF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 50)) THEN
 !	  Use FIGURE9
-	  FXX = F09
+	  Land_figure_FS = F09((J-1)*9+I)
 	ELSEIF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 10)) THEN
 !	  Use FIGURE10
-	  FXX = F10
+	  Land_figure_FS = F10((J-1)*9+I)
 	ELSEIF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 1)) THEN
 !	  Use FIGURE11
-	  FXX = F11
+	  Land_figure_FS = F11((J-1)*9+I)
 	ELSEIF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 50)) THEN
 !	  Use FIGURE17
-	  FXX = F17
+	  Land_figure_FS = F17((J-1)*9+I)
 	ELSEIF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 10)) THEN
 !	  Use FIGURE18
-	  FXX = F18
+	  Land_figure_FS = F18((J-1)*9+I)
 	ELSEIF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 1)) THEN
 !	  Use FIGURE19
-	  FXX = F19
+	  Land_figure_FS = F19((J-1)*9+I)
+	ELSE
+		HCM_error = 2005	! error in curves
+		RETURN
 	END IF
 !
-!	I = number in list of Heff
-!	J = number in list of distances
-	Land_figure_FS = FXX((J-1)*9+I)
-
 !	Get Sea_figure_FS
 	IF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 50)) THEN
 !	  Use FIGURE4
-	  FXX = F04
-	ELSEIF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 10) .AND. &
-		(Sea_temperature .EQ. "C")) THEN
-!	  Use FIGURE5
-	  FXX = F05
-	ELSEIF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 1) .AND. &
-		(Sea_temperature .EQ. "C")) THEN
-!	  Use FIGURE6
-	  FXX = F06
-	ELSEIF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 10) .AND. &
-		(Sea_temperature .EQ. "W")) THEN
-!	  Use FIGURE7
-	  FXX = F07
-	ELSEIF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 1) .AND. &
-		(Sea_temperature .EQ. "W")) THEN
-!	  Use FIGURE8
-	  FXX = F08
+	  SF_C = F04((J-1)*9+I)
+	  SF_W = SF_C
+	ELSEIF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 10)) THEN
+!	  Use FIGURE5,7
+	  SF_C = F05((J-1)*9+I)
+	  SF_W = F07((J-1)*9+I)
+	ELSEIF ((Figure_frequency .EQ. 100) .AND. (Time_percentage .EQ. 1)) THEN
+!	  Use FIGURE6,8
+	  SF_C = F06((J-1)*9+I)
+	  SF_W = F08((J-1)*9+I)
 	ELSEIF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 50)) THEN
 !	  Use FIGURE12
-	  FXX = F12
-	ELSEIF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 10) .AND. &
-		(Sea_temperature .EQ. "C")) THEN
-!	  Use FIGURE13
-	  FXX = F13
-	ELSEIF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 1) .AND. &
-		(Sea_temperature .EQ. "C")) THEN
-!	  Use FIGURE14
-	  FXX = F14
-	ELSEIF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 10) .AND. &
-		(Sea_temperature .EQ. "W")) THEN
-!	  Use FIGURE15
-	  FXX = F15
-	ELSEIF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 1) .AND. &
-		(Sea_temperature .EQ. "W")) THEN
-!	  Use FIGURE16
-	  FXX = F16
+	  SF_C = F12((J-1)*9+I)
+	  SF_W = SF_C
+	ELSEIF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 10)) THEN
+!	  Use FIGURE13,15
+	  SF_C = F13((J-1)*9+I)
+	  SF_W = F15((J-1)*9+I)
+	ELSEIF ((Figure_frequency .EQ. 600) .AND. (Time_percentage .EQ. 1)) THEN
+!	  Use FIGURE14,16
+	  SF_C = F14((J-1)*9+I)
+	  SF_W = F16((J-1)*9+I)
 	ELSEIF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 50)) THEN
 !	  Use FIGURE20
-	  FXX = F20
-	ELSEIF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 10) .AND. &
-		(Sea_temperature .EQ. "C")) THEN
-!	  Use FIGURE21
-	  FXX = F21
-	ELSEIF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 1) .AND. &
-		(Sea_temperature .EQ. "C")) THEN
-!	  Use FIGURE22
-	  FXX = F22
-	ELSEIF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 10) .AND. &
-		(Sea_temperature .EQ. "W")) THEN
-!	  Use FIGURE23
-	  FXX = F23
-	ELSEIF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 1) .AND. &
-		(Sea_temperature .EQ. "W")) THEN
-!	  Use FIGURE24
-	  FXX = F24
+	  SF_C = F20((J-1)*9+I)
+	  SF_W = SF_C
+	ELSEIF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 10)) THEN
+!	  Use FIGURE21,23
+	  SF_C = F21((J-1)*9+I)
+	  SF_W = F23((J-1)*9+I)
+	ELSEIF ((Figure_frequency .EQ. 2000) .AND. (Time_percentage .EQ. 1)) THEN
+!	  Use FIGURE22,24
+	  SF_C = F22((J-1)*9+I)
+	  SF_W = F24((J-1)*9+I)
+	ELSE
+	  HCM_error = 2005	! error in curves
+	  RETURN
 	END IF
 !
-!	I = number in list of Heff
-!	J = number in list of distances
-	Sea_figure_FS = FXX((J-1)*9+I)
+	IF (Sea_temperature .EQ. 'C') Sea_figure_FS = SF_C
+	IF (Sea_temperature .EQ. 'W') Sea_figure_FS = SF_W
+	IF (Sea_temperature .EQ. 'I') Sea_figure_FS = SF_W-((SF_W - SF_C)*(aLatM-35)) / 21.0
 !
 	RETURN
 !
