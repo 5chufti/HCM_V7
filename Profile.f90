@@ -1,6 +1,6 @@
 !
 !	Pofile.f90											P. Benner		20.11.2003
-!														G.H.			22.12.2015
+!														G.H.			16.04.2017
 !
 !	This subroutine constructs a terrain- or morphological profile from point A to
 !	point B in steps of 100 m. The heights or morphological information are stored
@@ -48,8 +48,7 @@
 !
 !
 	INTEGER(2)			PC
-	DOUBLE PRECISION	SIDA, SILAB, COLAB, SILAA, COLAA, COLOA, SILOA, COLOB, SILOB
-	DOUBLE PRECISION	LAY, LOY, DD, DA, DIS, DPa, PDa, A, B, K, x, y, z, o_Tx, o_Rx
+	DOUBLE PRECISION	LAY, LOY, DD, DIS, DIR, K, SLA, CLA, SDIR, CDIR, SIDD, CODD, o_Tx, o_Rx
 	LOGICAL				slant
 !
 !	**********************************************************************************
@@ -66,108 +65,73 @@
 	  RETURN
 	END IF
 !
-!	calculate avg. earthradius at given mean latitude  360/2*Pi = 57,295779513082321
-!	R = (6.378137D3 - 2.1385D1 * DSIND((LatA + LatB) / 2D0)) / 5.7295779513082321D1
-!
-!	'DA' distance in degrees,
-	DA = DIS / 1.112D2
-	SIDA  = DSIND(DA)
-!	number of segments
-	PN = NINT(DIS / PD)
-!	adjust PD to Distance
-!	PDa = DIS / DBLE(PN)
-!	Distance 'DP' between two points in degrees:
-	DPa   = DA / DBLE(PN)
 !	number of points in profile
-	PN = PN + 1
+	PN = NINT(DIS / PD) + 1
 !	set END Marker
 	Prof(PN+1)=-9999
 	slant = ((c_Mode .GE. 0) .AND. (c_Mode .LT. 99))
+!	slant = .FALSE.
 	IF (slant) THEN
 !	prepare for sloped profile
 		o_Tx = DBLE(H_Tx)
 		o_Rx = DBLE(H_Rx)
-		K = DBLE(H_Rx - H_Tx) / DA
+		K = DBLE(H_Rx - H_Tx) / (PN-1)
 		Prof(PN)=0
 		Prof(1)=0
 	ELSE
 		Prof(PN)=H_Rx
 		Prof(1)=H_Tx
 	END IF
-
 !
-!	part of profile RX to center
-	SILAA = DSIND(LatB)
-	COLAA = DCOSD(LatB)
-	SILAB = DSIND(LatA)
-	COLAB = DCOSD(LatA)
-	SILOA = DSIND(LongB)
-	COLOA = DCOSD(LongB)
-	SILOB = DSIND(LongA)
-	COLOB = DCOSD(LongA)
-!
-!	Loop for waypoints Rx to center
-	DO PC = PN-1, INT(REAL(PN)/2.0), -1
-!	Distance 'DD' between starting point and new point in degrees:
-		DD = DBLE(PN-PC) * DPa
-!	vector to new point
-		A = DSIND(DA - DD) / SIDA
-		B = DSIND(DD) / SIDA
-!	convert startpoint to x,y,z system and add vector
-		x = A * COLAA * COLOA +  B * COLAB * COLOB
-		y = A * COLAA * SILOA +  B * COLAB * SILOB
-		z = A * SILAA         +  B * SILAB
-!	convert new x,y,z to coordinates
-		LAY = DATAN2D(z,DSQRT(x**2D0 + y**2D0))
-		LOY = DATAN2D(y,x)
-!
+!	Direction Tx to Rx 
+	CALL Calc_Direction (LongA,LatA,LongB,LatB,DIR)
+!	Prepare often used values
+	SLA = DSIND(LatA)
+	CLA = DCOSD(LatA)
+	SDIR = DSIND(DIR)
+	CDIR = DCOSD(DIR)
+!	Loop for waypoints Tx to center
+	DO PC = 2, NINT(PN/2.0), 1
+	  DD=((PC-1)*PD)/6.37129D3
+	  SIDD = DSIN(DD)
+	  CODD = DCOS(DD)
+	  DD = SLA * CODD + CLA * SIDD * CDIR
+	  LAY = DASIND(DD)
+	  LOY = LongA + DATAN2D(SDIR * SIDD * CLA, CODD - SLA * DD)
 !	  get Information of new point:
-!
-		IF (P_Type .EQ. 'e') THEN 
-			CALL Point_height (LOY, LAY, Prof(PC)) 	
-!			Prof(PC) = Prof(PC) + NINT(PDa*(PC-1)*(DBLE(PN-PC) * PDa) / 17.0)
-			IF (slant) Prof(PC) = Prof(PC) - NINT(o_Rx - K * DD)
-		ELSE
-			CALL Point_type (LOY, LAY, Prof(PC))
-		END IF	
-		IF (HCM_Error .NE. 0) RETURN
+	    IF (P_Type .EQ. 'e') THEN 
+		CALL Point_height (LOY, LAY, Prof(PC))
+		IF (slant) Prof(PC) = Prof(PC) - NINT(o_Tx + K * (PC-1))
+	    ELSE
+		CALL Point_type (LOY, LAY, Prof(PC))
+	    END IF	
+	    IF (HCM_Error .NE. 0) RETURN
 	END DO
 !
-!	part of profile (TX to center)
-	SILAA = DSIND(LatA)
-	COLAA = DCOSD(LatA)
-	SILAB = DSIND(LatB)
-	COLAB = DCOSD(LatB)
-	SILOA = DSIND(LongA)
-	COLOA = DCOSD(LongA)
-	SILOB = DSIND(LongB)
-	COLOB = DCOSD(LongB)
-!
-!	Loop for waypoints Tx to center
-	DO PC = 2, PC, 1
-!	Distance 'DD' between starting point and new point in degrees:
-		DD = DBLE(PC-1) * DPa
-!	vector to new point
-		A = DSIND(DA - DD) / SIDA
-		B = DSIND(DD) / SIDA
-!	convert startpoint to x,y,z system and add vector
-		x = A * COLAA * COLOA +  B * COLAB * COLOB
-		y = A * COLAA * SILOA +  B * COLAB * SILOB
-		z = A * SILAA         +  B * SILAB
-!	convert new x,y,z to coordinates
-		LAY = DATAN2D(z,DSQRT(x**2D0 + y**2D0))
-		LOY = DATAN2D(y,x)
-!
+!	Direction Rx to Tx 
+	CALL Calc_Direction (LongB,LatB,LongA,LatA,DIR)
+!	Prepare often used values
+	SLA = DSIND(LatB)
+	CLA = DCOSD(LatB)
+	SDIR = DSIND(DIR)
+	CDIR = DCOSD(DIR)
+!	Loop for waypoints Rx to center
+	DO PC = PC+1, PN-1, 1
+!	http://www.movable-type.co.uk/scripts/latlong.html
+	  DD=((PN-PC)*PD)/6.37129D3
+	  SIDD = DSIN(DD)
+	  CODD = DCOS(DD)
+	  DD = SLA * CODD + CLA * SIDD * CDIR
+	  LAY = DASIND(DD)
+	  LOY = LongB + DATAN2D(SDIR * SIDD * CLA, CODD - SLA * DD)
 !	  get Information of new point:
-!
-		IF (P_Type .EQ. 'e') THEN 
-			CALL Point_height (LOY, LAY, Prof(PC))
-!			Prof(PC) = Prof(PC) + NINT(PDa*(PC-1)*(DBLE(PN-PC) * PDa) / 17.0)
-			IF (slant) Prof(PC) = Prof(PC) - NINT(o_Tx + K * DD)
-		ELSE
-			CALL Point_type (LOY, LAY, Prof(PC))
-		END IF	
-		IF (HCM_Error .NE. 0) RETURN
+	    IF (P_Type .EQ. 'e') THEN 
+		CALL Point_height (LOY, LAY, Prof(PC))
+		IF (slant) Prof(PC) = Prof(PC) - NINT(o_Rx - K * (PN-PC))
+	    ELSE
+		CALL Point_type (LOY, LAY, Prof(PC))
+	    END IF	
+	    IF (HCM_Error .NE. 0) RETURN
 	END DO
 !
 	RETURN
