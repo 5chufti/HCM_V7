@@ -1,8 +1,10 @@
 !
 !	HCM_MS_V7_definitions.f90
 !
-	INTEGER*2			T_Prof(10002), M_Prof(10002), H_X(10201), PN, H_Datab_Tx, H_Datab_Rx
-	INTEGER*4			HCM_error, Time_percentage, C_mode, D_to_border, OLD_T
+	INTEGER*2			T_Prof(10002), M_Prof(10002), H_T(10201), H_M(10201)
+	INTEGER*4			PN, H_Datab_Tx, H_Datab_Rx, RESH
+	INTEGER*4			OLD_T, OLD_M, O_LOT, O_LAT, O_LOM, O_LAM
+	INTEGER*4			HCM_error, Time_percentage, C_mode, D_to_border
 	INTEGER*4			H_AntTx, H_AntRx, H_Tx, H_Rx, Channel_sp_Rx, Channel_sp_Tx
 	INTEGER*8			Delta_frequency
 !
@@ -38,15 +40,15 @@
 !
 	LOGICAL*4			Info(20)
 !
-!						First all 8 byte variables (DOUBLE PRECISION)
+!						First all 8 byte variables (DOUBLE PRECISION, LONG INTEGER)
 	COMMON	/NDATA/		Tx_frequency, Distance, PD, &
 						Dir_Tx_Rx, Dir_Rx_Tx, D_sea_calculated, V_angle_Tx_Rx, &
 						V_angle_Rx_Tx, &
 						Rx_frequency, Tx_Azimuth, Tx_Elevation, Rx_Azimuth, &
-						Rx_Elevation, &
+						Rx_Elevation, Delta_frequency, &
 !
 !						Second all 4 byte variables (REAL, INTEGER, LOGICAL)
-						Heff, TCA, TCA_corr, &
+						Heff, TCA, TCA_corr, aLatM, &
 						Dh, Dh_corr, Calculated_FS, Perm_FS, Prot_margin, &
 						ERP_ref_Tx, CBR_D, Tx_TCA, Rx_TCA, Tx_TCA_corr, Rx_TCA_corr, &
 						Heff_Tx, Heff_Rx, Land_FS, Sea_FS, &
@@ -55,14 +57,15 @@
 						Power_to_Rx, Free_space_FS, Tx_serv_area, Rx_serv_area, MaxPow, &
 						H_diff_angle_Rx_Tx, V_diff_angle_Rx_Tx, H_diff_angle_Tx_Rx, V_diff_angle_Tx_Rx, &
 !
-						HCM_error, Time_percentage, aLatM, C_mode, D_to_border, OLD_T, &
-						H_AntTx, H_AntRx, H_Tx, H_Rx, Delta_frequency, Channel_sp_Rx, Channel_sp_Tx, &
+						HCM_error, Time_percentage, C_mode, D_to_border, &
+						OLD_T, OLD_M, O_LOT, O_LAT, O_LOM, O_LAM, PN, H_Datab_Tx, H_Datab_Rx, RESH, &
+						H_AntTx, H_AntRx, H_Tx, H_Rx, Channel_sp_Rx, Channel_sp_Tx, &
 !
 						Info, &
 !
 !						Third all 2 byte variables (INTEGER*2)
 
-						T_Prof, M_Prof, H_X, PN, H_Datab_Tx, H_Datab_Rx
+						T_Prof, M_Prof, H_T, H_M
 !
 !						All CHARACTER variables
 	COMMON	/CDATA/		Sea_temperature, Type_of_Tx_ant, Type_of_Rx_ant, Chan_occup, &

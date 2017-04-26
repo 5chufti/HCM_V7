@@ -1,6 +1,6 @@
 !
 !	Point_height.F90									P.Benner		20.11.2003
-!														G.H.			17.09.2014
+!														G.H.			25.04.2017
 !
 !	Subroutine to read the height of a given point from the terrain-database.
 !
@@ -109,83 +109,81 @@
 !
 	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
-	DOUBLE PRECISION	Long, Lat, Lo, La
+	DOUBLE PRECISION	Long, Lat
 	INTEGER(2)			Height
 !			
 	INTEGER(2)			H1, H2, H3, H4
-	INTEGER(4)			RESH, LOD, LAD, BH, BV, R, E
-	DOUBLE PRECISION	LOR, LAR, EH, EV, LORR, LARR, H12, H34
+	INTEGER(4)			LOD, LAD, LOR, LAR, BH, BV, R, E
+	DOUBLE PRECISION	EH, EV, LORR, LARR, H12, H34
 	CHARACTER(1)		H_C(20402)
 	CHARACTER(11)		FN
 !
-	EQUIVALENCE			(H_X,H_C)
+	EQUIVALENCE			(H_T,H_C)
 !	**********************************************************************************
 !
-	Height = -9999.9
+	Height = -9999
 !
 !	convert Longitude, split in Integer and Remainder
-	Lo  = DMOD(Long + 3.6D2,3.6D2)
-	LOR = DNINT(DMOD(Lo,1D0)*3.6D3)
-	LOD = INT(Lo)
-	La  = DMOD(Lat + 9D1,9D1)
-	LAR = DNINT(DMOD(La,1D0)*3.6D3)
-	LAD = INT(La)
+	LOD = FLOOR(Long)
+	LOR = IDNINT((Long-LOD)*3.599D3)
+	LAD = FLOOR(Lat)
+	LAR = IDNINT((Lat-LAD)*3.599D3)
 !
-	IF (LOR .GT. 3599) LOR = 3599
-	IF (LAR .GT. 3599) LAR = 3599
+	IF ((O_LOT .NE. LOD) .OR. (O_LAT .NE. LAD)) THEN
+		O_LOT=LOD
+		O_LAT=LAD
+		CLOSE(UNIT=5)
+
+		IF (LOD .GE. 0) THEN
+			FN(1:1) = 'E'                     
+		ELSE
+			FN(1:1) = 'W'
+		END IF
+		WRITE (FN(2:4), '(I3.3)') ABS(LOD)
 !
-	IF (LOD .LT. 1.8D2) THEN
-		FN(1:1) = 'e'                     
-	  ELSE
-		FN(1:1) = 'w'
-		LOD = 360-LOD
-	END IF
-	WRITE (FN(2:4), '(I3.3)') LOD
+		IF (LAD .GE. 0) THEN
+			FN(5:5) = 'N'
+		ELSE
+			FN(5:5) = 'S'
+		END IF
+		WRITE (FN(6:7), '(I2.2)') ABS(LAD)
 !
-	IF (Lat .GE. 0.0D0) THEN
-		FN(5:5) = 'n'
-	  ELSE
-		FN(5:5) = 's'
-		LAD = 90-LAD
-	END IF
-	WRITE (FN(6:7), '(I2.2)') LAD
-!
-	IF (LAD .LT. 5D1) THEN 
-		RESH = 100  
-		FN(8:11) = '.33e'
-	  ELSE
-		RESH = 50
-		FN(8:11) = '.63e'
+		IF (ABS(LAD) .LT. 50) THEN 
+			RESH = 101  
+			FN(8:11) = '.33E'
+		ELSE
+			RESH = 51
+			FN(8:11) = '.63E'
+		END IF
+		OLD_T=-1
+		OPEN (UNIT=5, FILE=TRIM(Topo_path) // '/' // FN(1:4) // '/' // FN,  &
+		ACCESS='DIRECT',RECL=202*(RESH), STATUS='OLD', &
+		ERR=400, MODE='READ')
 	END IF
 !
 !	coordinates of block containing P
-	BH = INT(LOR/3D2)
-	BV = INT(LAR/3D2)
+	BH = (LOR/300)
+	BV = (LAR/300)
 !	coordinates of point P in block
-	EH = DBLE(LOR-BH*3D2)/DBLE(300/RESH)
+	EH = DBLE(LOR-BH*3D2)/DBLE(300/(RESH-1))
 	EV = DBLE(LAR-BV*3D2)/3D0
 !
 	R = 12*BV + BH + 1
 !
-	IF ((FN .EQ. O_FN) .AND. (R .EQ. OLD_T)) GOTO 200
-	IF (FN .EQ. O_FN) GOTO 100
+	IF (R .NE. OLD_T) THEN
 !	point in new file
-	OPEN (UNIT=5, FILE=TRIM(Topo_path) // '/' // FN(1:4) // '/' // FN,  &
-		ACCESS='DIRECT',RECL=202*(RESH+1), STATUS='OLD', &
-		ERR=400, MODE='READ')
 !
-	O_FN=FN
-!
-100	READ (UNIT=5, ERR=450, REC=R) H_C(1:(202*(RESH+1)))
-	OLD_T = R
-!
-200	E = INT(EV)*(RESH+1) + INT(EH) + 1
+		READ (UNIT=5, ERR=450, REC=R) H_C(1:(202*(RESH)))
+		OLD_T = R
+	END IF
+!	
+	E = INT(EV)*(RESH) + INT(EH) + 1
 !
 !	Read Element :
-	H1=H_X(E)
-	H2=H_X(E+1)
-	H3=H_X(E+RESH+1)
-	H4=H_X(E+RESH+2)
+	H1=H_T(E)
+	H2=H_T(E+1)
+	H3=H_T(E+RESH)
+	H4=H_T(E+RESH+1)
 !
 	IF (MIN(H1,H2,H3,H4) .EQ. -9999) THEN
 	  HCM_Error = 400

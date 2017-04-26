@@ -1,6 +1,6 @@
 !
 !	Point_type.f90										P. Benner		09.10.2003
-!														G.H.			17.09.2014
+!														G.H.			25.04.2017
 !
 !	Subroutine to read the morphological type of a given point from the morpho-database.
 !
@@ -110,78 +110,76 @@
 !
 	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
-	DOUBLE PRECISION	Long, Lat, Lo , La
+	DOUBLE PRECISION	Long, Lat
 	INTEGER(2)			M_Type
 !
-	INTEGER(4)			RESH, LOD, LAD, BH, BV, R, E
-	DOUBLE PRECISION	LOR, LAR, EH, EV
+	INTEGER(4)			LOD, LAD, LOR, LAR, BH, BV, R, E
+	DOUBLE PRECISION	EH, EV
 	CHARACTER(1)		H_C(20402)
 	CHARACTER(11)		FN
 !
-	EQUIVALENCE			(H_X,H_C)
+	EQUIVALENCE			(H_M,H_C)
 !	**********************************************************************************
 !
 	M_Type = 0	! normal land
 !
 !	convert Longitude, split in Integer and Remainder
-	Lo  = DMOD(Long + 3.6D2,3.6D2)
-	LOR = DNINT(DMOD(Lo,1D0)*3.6D3)
-	LOD = INT(Lo)
-	La  = DMOD(Lat + 9D1,9D1)
-	LAR = DNINT(DMOD(La,1D0)*3.6D3)
-	LAD = INT(La)
+	LOD = FLOOR(Long)
+	LOR = IDNINT((Long-LOD)*3.599D3)
+	LAD = FLOOR(Lat)
+	LAR = IDNINT((Lat-LAD)*3.599D3)
 !
-	IF (LOR .GT. 3599) LOR = 3599
-	IF (LAR .GT. 3599) LAR = 3599
+	IF ((O_LOM .NE. LOD) .OR. (O_LAM .NE. LAD)) THEN
+		O_LOM=LOD
+		O_LAM=LAD
+		CLOSE(UNIT=6)
+
+		IF (LOD .GE. 0) THEN
+			FN(1:1) = 'E'                     
+		ELSE
+			FN(1:1) = 'W'
+		END IF
+		WRITE (FN(2:4), '(I3.3)') ABS(LOD)
 !
-	IF (LOD .LT. 1.8D2) THEN
-		FN(1:1) = 'e'                     
-	  ELSE
-		FN(1:1) = 'w'
-		LOD = 360-LOD
-	END IF
-	WRITE (FN(2:4), '(I3.3)') LOD
+		IF (LAD .GE. 0) THEN
+			FN(5:5) = 'N'
+		ELSE
+			FN(5:5) = 'S'
+		END IF
+		WRITE (FN(6:7), '(I2.2)') ABS(LAD)
 !
-	IF (Lat .GE. 0.0D0) THEN
-		FN(5:5) = 'n'
-	  ELSE
-		FN(5:5) = 's'
-		LAD = 90-LAD
-	END IF
-	WRITE (FN(6:7), '(I2.2)') LAD
-!
-	IF (LAD .LT. 5D1) THEN 
-		RESH = 100  
-		FN(8:11) = '.33m'
-	  ELSE
-		RESH = 50
-		FN(8:11) = '.63m'
+		IF (ABS(LAD) .LT. 50) THEN 
+			RESH = 101  
+			FN(8:11) = '.33M'
+		ELSE
+			RESH = 51
+			FN(8:11) = '.63M'
+		END IF
+		OLD_M=-1
+		OPEN (UNIT=6, FILE=TRIM(Morpho_path) // '/' // FN(1:4) // '/' // FN,  &
+		ACCESS='DIRECT',RECL=202*(RESH), STATUS='OLD', &
+		ERR=400, MODE='READ')
 	END IF
 !
 !	coordinates of block containing P
-	BH = INT(LOR/3D2)
-	BV = INT(LAR/3D2)
+	BH = INT(LOR/300)
+	BV = INT(LAR/300)
 !	coordinates of point P in block
-	EH = DBLE(LOR-BH*3D2)/DBLE(300/RESH)
+	EH = DBLE(LOR-BH*3D2)/DBLE(300/(RESH-1))
 	EV = DBLE(LAR-BV*3D2)/3D0
 !
 	R = 12*BV + BH + 1
 !
-	IF ((FN .EQ. O_FN) .AND. (R .EQ. OLD_T)) GOTO 200
-	IF (FN .EQ. O_FN) GOTO 100
+	IF (R .NE. OLD_M) THEN
 !	point in new file
-	OPEN (UNIT=6, FILE=TRIM(Morpho_path) // '/' // FN(1:4) // '/' // FN,  &
-			ACCESS='DIRECT',RECL=202*(RESH+1), STATUS='OLD', &
-			ERR=400, MODE='READ')
-!      
-	O_FN = FN
+		READ (UNIT=6, ERR=450, REC=R) H_C(1:(202*(RESH)))
+		OLD_M = R
+	END IF
 !
-100	READ (UNIT=6, ERR=450, REC=R) H_C(1:(202*(RESH+1)))
-	OLD_T = R
-!                                           
-200	E = NINT(EV)*(RESH+1) + NINT(EH) + 1
+	E = NINT(EV)*(RESH) + NINT(EH) + 1
+!
 !	Read Element :
-	M_Type=H_X(E)
+	M_Type=H_M(E)
 !
 	RETURN
 !
