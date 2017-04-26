@@ -1,9 +1,8 @@
 !
 !	HCM_MS_V7_definitions.f90
 !
-	INTEGER*2			T_Prof(10002), M_Prof(10002), H_T(10201), H_M(10201)
-	INTEGER*4			PN, H_Datab_Tx, H_Datab_Rx, RESH
-	INTEGER*4			OLD_T, OLD_M, O_LOT, O_LAT, O_LOM, O_LAM
+	INTEGER*2			T_Prof(10002), M_Prof(10002), H_I(10201), M_I(10201)
+	INTEGER*4			PN, H_Datab_Tx, H_Datab_Rx, OLD_R, O_LOD, O_LAD, RESH
 	INTEGER*4			HCM_error, Time_percentage, C_mode, D_to_border
 	INTEGER*4			H_AntTx, H_AntRx, H_Tx, H_Rx, Channel_sp_Rx, Channel_sp_Tx
 	INTEGER*8			Delta_frequency
@@ -38,7 +37,7 @@
 	CHARACTER*15		Coo_Tx, Coo_Rx, Coo_Tx_new, Coo_Rx_new
 	CHARACTER*63		Topo_path, Morpho_path, Border_path
 !
-	LOGICAL*4			Info(20)
+	LOGICAL*4			Info(20), slant, with_morpho
 !
 !						First all 8 byte variables (DOUBLE PRECISION, LONG INTEGER)
 	COMMON	/NDATA/		Tx_frequency, Distance, PD, &
@@ -58,14 +57,14 @@
 						H_diff_angle_Rx_Tx, V_diff_angle_Rx_Tx, H_diff_angle_Tx_Rx, V_diff_angle_Tx_Rx, &
 !
 						HCM_error, Time_percentage, C_mode, D_to_border, &
-						OLD_T, OLD_M, O_LOT, O_LAT, O_LOM, O_LAM, PN, H_Datab_Tx, H_Datab_Rx, RESH, &
+						OLD_R, O_LOD, O_LAD, PN, H_Datab_Tx, H_Datab_Rx, RESH, &
 						H_AntTx, H_AntRx, H_Tx, H_Rx, Channel_sp_Rx, Channel_sp_Tx, &
 !
-						Info, &
+						Info, slant, with_morpho, &
 !
 !						Third all 2 byte variables (INTEGER*2)
 
-						T_Prof, M_Prof, H_T, H_M
+						T_Prof, M_Prof, H_I, M_I
 !
 !						All CHARACTER variables
 	COMMON	/CDATA/		Sea_temperature, Type_of_Tx_ant, Type_of_Rx_ant, Chan_occup, &

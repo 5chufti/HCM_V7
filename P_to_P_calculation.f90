@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			09.06.2016
+!														G.H.			26.04.2017
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -195,7 +195,6 @@
 	REAL				Land_FS_1kW, Sea_FS_1kW
 	DOUBLE PRECISION	New_LongTx, New_LatTx, New_LongRx, New_LatRx, CI
 	LOGICAL				Free, null
-	CHARACTER*1			Point_Type
 !
 !	*****************************************************************
 !
@@ -220,8 +219,7 @@
 	Calculated_FS = 999.9
 !	Calculate new positions, if Tx or Rx or both are mobiles and not lines or '99':
 !	for lines new positions are calculated in CBR_Coordinates !
-	IF ((C_mode .NE. 99) .AND. (C_mode .GE. 0) &
-			.AND. ((Tx_serv_area .GT. 0.0) .OR. (Rx_serv_area .GT. 0.0))) THEN
+	IF (slant .AND. ((Tx_serv_area .GT. 0.0) .OR. (Rx_serv_area .GT. 0.0))) THEN
 !		Calculate new co-ordinates:
 		CALL Position_of_mobile ( LongTx, LatTx, LongRx, LatRx, &
 					New_LongTx, New_LatTx, New_LongRx, New_LatRx )
@@ -301,7 +299,7 @@
 !
 !	Checking of Tx site height:
 !		Height of Tx site above sea level:
-	CALL Point_height (New_LongTx, New_LatTx, H_Datab_Tx)
+	CALL Point_info (New_LongTx, New_LatTx, H_Datab_Tx, M_Prof(1))
 !
 	IF (HCM_error .NE. 0) RETURN
 !
@@ -329,7 +327,7 @@
 	END IF
 !	Checking Rx site height
 !		Height of Rx above sealevel
-	CALL Point_height (New_LongRx, New_LatRx, H_Datab_Rx)
+	CALL Point_info (New_LongRx, New_LatRx, H_Datab_Rx, M_Prof(10002))
 	IF (HCM_Error .NE. 0) RETURN
 	IF ((H_Rx_input .EQ. '    ') .OR. (C_mode .LT. 0) .OR. (Rx_serv_area .GT. 0.0)) THEN
 		H_Rx = H_Datab_Rx
@@ -411,13 +409,11 @@
 !
 !	*****************************************************************
 !	*								
-!	*				Elements of the terrain profile	
+!	*				Elements of the profile	
 !	*								
 !	*****************************************************************
 !
-	Point_Type = 'e'	! for elevation data
-	CALL PROFILE (New_LongTx, New_LatTx, New_LongRx, New_LatRx,  &
-			T_Prof, Point_Type)
+	CALL PROFILE (New_LongTx, New_LatTx, New_LongRx, New_LatRx)
 	IF (HCM_Error .NE. 0) RETURN
 !
 !
@@ -429,8 +425,7 @@
 !
 !	First Fresnel zone is only calculated, if Tx and Rx are no mobiles
 !	and if it is a point to point calculation:
-	IF ((Tx_serv_area .EQ. 0.0) .AND. (Rx_serv_area .EQ. 0.0) .AND. &
-		(C_Mode .GE. 0) .AND. (C_mode .NE. 99)) THEN
+	IF ((Tx_serv_area .EQ. 0.0) .AND. (Rx_serv_area .EQ. 0.0) .AND. slant) THEN
 !	  First value = height of Tx, last value (PN) = height of Rx !
 !	  J is number of points between Rx and Tx
 	  J = PN - 2	
@@ -490,7 +485,7 @@
 !	*									
 !	**********************************************************************
 !
-	IF ((c_Mode .GE. 0) .AND. (c_Mode .LT. 99)) THEN
+	IF (slant) THEN
 		I1 = H_AntTx
 		I2 = H_AntRx
 	ELSE
@@ -527,7 +522,7 @@
 !
 !	calculate receiver clearance angle 'Rx_TCA' according to proceeding table
 !
-	IF ((Rx_serv_area .EQ. 0.0) .AND. (C_Mode .GE. 0) .AND. (C_mode .NE. 99)) THEN
+	IF ((Rx_serv_area .EQ. 0.0) .AND. slant) THEN
 !	  Calculate Rx_TCA:
 		Rx_TCA = -90.0
 		IF (Distance .GE. 1.6D1) THEN
@@ -575,7 +570,7 @@
 	IF (Heff_Tx .LT. 3.0) Heff_Tx = 3.0
 !
 !	Receiver: 
-	IF ((C_Mode .GE. 0) .AND. (C_Mode .NE. 99)) THEN
+	IF (slant) THEN
 !	  for point to point calculations
 	  IF (Rx_serv_area .GT. 0) THEN
 !		Height of a mobile 'hmRx'
@@ -607,49 +602,36 @@
 !	*****************************************************************
 !
 !
-	IF (D_sea_input .EQ. '     ') THEN
+	IF (with_morpho) THEN
 		D_sea_calculated = 0.0
-!		Get the morphological profile:
-		Point_Type = 'm'
-		CALL PROFILE (New_LongTx, New_LatTx, New_LongRx, New_LatRx, &
-			M_Prof, Point_Type)
-		IF (HCM_Error .EQ. 0) THEN
-			null = .FALSE.
-			DS1 = 0.0               
-			J1 = 0
-			IF (Distance .GT. 1.0D0) THEN
-			  DO I = 1, PN      
-!				Test, if morphological information = 'sea'
-				IF (BITEST(M_Prof(I),0)) THEN
-					IF (null) THEN
-						J1 = J1 + 1 
-					  ELSE
-						J1 = 0
-						null = .TRUE.
-					END IF
-				  ELSE                
-					IF (null) THEN
-					  DS1 = REAL(J1) * PD
-					  D_sea_calculated = D_sea_calculated + DS1
-					  DS1 = 0.0
-					  J1 = 0 
-					  null = .FALSE.
-					END IF
+		null = .FALSE.
+		DS1 = 0.0               
+		J1 = 0
+		IF (Distance .GT. 1.0D0) THEN
+		  DO I = 1, PN      
+!			Test, if morphological information = 'sea'
+			IF (BITEST(M_Prof(I),0)) THEN
+				IF (null) THEN
+					J1 = J1 + 1 
+				  ELSE
+					J1 = 0
+					null = .TRUE.
 				END IF
-			  END DO                 
-			  IF (null) THEN
-				DS1 = REAL(J1) * PD 
-				D_sea_calculated = D_sea_calculated + DS1
-				null = .FALSE.
-			  END IF
+			  ELSE                
+				IF (null) THEN
+				  DS1 = REAL(J1) * PD
+				  D_sea_calculated = D_sea_calculated + DS1
+				  DS1 = 0.0
+				  J1 = 0 
+				  null = .FALSE.
+				END IF
 			END IF
-		  ELSE
-		    IF (HCM_Error .EQ. 36) THEN
-			  D_sea_calculated = 0.0
-			  Info(16) = .TRUE.
-!			  Calculated distance over sea is set to 0 because of missing morphological data
-			  HCM_Error = 0
-			END IF
+		  END DO                 
+		  IF (null) THEN
+			DS1 = REAL(J1) * PD 
+			D_sea_calculated = D_sea_calculated + DS1
+			null = .FALSE.
+		  END IF
 		END IF
 	  ELSE              
 		READ (D_sea_input, *, IOSTAT=IOS) D_sea_calculated

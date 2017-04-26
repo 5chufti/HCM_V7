@@ -1,6 +1,6 @@
 !
 !	Pofile.f90											P. Benner		20.11.2003
-!														G.H.			16.04.2017
+!														G.H.			26.04.2017
 !
 !	This subroutine constructs a terrain- or morphological profile from point A to
 !	point B in steps of 100 m. The heights or morphological information are stored
@@ -15,7 +15,6 @@
 !			LongB		DOUBLE PRECISION	longitude of point B (ending point)
 !			LatB		DOUBLE PRECISION	latitude of point B
 !			PD			DOUBLE PRECISION	point distance (grid size) of the profile
-!			P_Type		CHARACTER*1			'e' = elevation, 'm' = morpho information
 !			Topo_path	CHARACTER*63		path of topo database, e.g. 'D:\TOPO'
 !			Morpho_path	CHARACTER*63		path of morpho database, e.g. 'D:\MORPHO'
 !
@@ -32,24 +31,21 @@
 !			  1000 = Distance 0 km
 !			  1028 = Distance greater than 1000 km
 !
-!	Called subroutines : Point_height, Point_type
+!	Called subroutines : Point_Info
 !
 !	**********************************************************************************
 !
-	SUBROUTINE PROFILE (LongA, LatA, LongB, LatB, Prof, P_Type)
+	SUBROUTINE PROFILE (LongA, LatA, LongB, LatB)
 !
 	IMPLICIT			NONE
 !
 	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
 	DOUBLE PRECISION	LongA, LatA, LongB, LatB
-	INTEGER(2)			Prof(10002)
-	CHARACTER*1			P_Type
 !
 !
 	INTEGER(2)			PC
 	DOUBLE PRECISION	LAY, LOY, DD, DIS, DIR, K, SLA, CLA, SDIR, CDIR, SIDD, CODD, o_Tx, o_Rx
-	LOGICAL				slant
 !
 !	**********************************************************************************
 !
@@ -68,19 +64,18 @@
 !	number of points in profile
 	PN = NINT(DIS / PD) + 1
 !	set END Marker
-	Prof(PN+1)=-9999
-	slant = ((c_Mode .GE. 0) .AND. (c_Mode .LT. 99))
+	T_Prof(PN+1)=-9999
 !	slant = .FALSE.
 	IF (slant) THEN
 !	prepare for sloped profile
 		o_Tx = DBLE(H_Tx)
 		o_Rx = DBLE(H_Rx)
 		K = DBLE(H_Rx - H_Tx) / (PN-1)
-		Prof(PN)=0
-		Prof(1)=0
+		T_Prof(PN)=0
+		T_Prof(1)=0
 	ELSE
-		Prof(PN)=H_Rx
-		Prof(1)=H_Tx
+		T_Prof(PN)=H_Rx
+		T_Prof(1)=H_Tx
 	END IF
 !
 !	Direction Tx to Rx 
@@ -99,13 +94,9 @@
 	  LAY = DASIND(DD)
 	  LOY = LongA + DATAN2D(SDIR * SIDD * CLA, CODD - SLA * DD)
 !	  get Information of new point:
-	    IF (P_Type .EQ. 'e') THEN 
-		CALL Point_height (LOY, LAY, Prof(PC))
-		IF (slant) Prof(PC) = Prof(PC) - NINT(o_Tx + K * (PC-1))
-	    ELSE
-		CALL Point_type (LOY, LAY, Prof(PC))
-	    END IF	
-	    IF (HCM_Error .NE. 0) RETURN
+		CALL Point_info (LOY, LAY, T_Prof(PC), M_Prof(PC))
+		IF (slant) T_Prof(PC) = T_Prof(PC) - NINT(o_Tx + K * (PC-1))
+	  IF (HCM_Error .NE. 0) RETURN
 	END DO
 !
 !	Direction Rx to Tx 
@@ -125,13 +116,9 @@
 	  LAY = DASIND(DD)
 	  LOY = LongB + DATAN2D(SDIR * SIDD * CLA, CODD - SLA * DD)
 !	  get Information of new point:
-	    IF (P_Type .EQ. 'e') THEN 
-		CALL Point_height (LOY, LAY, Prof(PC))
-		IF (slant) Prof(PC) = Prof(PC) - NINT(o_Rx - K * (PN-PC))
-	    ELSE
-		CALL Point_type (LOY, LAY, Prof(PC))
-	    END IF	
-	    IF (HCM_Error .NE. 0) RETURN
+		CALL Point_info (LOY, LAY, T_Prof(PC), M_Prof(PC))
+		IF (slant) T_Prof(PC) = T_Prof(PC) - NINT(o_Rx - K * (PN-PC))
+	  IF (HCM_Error .NE. 0) RETURN
 	END DO
 !
 	RETURN

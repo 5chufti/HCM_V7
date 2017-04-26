@@ -97,7 +97,7 @@
 !
 !	***************************************************************************
 !
-	Version = '7.995'
+	Version = '7.996'
 !
 	HCM_error = 0
 !
@@ -109,12 +109,9 @@
 	  Info(I) = .FALSE.
 	END DO
 !
-	O_LAT=9999
-	O_LOT=9999
-	OLD_T=-1
-	O_LAM=9999
-	O_LOM=9999
-	OLD_M=-1
+	O_LOD=9999
+	O_LAD=9999
+	OLD_R=-1
 !	Read all input data:    
 !	correct countrycodes for filenames
 	IF (Land_to(3:3) .EQ. ' ') Land_to(3:3) = '_'
@@ -550,6 +547,9 @@
 		IF (aLatM .LE. 35.0) Sea_temperature = 'W'
 	END IF
 !
+!	pepare control values
+	slant = ((c_Mode .GE. 0) .AND. (c_Mode .NE. 99))
+	with_morpho = (Trim(D_sea_input) .EQ. '')	
 !	**************************************************************
 !
 	IF (C_mode .LT. 0) THEN
