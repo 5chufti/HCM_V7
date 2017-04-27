@@ -1,6 +1,6 @@
 !	
 !	HCMMS_V7.F90										P.Benner		23.02.2004
-!														G.H.			21.07.2016
+!														G.H.			27.04.2017
 !	Version 7					
 !
 !	Harmonized Calculation Method for mobile services
@@ -97,7 +97,7 @@
 !
 !	***************************************************************************
 !
-	Version = '7.996'
+	Version = '7.21ß'
 !
 	HCM_error = 0
 !
@@ -548,7 +548,7 @@
 	END IF
 !
 !	pepare control values
-	slant = ((c_Mode .GE. 0) .AND. (c_Mode .NE. 99))
+	p2p = ((c_Mode .GE. 0) .AND. (c_Mode .NE. 99))
 	with_morpho = (Trim(D_sea_input) .EQ. '')	
 !	**************************************************************
 !

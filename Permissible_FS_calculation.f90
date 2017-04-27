@@ -1,6 +1,6 @@
 !
 !	Permissible_FS_calculation.f90						P. Benner		17.10.2005
-!														G.H.			27.10.2016
+!														G.H.			27.04.2017
 !
 !	Subroutine to calculate the permissible field strength.
 !
@@ -146,7 +146,7 @@
 	END IF
 !
 !	bail out for line calculations
-	IF ((C_Mode .EQ. 99) .OR. (C_Mode .LT. 0)) THEN
+	IF (.NOT. p2p) THEN
 		Delta_frequency = 0
 !	WB/NB correction
 		IF (TX_DIG .AND. (CSXT .GT. 16000) .AND. (Tx_frequency .LE. 470.0) .AND. & 

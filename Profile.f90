@@ -46,6 +46,8 @@
 !
 	INTEGER(2)			PC
 	DOUBLE PRECISION	LAY, LOY, DD, DIS, DIR, K, SLA, CLA, SDIR, CDIR, SIDD, CODD, o_Tx, o_Rx
+	LOGICAL				slant
+	EQUIVALENCE			(p2p,slant)
 !
 !	**********************************************************************************
 !

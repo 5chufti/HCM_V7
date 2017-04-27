@@ -141,16 +141,16 @@
 		CLOSE(UNIT=5)
 
 		IF (LOD .GE. 0) THEN
-			FN(1:1) = 'E'                     
+			FN(1:1) = 'e'                     
 		ELSE
-			FN(1:1) = 'W'
+			FN(1:1) = 'w'
 		END IF
 		WRITE (FN(2:4), '(I3.3)') ABS(LOD)
 !
 		IF (LAD .GE. 0) THEN
-			FN(5:5) = 'N'
+			FN(5:5) = 'n'
 		ELSE
-			FN(5:5) = 'S'
+			FN(5:5) = 's'
 		END IF
 		WRITE (FN(6:7), '(I2.2)') ABS(LAD)
 !
@@ -162,13 +162,13 @@
 			FN(8:10) = '.63'
 		END IF
 !	open topo
-		OPEN (UNIT=5, FILE=TRIM(Topo_path) // '/' // FN(1:4) // '/' // FN // 'E',  &
+		OPEN (UNIT=5, FILE=TRIM(Topo_path) // '/' // FN(1:4) // '/' // FN // 'e',  &
 		ACCESS='DIRECT',RECL=202*(RESH), STATUS='OLD', &
 		ERR=400, MODE='READ')
 !	open morpho
 		IF (with_morpho) THEN
 			CLOSE (UNIT=6)
-			OPEN (UNIT=6, FILE=TRIM(Morpho_path) // '/' // FN(1:4) // '/' // FN // 'M',  &
+			OPEN (UNIT=6, FILE=TRIM(Morpho_path) // '/' // FN(1:4) // '/' // FN // 'm',  &
 				ACCESS='DIRECT',RECL=202*(RESH), STATUS='OLD', IOSTAT=OLD_R, MODE='READ')
 			IF (OLD_R .NE. 0) THEN
 				with_morpho = .FALSE.

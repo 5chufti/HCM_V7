@@ -219,7 +219,7 @@
 	Calculated_FS = 999.9
 !	Calculate new positions, if Tx or Rx or both are mobiles and not lines or '99':
 !	for lines new positions are calculated in CBR_Coordinates !
-	IF (slant .AND. ((Tx_serv_area .GT. 0.0) .OR. (Rx_serv_area .GT. 0.0))) THEN
+	IF (p2p .AND. ((Tx_serv_area .GT. 0.0) .OR. (Rx_serv_area .GT. 0.0))) THEN
 !		Calculate new co-ordinates:
 		CALL Position_of_mobile ( LongTx, LatTx, LongRx, LatRx, &
 					New_LongTx, New_LatTx, New_LongRx, New_LatRx )
@@ -275,10 +275,10 @@
 !
 	IF (Distance .LT. PD) THEN
 !	  Distance between Tx and Rx = 0. Calculations not possible.
-		IF (C_mode .LT. 0) THEN
-			INFO(7) = .True.
-		ELSE
+		IF (p2p) THEN
 			HCM_error = 1000   
+		ELSE
+			INFO(7) = .True.
 		END IF
 	END IF
 !
@@ -297,6 +297,32 @@
 !	Calculate the direction from Tx to Rx:
 	CALL Calc_direction (New_LongTx, New_LatTx, New_LongRx, New_LatRx, Dir_Tx_Rx)
 !
+!	Checking Rx site height
+!		Height of Rx above sealevel
+	CALL Point_info (New_LongRx, New_LatRx, H_Datab_Rx, M_Prof(10002))
+	IF (HCM_Error .NE. 0) RETURN
+	IF ((H_Rx_input .EQ. '    ') .OR. (.NOT. p2p) .OR. (Rx_serv_area .GT. 0.0)) THEN
+		H_Rx = H_Datab_Rx
+		Info(8) = .TRUE.
+!		No height of Rx site is given, height is from the terrain database.
+	ELSE
+		READ (H_Rx_input, '(I4)', IOSTAT=IOS) H_Rx
+		IF (IOS .NE. 0) THEN
+			HCM_Error = 1030
+!			Error in input value Rx site height above sea level.
+			RETURN	
+		END IF
+		IF (H_Rx .NE. H_Datab_Rx) THEN
+			IF (ABS(H_Rx-H_Datab_Rx) .LE. H_Rx/10) THEN
+				Info(9) = .TRUE.
+!				Height of Rx site differs from height of terrain data.
+			ELSE
+				Info(10) = .TRUE.
+!				Rx site height differs more than 10%,
+!				calculated values may be (extremely) wrong!
+			END IF
+		END IF
+	END IF
 !	Checking of Tx site height:
 !		Height of Tx site above sea level:
 	CALL Point_info (New_LongTx, New_LatTx, H_Datab_Tx, M_Prof(1))
@@ -321,32 +347,6 @@
 			ELSE
 				Info(3) = .TRUE.
 !				Height of Tx site differs more than 10%,
-!				calculated values may be (extremely) wrong!
-			END IF
-		END IF
-	END IF
-!	Checking Rx site height
-!		Height of Rx above sealevel
-	CALL Point_info (New_LongRx, New_LatRx, H_Datab_Rx, M_Prof(10002))
-	IF (HCM_Error .NE. 0) RETURN
-	IF ((H_Rx_input .EQ. '    ') .OR. (C_mode .LT. 0) .OR. (Rx_serv_area .GT. 0.0)) THEN
-		H_Rx = H_Datab_Rx
-		Info(8) = .TRUE.
-!		No height of Rx site is given, height is from the terrain database.
-	ELSE
-		READ (H_Rx_input, '(I4)', IOSTAT=IOS) H_Rx
-		IF (IOS .NE. 0) THEN
-			HCM_Error = 1030
-!			Error in input value Rx site height above sea level.
-			RETURN	
-		END IF
-		IF (H_Rx .NE. H_Datab_Rx) THEN
-			IF (ABS(H_Rx-H_Datab_Rx) .LE. H_Rx/10) THEN
-				Info(9) = .TRUE.
-!				Height of Rx site differs from height of terrain data.
-			ELSE
-				Info(10) = .TRUE.
-!				Rx site height differs more than 10%,
 !				calculated values may be (extremely) wrong!
 			END IF
 		END IF
@@ -425,7 +425,7 @@
 !
 !	First Fresnel zone is only calculated, if Tx and Rx are no mobiles
 !	and if it is a point to point calculation:
-	IF ((Tx_serv_area .EQ. 0.0) .AND. (Rx_serv_area .EQ. 0.0) .AND. slant) THEN
+	IF (p2p .AND. ((Tx_serv_area + Rx_serv_area) .EQ. 0.0)) THEN
 !	  First value = height of Tx, last value (PN) = height of Rx !
 !	  J is number of points between Rx and Tx
 	  J = PN - 2	
@@ -485,7 +485,7 @@
 !	*									
 !	**********************************************************************
 !
-	IF (slant) THEN
+	IF (p2p) THEN
 		I1 = H_AntTx
 		I2 = H_AntRx
 	ELSE
@@ -522,7 +522,7 @@
 !
 !	calculate receiver clearance angle 'Rx_TCA' according to proceeding table
 !
-	IF ((Rx_serv_area .EQ. 0.0) .AND. slant) THEN
+	IF (p2p .AND. (Rx_serv_area .EQ. 0.0)) THEN
 !	  Calculate Rx_TCA:
 		Rx_TCA = -90.0
 		IF (Distance .GE. 1.6D1) THEN
@@ -570,7 +570,7 @@
 	IF (Heff_Tx .LT. 3.0) Heff_Tx = 3.0
 !
 !	Receiver: 
-	IF (slant) THEN
+	IF (p2p) THEN
 !	  for point to point calculations
 	  IF (Rx_serv_area .GT. 0) THEN
 !		Height of a mobile 'hmRx'
@@ -656,7 +656,7 @@
 !	*****************************************************************
 !
 	IF ((Distance .LE. 10.0) .OR. (D_sea_calculated .GE. Distance) .OR. &
-		((Tx_serv_area .GT. 0.0) .AND. ((C_Mode .LT. 0) .OR. (C_Mode .EQ. 99)))) THEN
+		((Tx_serv_area .GT. 0.0) .AND. (.NOT. p2p))) THEN
 		Dh = 50.0
 		Dh_corr = 0.0
 	  ELSE

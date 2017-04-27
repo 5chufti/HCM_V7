@@ -1,6 +1,6 @@
 !
 !	Position_of_mobile.f90								P. Benner		29.11.2004
-!														G.H.			17.09.2014
+!														G.H.			27.04.2017
 !
 !	Subroutine to calculate the new position of Tx (New_LongTx, New_LatTx)
 !	and/or Rx (New_LongRx, New_latRx) if at least one is a mobile and
@@ -60,7 +60,7 @@
 !	  Determine, if in direction of Rx, the Tx circle is cut:
 	  DP1 = Distance
 	  IF (DP1 .GT. Tx_serv_area) DP1 = Tx_serv_area
-	  IF ((D_to_border .EQ. 0) .AND. (C_mode .LT. 0)) THEN
+	  IF ((D_to_border .EQ. 0) .AND. (.NOT. p2p)) THEN
 		N_Cut_Tx = 1
 	  ELSE
 	    CALL TestCut (Dir_Tx_Rx, LongTx, LatTx, DP1, N_Cut_Tx, HCM_error, Land_from)
