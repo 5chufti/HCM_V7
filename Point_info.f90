@@ -13,8 +13,8 @@
 !
 !
 !	Output values:
-!			Height		INTEGER*2			height of point in meter
-!			M_Type		INTEGER*2			type of morphologie
+!			Height		INTEGER*4			height of point in meter
+!			M_Type		INTEGER*4			type of morphologie
 !			Error		INTEGER*4			error value
 !
 !	Possible error values
@@ -115,7 +115,7 @@
 	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
 	DOUBLE PRECISION	Long, Lat
-	INTEGER(2)			Height, M_Type
+	INTEGER(4)			Height, M_Type
 !			
 	INTEGER(2)			H1, H2, H3, H4
 	INTEGER(4)			LOD, LAD, LOR, LAR, BH, BV, R, E
@@ -136,6 +136,7 @@
 	LAR = IDNINT((Lat-LAD)*3.599D3)
 !
 	IF ((O_LOD .NE. LOD) .OR. (O_LAD .NE. LAD)) THEN
+		FN = ''
 		O_LOD=LOD
 		O_LAD=LAD
 		CLOSE(UNIT=5)
@@ -190,15 +191,15 @@
 	IF (R .NE. OLD_R) THEN
 !	point in new file
 !
-		READ (UNIT=5, ERR=450, REC=R) H_C(1:(202*(RESH)))
-		IF (with_morpho) READ (UNIT=6, ERR=450, REC=R) M_C(1:(202*(RESH)))
+		READ (UNIT=5, ERR=450, REC=R) H_C(1:(202*RESH))
+		IF (with_morpho) READ (UNIT=6, ERR=450, REC=R) M_C(1:(202*RESH))
 		OLD_R = R
 	END IF
 !
 !	get morpho
-	IF (with_morpho) M_Type=M_I(NINT(EV)*(RESH) + NINT(EH) + 1)
+	IF (with_morpho) M_Type=M_I(IDNINT(EV)*RESH + IDNINT(EH) + 1)
 !	
-	E = INT(EV)*(RESH) + INT(EH) + 1
+	E = IDINT(EV)*RESH + IDINT(EH) + 1
 !
 !	get topo
 	H1=H_I(E)
@@ -217,7 +218,7 @@
 !	calculate height P
 	H12 = DBLE(H1) + DBLE(H2 - H1) * LORR
 	H34 = DBLE(H3) + DBLE(H4 - H3) * LORR
-	Height = NINT(H12 + (H34 - H12) * LARR)
+	Height = IDNINT(H12 + (H34 - H12) * LARR)
 !
 	RETURN
 !

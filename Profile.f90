@@ -1,6 +1,6 @@
 !
 !	Pofile.f90											P. Benner		20.11.2003
-!														G.H.			26.04.2017
+!														G.H.			29.04.2017
 !
 !	This subroutine constructs a terrain- or morphological profile from point A to
 !	point B in steps of 100 m. The heights or morphological information are stored
@@ -45,7 +45,7 @@
 !
 !
 	INTEGER(2)			PC
-	DOUBLE PRECISION	LAY, LOY, DD, DIS, DIR, K, SLA, CLA, SDIR, CDIR, SIDD, CODD, o_Tx, o_Rx
+	DOUBLE PRECISION	LAY, LOY, DD, DIS, DIR, PDa, K, SLA, CLA, SDIR, CDIR, SIDD, CODD, o_Tx, o_Rx
 	LOGICAL				slant
 	EQUIVALENCE			(p2p,slant)
 !
@@ -64,7 +64,10 @@
 	END IF
 !
 !	number of points in profile
-	PN = NINT(DIS / PD) + 1
+	PN = IDINT(DIS / PD)
+!	calc PDa
+	PDa = (DIS/PN)/6.37129D3
+	PN = PN +1
 !	set END Marker
 	T_Prof(PN+1)=-9999
 !	slant = .FALSE.
@@ -79,7 +82,6 @@
 		T_Prof(PN)=H_Rx
 		T_Prof(1)=H_Tx
 	END IF
-!
 !	Direction Tx to Rx 
 	CALL Calc_Direction (LongA,LatA,LongB,LatB,DIR)
 !	Prepare often used values
@@ -89,7 +91,7 @@
 	CDIR = DCOSD(DIR)
 !	Loop for waypoints Tx to center
 	DO PC = 2, NINT(PN/2.0), 1
-	  DD=((PC-1)*PD)/6.37129D3
+	  DD=(PC-1)*PDa
 	  SIDD = DSIN(DD)
 	  CODD = DCOS(DD)
 	  DD = SLA * CODD + CLA * SIDD * CDIR
@@ -109,9 +111,9 @@
 	SDIR = DSIND(DIR)
 	CDIR = DCOSD(DIR)
 !	Loop for waypoints Rx to center
-	DO PC = PC+1, PN-1, 1
+	DO PC = PC, PN-1, 1
 !	http://www.movable-type.co.uk/scripts/latlong.html
-	  DD=((PN-PC)*PD)/6.37129D3
+	  DD=(PN-PC)*PDa
 	  SIDD = DSIN(DD)
 	  CODD = DCOS(DD)
 	  DD = SLA * CODD + CLA * SIDD * CDIR

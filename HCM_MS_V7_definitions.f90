@@ -32,7 +32,6 @@
 	CHARACTER*6			Max_power
 	CHARACTER*7			Ant_typ_H_Tx, Ant_typ_V_Tx, Ant_typ_H_Rx, Ant_typ_V_Rx
 	CHARACTER*9			Desig_of_Tx_emis, Desig_of_Rx_emis
-	CHARACTER*11		O_FN
 	CHARACTER*12		Tx_frequ, Rx_frequ
 	CHARACTER*15		Coo_Tx, Coo_Rx, Coo_Tx_new, Coo_Rx_new
 	CHARACTER*63		Topo_path, Morpho_path, Border_path
@@ -79,4 +78,4 @@
 						Desig_of_Tx_emis, Desig_of_Rx_emis, &
 						Tx_frequ, Rx_frequ, &
 						Coo_Tx, Coo_Rx, Coo_Tx_new, Coo_Rx_new, &
-						Topo_path, Morpho_path, Border_path, O_FN
+						Topo_path, Morpho_path, Border_path
