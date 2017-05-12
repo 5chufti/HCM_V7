@@ -1,5 +1,14 @@
 !
-!	Calc_distance.f90									G.H.			10.05.2005
+!	Calc_distance.f90				(c) Gottfried Harasek '04 - '17		10.05.2005
+!	This file is part of HCM.
+!
+!	Calc_distance.f90 is free software: you can redistribute it and/or modify
+!	it as long as this copyright notice is kept in tact, the sourcecode is
+!	distributed with the final distributed product, mentioning the copyright.
+!
+!	Calc_distance.f90 is distributed in the hope that it will be useful,
+!	but WITHOUT ANY WARRANTY; without even the implied warranty of
+!	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.!
 !
 !	This subroutine calculates the distance  between two points.
 !

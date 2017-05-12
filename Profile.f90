@@ -1,13 +1,21 @@
 !
-!	Pofile.f90											P. Benner		20.11.2003
-!														G.H.			29.04.2017
+!	Pofile.f90						(c) Gottfried Harasek '04 - '17		29.04.2017
+!	This file is part of HCM.
 !
-!	This subroutine constructs a terrain- or morphological profile from point A to
+!	Profile.f90 is free software: you can redistribute it and/or modify
+!	it as long as this copyright notice is kept in tact, the sourcecode is
+!	distributed with the final distributed product, mentioning the copyright.
+!
+!	Profile.f90 is distributed in the hope that it will be useful,
+!	but WITHOUT ANY WARRANTY; without even the implied warranty of
+!	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!
+!
+!	This subroutine constructs a terrain- and morphological profile from point A to
 !	point B in steps of 100 m. The heights or morphological information are stored
 !	in 'Prof(i)'. The total number of points is in 'PN'. The first profile point
 !	'Prof(1)' is the height or morphological type of point A, the last profile point
 !	'Prof(PN)' is the height or morphological type of point B.
-!
 !
 !	Input values:
 !			LongA		DOUBLE PRECISION	longitude of point A (starting point)
@@ -64,10 +72,7 @@
 	END IF
 !
 !	number of points in profile
-	PN = IDINT(DIS / PD)
-!	calc PDa
-	PDa = (DIS/PN)/6.37129D3
-	PN = PN +1
+	PN = NINT(DIS / PD) + 1
 !	set END Marker
 	T_Prof(PN+1)=-9999
 !	slant = .FALSE.
@@ -82,6 +87,8 @@
 		T_Prof(PN)=H_Rx
 		T_Prof(1)=H_Tx
 	END IF
+!
+	PDa = PD/6.37129D3
 !	Direction Tx to Rx 
 	CALL Calc_Direction (LongA,LatA,LongB,LatB,DIR)
 !	Prepare often used values

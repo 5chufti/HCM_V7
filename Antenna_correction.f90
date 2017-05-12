@@ -1,6 +1,15 @@
 !
-!	Antenna_correction.f90
-!														G.H.		16.02.2010
+!	Antenna_correction.f90			(c) Gottfried Harasek '04 - '17		16.02.2010
+!	This file is part of HCM.
+!
+!	Antenna_correction.f90 is free software: you can redistribute it and/or modify
+!	it as long as this copyright notice is kept in tact, the sourcecode is
+!	distributed with the final distributed product, mentioning the copyright.
+!
+!	Antenna_correction.f90 is distributed in the hope that it will be useful,
+!	but WITHOUT ANY WARRANTY; without even the implied warranty of
+!	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!
 !
 	SUBROUTINE Ctransf (azi,aziM,ele,eleM,hda,vda)
 !

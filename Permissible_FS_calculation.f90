@@ -1,6 +1,15 @@
 !
-!	Permissible_FS_calculation.f90						P. Benner		17.10.2005
-!														G.H.			27.04.2017
+!	Permissible_FS_calculation.f90		(c) Gottfried Harasek '04 - '17		27.04.2017
+!	This file is part of HCM.
+!
+!	Permissible_FS_calculation.f90 is free software: you can redistribute it and/or modify
+!	it as long as this copyright notice is kept in tact, the sourcecode is
+!	distributed with the final distributed product, mentioning the copyright.
+!
+!	Permissible_FS_calculation.f90 is distributed in the hope that it will be useful,
+!	but WITHOUT ANY WARRANTY; without even the implied warranty of
+!	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!
 !
 !	Subroutine to calculate the permissible field strength.
 !
