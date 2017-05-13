@@ -1,10 +1,11 @@
 !
-!	HCM_MS_V7_definitions.f90
+!	HCM_MS_V7_definitions.f90							G.H. 13.05.2017
 !
-	INTEGER*2			T_Prof(10002), M_Prof(10002), H_I(10201), M_I(10201)
-	INTEGER*4			PN, H_Datab_Tx, H_Datab_Rx, OLD_R, O_LOD, O_LAD, RESH
+	INTEGER*2			H_I(10201), M_I(10201)
+	INTEGER*2			T_Prof(10002), M_Prof(10002), H_Datab_Tx, H_Datab_Rx, H_Tx, H_Rx
+	INTEGER*4			PN, OLD_R, O_LOD, O_LAD, RESH
 	INTEGER*4			HCM_error, Time_percentage, C_mode, D_to_border
-	INTEGER*4			H_AntTx, H_AntRx, H_Tx, H_Rx, Channel_sp_Rx, Channel_sp_Tx
+	INTEGER*4			H_AntTx, H_AntRx, Channel_sp_Rx, Channel_sp_Tx
 	INTEGER*8			Delta_frequency
 !
 	REAL				Heff, TCA, TCA_corr, aLatM
@@ -56,14 +57,14 @@
 						H_diff_angle_Rx_Tx, V_diff_angle_Rx_Tx, H_diff_angle_Tx_Rx, V_diff_angle_Tx_Rx, &
 !
 						HCM_error, Time_percentage, C_mode, D_to_border, &
-						OLD_R, O_LOD, O_LAD, PN, H_Datab_Tx, H_Datab_Rx, RESH, &
-						H_AntTx, H_AntRx, H_Tx, H_Rx, Channel_sp_Rx, Channel_sp_Tx, &
+						OLD_R, O_LOD, O_LAD, PN,  RESH, &
+						H_AntTx, H_AntRx,  Channel_sp_Rx, Channel_sp_Tx, &
 !
 						Info, p2p, with_morpho, &
 !
 !						Third all 2 byte variables (INTEGER*2)
-
-						T_Prof, M_Prof, H_I, M_I
+						T_Prof, M_Prof, H_Datab_Tx, H_Datab_Rx, H_Tx, H_Rx, &
+						H_I, M_I
 !
 !						All CHARACTER variables
 	COMMON	/CDATA/		Sea_temperature, Type_of_Tx_ant, Type_of_Rx_ant, Chan_occup, &

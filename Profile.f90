@@ -1,9 +1,9 @@
 !
-!	Pofile.f90						(c) Gottfried Harasek '04 - '17		29.04.2017
+!	Pofile.f90						(c) Gottfried Harasek '04 - '17		13.05.2017
 !	This file is part of HCM.
 !
 !	Profile.f90 is free software: you can redistribute it and/or modify
-!	it as long as this copyright notice is kept in tact, the sourcecode is
+!	it as long as this copyright notice is kept intact, the sourcecode is
 !	distributed with the final distributed product, mentioning the copyright.
 !
 !	Profile.f90 is distributed in the hope that it will be useful,
@@ -11,11 +11,12 @@
 !	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 !
 !
-!	This subroutine constructs a terrain- and morphological profile from point A to
+!	This subroutine constructs a terrain- or morphological profile from point A to
 !	point B in steps of 100 m. The heights or morphological information are stored
 !	in 'Prof(i)'. The total number of points is in 'PN'. The first profile point
 !	'Prof(1)' is the height or morphological type of point A, the last profile point
 !	'Prof(PN)' is the height or morphological type of point B.
+!
 !
 !	Input values:
 !			LongA		DOUBLE PRECISION	longitude of point A (starting point)
@@ -52,7 +53,7 @@
 	DOUBLE PRECISION	LongA, LatA, LongB, LatB
 !
 !
-	INTEGER(2)			PC
+	INTEGER(4)			PC
 	DOUBLE PRECISION	LAY, LOY, DD, DIS, DIR, PDa, K, SLA, CLA, SDIR, CDIR, SIDD, CODD, o_Tx, o_Rx
 	LOGICAL				slant
 	EQUIVALENCE			(p2p,slant)
@@ -72,23 +73,25 @@
 	END IF
 !
 !	number of points in profile
-	PN = NINT(DIS / PD) + 1
+	PN = IDINT(DIS / PD)
+!	calc PDa
+	PDa = (DIS/PN)/6.37129D3
+	PN = PN + 1
 !	set END Marker
 	T_Prof(PN+1)=-9999
 !	slant = .FALSE.
 	IF (slant) THEN
-!	prepare for sloped profile
+!	prepare for sloped profile (C_Mode pos)
 		o_Tx = DBLE(H_Tx)
 		o_Rx = DBLE(H_Rx)
-		K = DBLE(H_Rx - H_Tx) / (PN-1)
+		K = DBLE(H_Rx - H_Tx) / DBLE(PN-1)
 		T_Prof(PN)=0
 		T_Prof(1)=0
 	ELSE
+!	line calculation (C_Mode neg)
 		T_Prof(PN)=H_Rx
 		T_Prof(1)=H_Tx
 	END IF
-!
-	PDa = PD/6.37129D3
 !	Direction Tx to Rx 
 	CALL Calc_Direction (LongA,LatA,LongB,LatB,DIR)
 !	Prepare often used values
@@ -98,7 +101,7 @@
 	CDIR = DCOSD(DIR)
 !	Loop for waypoints Tx to center
 	DO PC = 2, NINT(PN/2.0), 1
-	  DD=(PC-1)*PDa
+	  DD=DBLE(PC-1)*PDa
 	  SIDD = DSIN(DD)
 	  CODD = DCOS(DD)
 	  DD = SLA * CODD + CLA * SIDD * CDIR
@@ -106,7 +109,7 @@
 	  LOY = LongA + DATAN2D(SDIR * SIDD * CLA, CODD - SLA * DD)
 !	  get Information of new point:
 		CALL Point_info (LOY, LAY, T_Prof(PC), M_Prof(PC))
-		IF (slant) T_Prof(PC) = T_Prof(PC) - NINT(o_Tx + K * (PC-1))
+		IF (slant) T_Prof(PC) = T_Prof(PC) - IIDNNT(o_Tx + K * DBLE(PC-1))
 	  IF (HCM_Error .NE. 0) RETURN
 	END DO
 !
@@ -120,7 +123,7 @@
 !	Loop for waypoints Rx to center
 	DO PC = PC, PN-1, 1
 !	http://www.movable-type.co.uk/scripts/latlong.html
-	  DD=(PN-PC)*PDa
+	  DD=DBLE(PN-PC)*PDa
 	  SIDD = DSIN(DD)
 	  CODD = DCOS(DD)
 	  DD = SLA * CODD + CLA * SIDD * CDIR
@@ -128,7 +131,7 @@
 	  LOY = LongB + DATAN2D(SDIR * SIDD * CLA, CODD - SLA * DD)
 !	  get Information of new point:
 		CALL Point_info (LOY, LAY, T_Prof(PC), M_Prof(PC))
-		IF (slant) T_Prof(PC) = T_Prof(PC) - NINT(o_Rx - K * (PN-PC))
+		IF (slant) T_Prof(PC) = T_Prof(PC) - IIDNNT(o_Rx - K * DBLE(PN-PC))
 	  IF (HCM_Error .NE. 0) RETURN
 	END DO
 !

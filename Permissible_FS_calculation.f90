@@ -3,7 +3,7 @@
 !	This file is part of HCM.
 !
 !	Permissible_FS_calculation.f90 is free software: you can redistribute it and/or modify
-!	it as long as this copyright notice is kept in tact, the sourcecode is
+!	it as long as this copyright notice is kept intact, the sourcecode is
 !	distributed with the final distributed product, mentioning the copyright.
 !
 !	Permissible_FS_calculation.f90 is distributed in the hope that it will be useful,

@@ -1,17 +1,18 @@
 !
-!	Point_info.F90					(c) Gottfried Harasek '04 - '17		27.04.2017
+!	Point_Info.f90						(c) Gottfried Harasek '04 - '17		13.05.2017
 !	This file is part of HCM.
 !
-!	Point_info.f90 is free software: you can redistribute it and/or modify
-!	it as long as this copyright notice is kept in tact, the sourcecode is
+!	Point_Info.f90 is free software: you can redistribute it and/or modify
+!	it as long as this copyright notice is kept intact, the sourcecode is
 !	distributed with the final distributed product, mentioning the copyright.
 !
-!	Point_info is distributed in the hope that it will be useful,
+!	Point_Info.f90 is distributed in the hope that it will be useful,
 !	but WITHOUT ANY WARRANTY; without even the implied warranty of
 !	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 !
 !
-!	Subroutine to read the height and morpho of a given point from the database.
+!	Subroutine to read the info of a given point from the database.
+!
 !
 !	Input values:
 !			Long		DOUBLE PRECISION	longitude of point	(-180.0....+180.0)
@@ -144,8 +145,7 @@
 	LAR = IDNINT((Lat-LAD)*3.599D3)
 !
 	IF ((O_LOD .NE. LOD) .OR. (O_LAD .NE. LAD)) THEN
-		O_LOD=LOD
-		O_LAD=LAD
+		FN = '          '
 		CLOSE(UNIT=5)
 
 		IF (LOD .GE. 0) THEN
@@ -172,7 +172,7 @@
 !	open topo
 		OPEN (UNIT=5, FILE=TRIM(Topo_path) // '/' // FN(1:4) // '/' // FN // 'e',  &
 		ACCESS='DIRECT',RECL=202*(RESH), STATUS='OLD', &
-		ERR=400, MODE='READ')
+		ERR=36, MODE='READ')
 !	open morpho
 		IF (with_morpho) THEN
 			CLOSE (UNIT=6)
@@ -184,6 +184,8 @@
 			END IF
 		END IF
 		OLD_R=-1
+		O_LOD=LOD
+		O_LAD=LAD
 	END IF
 !
 !	coordinates of block containing P
@@ -198,15 +200,15 @@
 	IF (R .NE. OLD_R) THEN
 !	point in new file
 !
-		READ (UNIT=5, ERR=450, REC=R) H_C(1:(202*(RESH)))
-		IF (with_morpho) READ (UNIT=6, ERR=450, REC=R) M_C(1:(202*(RESH)))
+		READ (UNIT=5, ERR=220, REC=R) H_C(1:(202*RESH))
+		IF (with_morpho) READ (UNIT=6, ERR=220, REC=R) M_C(1:(202*RESH))
 		OLD_R = R
 	END IF
 !
 !	get morpho
-	IF (with_morpho) M_Type=M_I(NINT(EV)*(RESH) + NINT(EH) + 1)
+	IF (with_morpho) M_Type=INT(M_I(IDNINT(EV)*RESH + IDNINT(EH) + 1))
 !	
-	E = INT(EV)*(RESH) + INT(EH) + 1
+	E = IDINT(EV)*RESH + IDINT(EH) + 1
 !
 !	get topo
 	H1=H_I(E)
@@ -225,14 +227,14 @@
 !	calculate height P
 	H12 = DBLE(H1) + DBLE(H2 - H1) * LORR
 	H34 = DBLE(H3) + DBLE(H4 - H3) * LORR
-	Height = NINT(H12 + (H34 - H12) * LARR)
+	Height = IIDNNT(H12 + (H34 - H12) * LARR)
 !
 	RETURN
 !
-400	HCM_Error = 36
+36	HCM_Error = 36
 	RETURN
 !
-450	HCM_Error = 220
+220	HCM_Error = 220
 	RETURN
 !
 	END SUBROUTINE Point_info
