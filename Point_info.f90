@@ -1,5 +1,5 @@
 !
-!	Point_Info.f90						(c) Gottfried Harasek '04 - '17		13.05.2017
+!	Point_Info.f90						(c) Gottfried Harasek '04 - '17		14.05.2017
 !	This file is part of HCM.
 !
 !	Point_Info.f90 is free software: you can redistribute it and/or modify
@@ -29,10 +29,7 @@
 !	Possible error values
 !		  0 no error
 !		 36 error opening file (no data)
-!		200 error in longitude 
-!		210 error in latitude 
 !		220 error reading record
-!		300 latitude is not in range of 0.0 - 90.0
 !		400 height is missing (-9999)
 !
 !	Terrain-data location: Topo_path\Subdir\

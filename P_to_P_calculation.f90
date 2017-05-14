@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			26.04.2017
+!														G.H.			14.05.2017
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -79,11 +79,7 @@
 !
 !	0		no error
 !	36		error opening terrain- or morphological data file (data not available)
-!	200		error in longitude (in 'Point_height' or 'Point_type' subroutine) 
-!	210		error in latitude (in 'Point_height' or 'Point_type' subroutine)
 !	220		error reading record (in 'Point_height' or 'Point_type' subroutine)
-!	300		latitude is not in range of 0.0 - 90.0
-!			(in 'Point_height' or 'Point_type' subroutine)
 !	400		height is missing (-9999) (in 'Point_height' subroutine)
 !	1000	Distance between Tx and Rx = 0. Calculations not possible
 !	1001	Error in geographical coordinates (Tx longitude, degrees)
@@ -297,31 +293,35 @@
 !	Calculate the direction from Tx to Rx:
 	CALL Calc_direction (New_LongTx, New_LatTx, New_LongRx, New_LatRx, Dir_Tx_Rx)
 !
+	IF (p2p) THEN
 !	Checking Rx site height
 !		Height of Rx above sealevel
-	CALL Point_info (New_LongRx, New_LatRx, H_Datab_Rx, M_Prof(10002))
-	IF (HCM_Error .NE. 0) RETURN
-	IF ((H_Rx_input .EQ. '    ') .OR. (.NOT. p2p) .OR. (Rx_serv_area .GT. 0.0)) THEN
-		H_Rx = H_Datab_Rx
-		Info(8) = .TRUE.
+		CALL Point_info (New_LongRx, New_LatRx, H_Datab_Rx, M_Prof(10002))
+		IF (HCM_Error .NE. 0) RETURN
+		IF ((H_Rx_input .EQ. '    ') .OR. (Rx_serv_area .GT. 0.0)) THEN
+			H_Rx = H_Datab_Rx
+			Info(8) = .TRUE.
 !		No height of Rx site is given, height is from the terrain database.
-	ELSE
-		READ (H_Rx_input, '(I4)', IOSTAT=IOS) H_Rx
-		IF (IOS .NE. 0) THEN
-			HCM_Error = 1030
-!			Error in input value Rx site height above sea level.
-			RETURN	
-		END IF
-		IF (H_Rx .NE. H_Datab_Rx) THEN
-			IF (ABS(H_Rx-H_Datab_Rx) .LE. H_Rx/10) THEN
-				Info(9) = .TRUE.
+		ELSE
+			READ (H_Rx_input, '(I4)', IOSTAT=IOS) H_Rx
+			IF (IOS .NE. 0) THEN
+				HCM_Error = 1030
+	!			Error in input value Rx site height above sea level.
+				RETURN	
+			END IF
+			IF (H_Rx .NE. H_Datab_Rx) THEN
+				IF (ABS(H_Rx-H_Datab_Rx) .LE. H_Rx/10) THEN
+					Info(9) = .TRUE.
 !				Height of Rx site differs from height of terrain data.
-			ELSE
-				Info(10) = .TRUE.
+				ELSE
+					Info(10) = .TRUE.
 !				Rx site height differs more than 10%,
 !				calculated values may be (extremely) wrong!
+				END IF
 			END IF
 		END IF
+	ELSE
+		Info(8) = .TRUE.
 	END IF
 !	Checking of Tx site height:
 !		Height of Tx site above sea level:
