@@ -37,7 +37,7 @@
 	CHARACTER*15		Coo_Tx, Coo_Rx, Coo_Tx_new, Coo_Rx_new
 	CHARACTER*63		Topo_path, Morpho_path, Border_path
 !
-	LOGICAL*4			Info(20), p2p, with_morpho
+	LOGICAL*4			Info(20), p2p, with_morpho, flp
 !
 !						First all 8 byte variables (DOUBLE PRECISION, LONG INTEGER)
 	COMMON	/NDATA/		Tx_frequency, Distance, PD, &
@@ -60,7 +60,7 @@
 						OLD_R, O_LOD, O_LAD, PN,  RESH, &
 						H_AntTx, H_AntRx,  Channel_sp_Rx, Channel_sp_Tx, &
 !
-						Info, p2p, with_morpho, &
+						Info, p2p, with_morpho, flp, &
 !
 !						Third all 2 byte variables (INTEGER*2)
 						T_Prof, M_Prof, H_Datab_Tx, H_Datab_Rx, H_Tx, H_Rx, &

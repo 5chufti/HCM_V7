@@ -122,9 +122,6 @@
 		IF (slant) T_Prof(PC) = T_Prof(PC) - IIDNNT(o_Rx - K * DBLE(PN-PC))
 	  IF (HCM_Error .NE. 0) RETURN
 	END DO
-	IF (.NOT. slant) THEN
-	    H_Datab_Rx = T_Prof(PN)
-	END IF
 !
 	RETURN
 !

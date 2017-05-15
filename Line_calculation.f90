@@ -66,6 +66,7 @@
 	PI = 3.141592653589793238D0                                 
 	RB = 1.8D2 / PI
 !
+	flp = .FALSE.
 	Rx_serv_area = 0.0
 !
 !	Select line data
@@ -313,6 +314,7 @@
 	  CALL CBR_Coordinates (LongRx, LatRx, Lo, La, d2b)
 !	check ctry affected if x-km or CBR
 	  IF ((D_to_border .NE. 0) .AND. (Test_cut1 (LongRx, LatRx, Lo, La))) RETURN
+	  flp=.TRUE.
 	  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx )
     ELSE
 	  HCM_Error = 1047

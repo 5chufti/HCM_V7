@@ -224,6 +224,7 @@
 		New_LatTx  = LatTx
 		New_LongRx = LongRx
 		New_LatRx  = LatRx
+		IF (.NOT. flp) GOTO 10
 	END IF
 !
 	CALL CooConv (New_LongTx, New_LatTx, Coo_Tx_new)
@@ -306,7 +307,7 @@
 			READ (H_Rx_input, '(I4)', IOSTAT=IOS) H_Rx
 			IF (IOS .NE. 0) THEN
 				HCM_Error = 1030
-	!			Error in input value Rx site height above sea level.
+!				Error in input value Rx site height above sea level.
 				RETURN	
 			END IF
 			IF (H_Rx .NE. H_Datab_Rx) THEN
@@ -490,7 +491,6 @@
 		I2 = H_AntRx
 	ELSE
 		I1 = H_Tx + H_AntTx
-		I2 = H_Rx + H_AntRx
 	END IF
 !
 !	***********************************************************
