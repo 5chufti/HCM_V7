@@ -1,6 +1,6 @@
 !
 !	Line_calculation.f90							P.Benner		23.11.2004
-!													G.H.			06.04.2016
+!													G.H.			17.07.2017
 !
 !	23.11.2004	Steps from 100 / 10 / 1 modified to 25 / 5 / 1
 !	18.07.2011  Steps modified to 5 / 1
@@ -85,6 +85,7 @@
 !			Distance to borderline is too long
 			RETURN
 	    ELSE
+		  d2b=D_to_border	
 		  WRITE (BorderFile(8:10), '(I3.3)') D_to_border
 	  END IF
 	END IF
