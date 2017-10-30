@@ -1,6 +1,6 @@
 !	
 !	HCMMS_V7.F90										P.Benner		23.02.2004
-!														G.H.			27.04.2017
+!														G.H.			30.10.2017
 !	Version 7					
 !
 !	Harmonized Calculation Method for mobile services
@@ -97,7 +97,7 @@
 !
 !	***************************************************************************
 !
-	Version = '7.21ß'
+	Version = '7.21g'
 !
 	HCM_error = 0
 !
@@ -541,10 +541,14 @@
 !
 !	Sea temparatur:
 	IF ((Sea_temperature .NE. 'W') .AND. (Sea_temperature .NE. 'C')) THEN
+	    IF (C_mode .GE. 0) THEN
 		aLatM = ABS(LatTx + LatRx) / 2.0
-		Sea_temperature = 'C'
-		IF (aLatM .LT. 56.0) Sea_temperature = 'I'
-		IF (aLatM .LE. 35.0) Sea_temperature = 'W'
+	    ELSE
+		aLatM = LatTx
+	    END IF
+	    Sea_temperature = 'C'
+	    IF (aLatM .LT. 56.0) Sea_temperature = 'I'
+	    IF (aLatM .LE. 35.0) Sea_temperature = 'W'
 	END IF
 !
 !	pepare control values

@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			14.05.2017
+!														G.H.			30.10.2017
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -294,11 +294,11 @@
 !	Calculate the direction from Tx to Rx:
 	CALL Calc_direction (New_LongTx, New_LatTx, New_LongRx, New_LatRx, Dir_Tx_Rx)
 !
-	IF (p2p) THEN
 !	Checking Rx site height
 !		Height of Rx above sealevel
 		CALL Point_info (New_LongRx, New_LatRx, H_Datab_Rx, M_Prof(10002))
 		IF (HCM_Error .NE. 0) RETURN
+	IF (p2p) THEN
 		IF ((H_Rx_input .EQ. '    ') .OR. (Rx_serv_area .GT. 0.0)) THEN
 			H_Rx = H_Datab_Rx
 			Info(8) = .TRUE.
@@ -322,6 +322,7 @@
 			END IF
 		END IF
 	ELSE
+		H_Rx = H_Datab_Rx
 		Info(8) = .TRUE.
 	END IF
 !	Checking of Tx site height:
