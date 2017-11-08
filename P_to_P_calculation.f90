@@ -212,7 +212,23 @@
 	Info(13) = .FALSE.
 	Info(16) = .FALSE.
 !
+!	Clear - maybe skipped - result var's
+!
 	Calculated_FS = 999.9
+	PN = 0
+	Rx_TCA = 0.0
+	Rx_TCA_corr = 0.0
+	Tx_TCA = 0.0
+	Tx_TCA_corr = 0.0
+	Heff = 0.0
+	Heff_Rx = 0.0
+	Heff_Tx = 0.0
+	D_sea_calculated = 0.0
+	Dh = 50.0
+	Dh_corr = 0.0
+	Land_FS = 0.0
+	Sea_FS = 0.0
+!
 !	Calculate new positions, if Tx or Rx or both are mobiles and not lines or '99':
 !	for lines new positions are calculated in CBR_Coordinates !
 	IF (p2p .AND. ((Tx_serv_area .GT. 0.0) .OR. (Rx_serv_area .GT. 0.0))) THEN
@@ -277,6 +293,7 @@
 		ELSE
 			INFO(7) = .True.
 		END IF
+		RETURN
 	END IF
 !
 	IF (Distance .GT. 1D3) THEN
@@ -286,7 +303,7 @@
 	  RETURN
 	END IF
 !
-	IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
+!	IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
 !
 !	Calculate the direction from Rx to Tx:
 	CALL Calc_direction (New_LongRx, New_LatRx, New_LongTx, New_LatTx, Dir_Rx_Tx)
@@ -296,8 +313,8 @@
 !
 !	Checking Rx site height
 !		Height of Rx above sealevel
-		CALL Point_info (New_LongRx, New_LatRx, H_Datab_Rx, M_Prof(10002))
-		IF (HCM_Error .NE. 0) RETURN
+	CALL Point_info (New_LongRx, New_LatRx, H_Datab_Rx, M_Prof(10002))
+	IF (HCM_Error .NE. 0) RETURN
 	IF (p2p) THEN
 		IF ((H_Rx_input .EQ. '    ') .OR. (Rx_serv_area .GT. 0.0)) THEN
 			H_Rx = H_Datab_Rx
@@ -406,7 +423,7 @@
 	  Calculated_FS = Free_space_FS
 	  Info(11) = .TRUE.
 !	  Free space field strength used because distance < 1km.
-!	  RETURN
+	  RETURN
 	END IF
 !
 !	*****************************************************************
@@ -516,9 +533,6 @@
 		END DO
 !	Calculate correction factor:
 		CALL TCA_correction_calculation (Tx_TCA, Tx_frequency, Tx_TCA_corr)
-	ELSE
-		Tx_TCA	= 0.0
-		Tx_TCA_corr	= 0.0
 	END IF
 !
 !	calculate receiver clearance angle 'Rx_TCA' according to proceeding table
@@ -538,9 +552,6 @@
 		END DO
 !	Calculate correction factor:
 		CALL TCA_correction_calculation (Rx_TCA, Rx_frequency, Rx_TCA_corr)
-	ELSE
-		Rx_TCA	= 0.0
-		Rx_TCA_corr	= 0.0
 	ENDIF
 !
 !	************************************************
@@ -571,9 +582,9 @@
 	IF (Heff_Tx .LT. 3.0) Heff_Tx = 3.0
 !
 !	Receiver: 
-	IF (p2p) THEN
+!	IF (p2p) THEN
 !	  for point to point calculations
-	  IF (Rx_serv_area .GT. 0) THEN
+	  IF ((.NOT. p2p) .OR. (Rx_serv_area .GT. 0)) THEN
 !		Height of a mobile 'hmRx'
 		Heff_Rx = REAL(H_AntRx)
 	  ELSE
@@ -583,10 +594,10 @@
 		  END DO
 		  Heff_Rx = REAL(I2) - REAL(HSUM)/REAL(D2-D1+1)
 	  END IF
-	ELSE
+!	ELSE
 !	for line calculations
-	  Heff_Rx = REAL(H_AntRx)
-	END IF
+!	  Heff_Rx = REAL(H_AntRx)
+!	END IF
 	IF (Heff_Rx .LT. 3.0) Heff_Rx = 3.0
 !
 !	heff for curves according to proceding table:
@@ -604,7 +615,6 @@
 !
 !
 	IF (with_morpho) THEN
-		D_sea_calculated = 0.0
 		null = .FALSE.
 		DS1 = 0.0               
 		J1 = 0
@@ -658,8 +668,8 @@
 !
 	IF ((Distance .LE. 10.0) .OR. (D_sea_calculated .GE. Distance) .OR. &
 		((Tx_serv_area .GT. 0.0) .AND. (.NOT. p2p))) THEN
-		Dh = 50.0
-		Dh_corr = 0.0
+!		Dh = 50.0
+!		Dh_corr = 0.0
 	  ELSE
 !		Calculate delta-h
 		CALL Dh_calculation ()
