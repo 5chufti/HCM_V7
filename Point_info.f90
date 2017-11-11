@@ -1,5 +1,5 @@
 !
-!	Point_Info.f90						(c) Gottfried Harasek '04 - '17		14.05.2017
+!	Point_Info.f90						(c) Gottfried Harasek '04 - '17		11.11.2017
 !	This file is part of HCM.
 !
 !	Point_Info.f90 is free software: you can redistribute it and/or modify
@@ -176,8 +176,9 @@
 			OPEN (UNIT=6, FILE=TRIM(Morpho_path) // '/' // FN(1:4) // '/' // FN // 'm',  &
 				ACCESS='DIRECT',RECL=202*(RESH), STATUS='OLD', IOSTAT=OLD_R, MODE='READ')
 			IF (OLD_R .NE. 0) THEN
+				Info(16) = .TRUE.
 				with_morpho = .FALSE.
-				D_sea_input = '  0.0'
+				D_sea_calculated = 0
 			END IF
 		END IF
 		OLD_R=-1

@@ -553,7 +553,17 @@
 !
 !	pepare control values
 	p2p = ((c_Mode .GE. 0) .AND. (c_Mode .NE. 99))
-	with_morpho = (Trim(D_sea_input) .EQ. '')	
+	IF (Trim(D_sea_input) .EQ. '') THEN
+		with_morpho = .TRUE.
+	  ELSE
+		with_morpho = .FALSE.
+		READ (D_sea_input, '(F5.1)', IOSTAT=IOS) D_sea_calculated
+		IF (IOS .NE. 0) THEN
+		  HCM_Error = 1035
+!		  Error in input value of distance over sea
+		  RETURN
+		END IF
+	END IF
 !	**************************************************************
 !
 	IF (C_mode .LT. 0) THEN

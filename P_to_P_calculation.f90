@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			30.10.2017
+!														G.H.			11.11.2017
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -210,7 +210,7 @@
 	Info(11) = .FALSE.
 	Info(12) = .FALSE.
 	Info(13) = .FALSE.
-	Info(16) = .FALSE.
+!	Info(16) = .FALSE.
 !
 !	Clear - maybe skipped - result var's
 !
@@ -643,13 +643,6 @@
 			D_sea_calculated = D_sea_calculated + DS1
 			null = .FALSE.
 		  END IF
-		END IF
-	  ELSE              
-		READ (D_sea_input, *, IOSTAT=IOS) D_sea_calculated
-		IF (IOS .NE. 0) THEN
-		  HCM_Error = 1035
-!		  Error in input value of distance over sea
-		  RETURN
 		END IF
 	END IF      
 !
