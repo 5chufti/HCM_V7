@@ -48,16 +48,16 @@
 !
 	DOUBLE PRECISION	LongTx, LatTx, LongRx, LatRx
 !
-	INTEGER				IOS, N_rec, N_List, Rec_N_list(3), N_cp
+	INTEGER				IOS, N_rec, N_List, Rec_N_list(3), N_cp, N_all
 	INTEGER				N_List1, Rec_N_list1(3), teststep
 	INTEGER				I, J, K, Rec_N_x, Rec_x
-	DOUBLE PRECISION	N_Record(22), RB, PI, Lo, La, Co_cp(2000,2)
+	DOUBLE PRECISION	N_Record(22), N_File(44000), RB, PI, Lo, La, Co_cp(2000,2)
 	REAL				FS_list(3), FS_list1(3), FS_x, d2b
-	CHARACTER*8			C_Record(22)
+	CHARACTER*8			C_Record(22), C_File(44000)
 	CHARACTER*10		BorderFile
 	LOGICAL				Take_it, Test_cut1
 !
-	EQUIVALENCE			(N_Record,C_Record)
+	EQUIVALENCE			(N_Record,C_Record), (N_File,C_File)
 !
 	COMMON /Co_ord_cp/	Co_cp, N_cp
 !    
@@ -68,6 +68,7 @@
 !
 	flp = .FALSE.
 	Rx_serv_area = 0.0
+	N_List = 0
 !
 !	Select line data
 !
@@ -91,44 +92,54 @@
 	END IF
 !
 !	get additionally all borderline centerpoints of the affected coutry:
-	  OPEN (UNIT=3, FILE=TRIM(Border_path) // '/' // BorderFile(1:7) // '000', &
-			STATUS='OLD', ACCESS='DIRECT',RECL=176, MODE='READ', IOSTAT=IOS)
-!
-	  IF (IOS .NE. 0) THEN
-		HCM_Error= 1048
-!		Selected line data not available
-		RETURN
-	  END IF                            
-!	  Store all center points table 'N_Record(i,j)':
-	  DO N_rec = 1, 2000      
-		READ (3, REC=N_rec, IOSTAT=IOS) C_Record
-!		End of file reached (or non existing record) ?
-		IF ((IOS .LT. 0) .OR. (IOS .EQ. 36)) EXIT
-		IF (IOS .NE. 0) THEN   
-!		  Error in (border-) line data
-		  HCM_Error = 1049
-		  RETURN
-		END IF
-		Co_cp(N_rec,1) = N_Record(21) * RB
-		Co_cp(N_rec,2) = N_Record(22) * RB
-	  END DO
-!
-!	  Number of entries in the list of center co-ordinates
-	  N_cp = N_rec -1
-!
-	  CLOSE (UNIT=3)
-!
-!	Open line file:
-	OPEN (UNIT=3, FILE=TRIM(Border_path) // '/' // BorderFile, &
-			STATUS='OLD', ACCESS='DIRECT',RECL=176, MODE='READ', IOSTAT=IOS)
+	OPEN (UNIT=3, FILE=TRIM(Border_path) // '/' // BorderFile(1:7) // '000', &
+		STATUS='OLD', ACCESS='DIRECT',RECL=176, MODE='READ', IOSTAT=IOS)
 !
 	IF (IOS .NE. 0) THEN
-	  HCM_Error = 1048
-!	  Selected line data not available
+	  HCM_Error= 1048
+!		Selected line data not available
 	  RETURN
-	END IF                          
+	END IF                            
+!	  Store all center points table 'N_Record(i,j)':
+	DO N_rec = 1, 2000      
+	  READ (3, REC=N_rec, IOSTAT=IOS) C_Record
+!	  End of file reached (or non existing record) ?
+	  IF ((IOS .LT. 0) .OR. (IOS .EQ. 36)) EXIT
+	  IF (IOS .NE. 0) THEN   
+!	    Error in (border-) line data
+	    HCM_Error = 1049
+	    RETURN
+	  END IF
+	  Co_cp(N_rec,1) = N_Record(21) * RB
+	  Co_cp(N_rec,2) = N_Record(22) * RB
+	END DO
 !
+!	  Number of entries in the list of center co-ordinates
+	N_cp = N_rec - 1
+!
+	CLOSE (UNIT=3)
+!
+!	  Open line file and cache full line:
+	OPEN (UNIT=3, FILE=TRIM(Border_path) // '/' // BorderFile, &
+		STATUS='OLD', ACCESS='DIRECT',RECL=8, MODE='READ', IOSTAT=IOS)
+!
+	DO N_rec = 1, 44000      
+	  READ (3, REC=N_rec, IOSTAT=IOS) C_File(N_rec)
+	  IF ((IOS .LT. 0) .OR. (IOS .EQ. 36)) GOTO 60
+	  IF (IOS .NE. 0) THEN
+	    HCM_Error = 1048
+!	    Selected line data not available
+	    RETURN
+	  END IF  
+	END DO                          
+!
+60	CLOSE (UNIT=3)
+	N_all = (N_rec - 1)/22
 	N_List = 0	! number of stored record numbers and field strength
+	DO I = 1,3
+	  FS_List(I) = 0.0
+	  Rec_N_list(I) = 0
+	END DO
 !	all linepoints?
 	INQUIRE (FILE='HCM_LP',EXIST=Take_it)
 	IF (.NOT. Take_it) GOTO 80
@@ -176,26 +187,17 @@
 !	x-km: each centerpoint
 80	IF (D_to_border .GT. 0) THEN
 		teststep = 1
-		N_rec = 1
+		N_rec = 0
 	ELSE
 		teststep = 5
-		N_rec = 3	! start record number in file
+		N_rec = 2	! start record number in file
 	END IF
-	
-90	IOS = 0
 !
-	DO WHILE (IOS .EQ. 0)
-	  READ (3, REC=N_rec, IOSTAT=IOS) C_Record
+90	DO WHILE (.TRUE.)
 !	  End of file reached (or non existing record) ?
-	  IF ((IOS .LT. 0) .OR. (IOS .EQ. 36)) EXIT ! end of file reached
-	  IF (IOS .NE. 0) THEN   
-		HCM_Error = 1049
-!		Error in line data
-		CLOSE (UNIT = 3)
-		RETURN
-	  END IF
-	  LongRx = N_Record(21) * RB
-	  LatRx  = N_Record(22) * RB
+	  IF (N_rec .GT. N_all) EXIT ! end of file reached
+	  LongRx = N_File(22*N_rec + 21) * RB
+	  LatRx  = N_File(22*N_rec + 22) * RB
 	  Lo = LongTx
 	  La = LatTx
 	  CALL CBR_Coordinates (LongRx, LatRx, Lo, La, d2b)
@@ -215,21 +217,17 @@
 			GOTO 90
 		ELSE
 		  N_List1 = N_List
+		  N_List = 0	
 		  DO I = 1, 3
 		    Rec_N_list1(I) = Rec_N_list(I)
+		    Rec_N_list(I) = 0
 		    FS_list1(I) = FS_list(I)
+		    FS_List(I) = 0.0
 		  END DO
 		END IF
 !
 !	2nd:  calculate to every +2/-2 neighbouring centerpoint of stored centerpoints
 !	Use 1st list again:
-		N_List = 0	! number of stored records and field strength
-		DO I = 1,3
-		  FS_List(I) = 0.0
-		  Rec_N_list(I) = 0
-		END DO
-		Calculated_FS = -999.9	! default setting
-		IF (N_List1 .GT. 0) THEN
 		  DO I = 1, N_List1
 			J = Rec_N_list1(I)
 			DO J = (J-2),(J+2)
@@ -237,16 +235,8 @@
 !				  This calculation is already done in the previous step!
 				  Calculated_FS = FS_list1(I)
 				ELSE
-				  READ (3, REC=J, IOSTAT=IOS) C_Record
-				  IF ((IOS .LT. 0) .OR. (IOS .EQ. 36)) EXIT
-				  IF (IOS .NE. 0) THEN   
-					HCM_Error = 1049
-!					Error in line data
-					CLOSE (UNIT = 3)
-					RETURN
-				  END IF
-				  LongRx = N_Record(21) * RB
-				  LatRx  = N_Record(22) * RB
+				  LongRx = N_File(J*22 + 21) * RB
+				  LatRx  = N_File(J*22 + 22) * RB
 				  Lo = LongTx
 				  La = LatTx
 				  CALL CBR_Coordinates (LongRx, LatRx, Lo, La, d2b)
@@ -260,7 +250,6 @@
 120			  CONTINUE
 			END DO
 		  END DO
-		END IF
 	END IF
 !
 !	3rd: calculate to all points inside the stored records:
@@ -268,17 +257,10 @@
 	IF (N_List .GT. 0) THEN
 	  DO I = 1, N_List
 		J = Rec_N_list(I)
-		READ (3, REC=J, IOSTAT=IOS) C_Record
-		IF (IOS .NE. 0) THEN   
-		  HCM_Error = 1049
-!		  Error in line data
-		  CLOSE (UNIT = 3)
-		  RETURN
-		END IF
 !		Calculate to all 10 points inside this record
 		DO K = 1, 19, 2
-		  LongRx = N_Record(K)   * RB
-		  LatRx  = N_Record(K+1) * RB
+		  LongRx = N_File(22*J+K)   * RB
+		  LatRx  = N_File(22*J+K+1) * RB
 		  Lo = LongTx
 		  La = LatTx
 		  CALL CBR_Coordinates (LongRx, LatRx, Lo, La, d2b)
@@ -286,7 +268,7 @@
 		  IF ((D_to_border .NE. 0) .AND. (Test_cut1 (LongRx, LatRx, Lo, La))) GOTO 130
 		  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx )
 		  IF (HCM_Error .EQ. 1028) GOTO 130	! Distance > 1000 km
-!		  Find maximun of field strength:
+!		  Find maximum field strength:
 		  IF (Calculated_FS .GE. FS_x) THEN
 			FS_x = Calculated_FS
 			Rec_x = K
@@ -301,15 +283,8 @@
 !	4th: calculate to point of maximum field strength again to get all
 !		 output values:
 140	IF (Rec_N_x .GT. 0) THEN
-	  READ (3, REC=Rec_N_x, IOSTAT=IOS) C_Record
-	  IF (IOS .NE. 0) THEN   
-		HCM_Error = 1049
-!		Error in line data
-		RETURN
-	  END IF
-	  CLOSE (UNIT = 3)
-	  LongRx = N_Record(Rec_x)   * RB
-	  LatRx  = N_Record(Rec_x+1) * RB
+	  LongRx = N_File(22*Rec_N_x+Rec_x)   * RB
+	  LatRx  = N_File(22*Rec_N_x+Rec_x+1) * RB
 	  Lo = LongTx
 	  La = LatTx
 	  CALL CBR_Coordinates (LongRx, LatRx, Lo, La, d2b)
