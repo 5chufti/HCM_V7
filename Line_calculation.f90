@@ -1,6 +1,6 @@
 !
 !	Line_calculation.f90							P.Benner		23.11.2004
-!													G.H.			17.07.2017
+!													G.H.			17.04.2018
 !
 !	23.11.2004	Steps from 100 / 10 / 1 modified to 25 / 5 / 1
 !	18.07.2011  Steps modified to 5 / 1
@@ -51,13 +51,10 @@
 	INTEGER				IOS, N_rec, N_List, Rec_N_list(3), N_cp, N_all
 	INTEGER				N_List1, Rec_N_list1(3), teststep
 	INTEGER				I, J, K, Rec_N_x, Rec_x
-	DOUBLE PRECISION	N_Record(22), N_File(44000), RB, PI, Lo, La, Co_cp(2000,2)
+	DOUBLE PRECISION	N_Record(22), N_File(26400), RB, PI, Lo, La, Co_cp(1200,2)
 	REAL				FS_list(3), FS_list1(3), FS_x, d2b
-	CHARACTER*8			C_Record(22), C_File(44000)
 	CHARACTER*10		BorderFile
 	LOGICAL				Take_it, Test_cut1
-!
-	EQUIVALENCE			(N_Record,C_Record), (N_File,C_File)
 !
 	COMMON /Co_ord_cp/	Co_cp, N_cp
 !    
@@ -69,6 +66,8 @@
 	flp = .FALSE.
 	Rx_serv_area = 0.0
 	N_List = 0
+	Rec_N_x = -1
+	FS_x = -999.9
 !
 !	Select line data
 !
@@ -100,83 +99,80 @@
 !		Selected line data not available
 	  RETURN
 	END IF                            
-!	  Store all center points table 'N_Record(i,j)':
-	DO N_rec = 1, 2000      
-	  READ (3, REC=N_rec, IOSTAT=IOS) C_Record
+!	  Store all center points table 'Co_cp(i,j)':
+	DO N_cp = 1, 1200      
+	  READ (3, REC=N_cp, IOSTAT=IOS) N_Record
 !	  End of file reached (or non existing record) ?
-	  IF ((IOS .LT. 0) .OR. (IOS .EQ. 36)) EXIT
+	  IF ((IOS .LT. 0) .OR. (IOS .EQ. 36)) GOTO 10
 	  IF (IOS .NE. 0) THEN   
 !	    Error in (border-) line data
 	    HCM_Error = 1049
 	    RETURN
 	  END IF
-	  Co_cp(N_rec,1) = N_Record(21) * RB
-	  Co_cp(N_rec,2) = N_Record(22) * RB
+	  Co_cp(N_cp,1) = N_Record(21) * RB
+	  Co_cp(N_cp,2) = N_Record(22) * RB
 	END DO
 !
 !	  Number of entries in the list of center co-ordinates
-	N_cp = N_rec - 1
+10	N_cp = N_cp - 1
 !
 	CLOSE (UNIT=3)
 !
 !	  Open line file and cache full line:
 	OPEN (UNIT=3, FILE=TRIM(Border_path) // '/' // BorderFile, &
-		STATUS='OLD', ACCESS='DIRECT',RECL=8, MODE='READ', IOSTAT=IOS)
+		STATUS='OLD', ACCESS='DIRECT',RECL=176, MODE='READ', IOSTAT=IOS)
 !
-	DO N_rec = 1, 44000      
-	  READ (3, REC=N_rec, IOSTAT=IOS) C_File(N_rec)
-	  IF ((IOS .LT. 0) .OR. (IOS .EQ. 36)) GOTO 60
-	  IF (IOS .NE. 0) THEN
-	    HCM_Error = 1048
+	IF (IOS .NE. 0) THEN
+	  HCM_Error= 1048
+!	  Selected line data not available
+	  RETURN
+	END IF
+!
+	DO N_all = 0, 1200
+		READ (3, REC=N_all+1, IOSTAT=IOS) N_File(N_all*22+1:N_all*22+22)
+		IF ((IOS .LT. 0) .OR. (IOS .EQ. 36)) GOTO 20
+		IF (IOS .NE. 0) THEN
+			HCM_Error = 1048
 !	    Selected line data not available
-	    RETURN
-	  END IF  
-	END DO                          
+			RETURN
+		END IF
+	END DO
 !
-60	CLOSE (UNIT=3)
-	N_all = (N_rec - 1)/22
-	N_List = 0	! number of stored record numbers and field strength
+!	  Number of full line records
+20	N_all = N_all - 1
+!
+	CLOSE (UNIT=3)
+!
 	DO I = 1,3
 	  FS_List(I) = 0.0
 	  Rec_N_list(I) = 0
 	END DO
-!	all linepoints?
+!	  all linepoints?
 	INQUIRE (FILE='HCM_LP',EXIST=Take_it)
 	IF (.NOT. Take_it) GOTO 80
 !-----------------------------------------------------------------------
 !	Testroutine to calculate to each point:
-	FS_x = -999.9
-	DO J = 1, 5000
-	  READ (3, REC=J, IOSTAT=IOS) C_Record
-!	  End of file reached (or non existing record) ?
-	  IF ((IOS .LT. 0) .OR. (IOS .EQ. 36)) EXIT ! end of file reached
-	  IF (IOS .NE. 0) THEN
-		HCM_Error = 1049
-!		Error in line data
-		CLOSE (UNIT = 3)
-		RETURN
-	  END IF
-!
-!	  Calculate to all 10 points inside this record
+	DO J = 0, N_all
+!	Calculate to all 10 points inside this record
 	  DO K = 1, 19, 2
-		LongRx = N_Record(K)   * RB
-		LatRx  = N_Record(K+1) * RB
-		Lo = LongTx
-		La = LatTx
-		CALL CBR_Coordinates (LongRx, LatRx, Lo, La, d2b)
+	    LongRx = N_File(22*J + K) * RB
+	    LatRx  = N_File(22*J + K + 1) * RB
+	    Lo = LongTx
+	    La = LatTx
+	    CALL CBR_Coordinates (LongRx, LatRx, Lo, La, d2b)
 !		check ctry affected if x-km or CBR
-		IF ((D_to_border .NE. 0) .AND. (Test_cut1 (LongRx, LatRx, Lo, La))) GOTO 70
-		CALL P_to_P_Calculation (Lo, La, LongRx, LatRx)
-		IF ((HCM_Error .NE. 0) .OR. INFO(7)) RETURN
+	    IF ((D_to_border .NE. 0) .AND. (Test_cut1 (LongRx, LatRx, Lo, La))) GOTO 70
+	    CALL P_to_P_Calculation (Lo, La, LongRx, LatRx)
 		IF (HCM_Error .EQ. 1028) GOTO 70	! Distance > 1000 km
-!		  Find maximun of field strength:
-		IF (Calculated_FS .GT. FS_x) THEN
-			FS_x = Calculated_FS
-			Rec_x = K
-			Rec_N_x = J
-		END IF
-70		CONTINUE
-	  END DO	! K
+!		Find maximun of field strength:
+	    IF (Calculated_FS .GE. FS_x) THEN
+		  FS_x = Calculated_FS
+		  Rec_x = K
+		  Rec_N_x = J
+		  IF ((HCM_Error .NE. 0) .OR. INFO(7)) GOTO 75
+	    END IF
+70	    CONTINUE
+	  END DO  ! K
 	END DO	! J
 !
 75	GOTO 140
@@ -193,9 +189,7 @@
 		N_rec = 2	! start record number in file
 	END IF
 !
-90	DO WHILE (.TRUE.)
-!	  End of file reached (or non existing record) ?
-	  IF (N_rec .GT. N_all) EXIT ! end of file reached
+90	DO N_rec = N_rec, N_all-N_rec, teststep
 	  LongRx = N_File(22*N_rec + 21) * RB
 	  LatRx  = N_File(22*N_rec + 22) * RB
 	  Lo = LongTx
@@ -207,13 +201,13 @@
 	  IF (HCM_Error .EQ. 1028) GOTO 100	! Distance > 1000 km
 	  CALL Manage_List (N_rec, N_List, Rec_N_list, FS_list, Calculated_FS)
 	  IF ((HCM_Error .NE. 0) .OR. INFO(7)) Goto 125
-100	  N_rec = N_rec + teststep
+100	  CONTINUE
 	END DO
 !
 	IF (teststep .EQ. 5) THEN
 		IF (N_List .EQ. 0) THEN
 			teststep = 1
-			N_rec = 1
+			N_rec = 0
 			GOTO 90
 		ELSE
 		  N_List1 = N_List
@@ -273,8 +267,8 @@
 			FS_x = Calculated_FS
 			Rec_x = K
 			Rec_N_x = J
+		    IF ((HCM_Error .NE. 0) .OR. INFO(7)) GOTO 140
 		  END IF
-		  IF ((HCM_Error .NE. 0) .OR. INFO(7)) GOTO 140
 130		  CONTINUE
 		END DO
 	  END DO
@@ -282,14 +276,14 @@
 !
 !	4th: calculate to point of maximum field strength again to get all
 !		 output values:
-140	IF (Rec_N_x .GT. 0) THEN
+140	IF (Rec_N_x .GE. 0) THEN
 	  LongRx = N_File(22*Rec_N_x+Rec_x)   * RB
 	  LatRx  = N_File(22*Rec_N_x+Rec_x+1) * RB
 	  Lo = LongTx
 	  La = LatTx
 	  CALL CBR_Coordinates (LongRx, LatRx, Lo, La, d2b)
 !	check ctry affected if x-km or CBR
-	  IF ((D_to_border .NE. 0) .AND. (Test_cut1 (LongRx, LatRx, Lo, La))) RETURN
+!	  IF ((D_to_border .NE. 0) .AND. (Test_cut1 (LongRx, LatRx, Lo, La))) RETURN
 	  flp=.TRUE.
 	  CALL P_to_P_Calculation ( Lo, La, LongRx, LatRx )
     ELSE
@@ -311,7 +305,7 @@
 !
 	INTEGER				I, N_cp
 	DOUBLE PRECISION	CX, CY, DX, DY, AX, AY, BX, BY, RN, R, S
-	DOUBLE PRECISION	Co_cp(2000,2)
+	DOUBLE PRECISION	Co_cp(1200,2)
 !
 	COMMON /Co_ord_cp/	Co_cp, N_cp
 !
