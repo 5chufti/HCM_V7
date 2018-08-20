@@ -1,5 +1,5 @@
 !
-!	HCM_MS_V7_definitions.f90							G.H. 13.05.2017
+!	HCM_MS_V7_definitions.f90							G.H. 17.08.2018
 !
 	INTEGER*2			H_I(10201), M_I(10201)
 	INTEGER*2			T_Prof(10002), M_Prof(10002), H_Datab_Tx, H_Datab_Rx, H_Tx, H_Rx
@@ -29,8 +29,8 @@
 	CHARACTER*4			Depol_loss, Cor_fact_frequ_diff
 	CHARACTER*5			Azi_Tx_input, Ele_Tx_input, Azi_Rx_input, Ele_Rx_input
 	CHARACTER*5			D_sea_input, Rad_of_Tx_serv_area, Rad_of_Rx_serv_area
-	CHARACTER*5			Perm_FS_input, Version
-	CHARACTER*6			Max_power
+	CHARACTER*5			Perm_FS_input
+	CHARACTER*6			Max_power, Version
 	CHARACTER*7			Ant_typ_H_Tx, Ant_typ_V_Tx, Ant_typ_H_Rx, Ant_typ_V_Rx
 	CHARACTER*9			Desig_of_Tx_emis, Desig_of_Rx_emis
 	CHARACTER*12		Tx_frequ, Rx_frequ

@@ -1,6 +1,6 @@
 !
 !	Line_calculation.f90							P.Benner		23.11.2004
-!													G.H.			17.04.2018
+!													G.H.			18.08.2018
 !
 !	23.11.2004	Steps from 100 / 10 / 1 modified to 25 / 5 / 1
 !	18.07.2011  Steps modified to 5 / 1
@@ -129,13 +129,14 @@
 	END IF
 !
 	DO N_all = 0, 1200
-		READ (3, REC=N_all+1, IOSTAT=IOS) N_File(N_all*22+1:N_all*22+22)
+		READ (3, REC=N_all+1, IOSTAT=IOS) N_Record
 		IF ((IOS .LT. 0) .OR. (IOS .EQ. 36)) GOTO 20
 		IF (IOS .NE. 0) THEN
 			HCM_Error = 1048
 !	    Selected line data not available
 			RETURN
 		END IF
+		N_File(N_all*22+1:N_all*22+22) = N_Record(1:22)
 	END DO
 !
 !	  Number of full line records

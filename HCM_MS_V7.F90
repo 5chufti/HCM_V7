@@ -1,6 +1,6 @@
 !	
 !	HCMMS_V7.F90										P.Benner		23.02.2004
-!														G.H.			30.10.2017
+!														G.H.			18.08.2018
 !	Version 7					
 !
 !	Harmonized Calculation Method for mobile services
@@ -97,11 +97,9 @@
 !
 !	***************************************************************************
 !
-	Version = '7.21 '
+	Version = '7.21  '
 !
 	HCM_error = 0
-!
-!	Convert strings to uppercase and remove chr(0)
 !
 !	Clear all Info's
 !
@@ -112,6 +110,8 @@
 	O_LOD=9999
 	O_LAD=9999
 	OLD_R=-1
+	Coo_Tx_new = Coo_Tx
+!
 !	Read all input data:    
 !	correct countrycodes for filenames
 	IF (Land_to(3:3) .EQ. ' ') Land_to(3:3) = '_'
@@ -202,20 +202,11 @@
 	  RETURN
 	END IF
 !
-!
 !	Get the radius of the Tx service area:
 	READ (Rad_of_Tx_serv_area, '(F5.0)', IOSTAT=IOS) Tx_serv_area
 	IF (IOS .NE. 0) THEN
 	  HCM_error = 1012
 !	  Error in radius of service area of Tx
-	  RETURN
-	END IF
-!
-!	get power
-	READ (Max_power, '(F6.1)', IOSTAT=IOS) MaxPow
-	IF (IOS .NE. 0) THEN
-	  HCM_Error = 1034
-!	  Error in power.
 	  RETURN
 	END IF
 !
@@ -230,20 +221,19 @@
 		RETURN
 	END IF
 !
+!	get power
+	READ (Max_power, '(F6.1)', IOSTAT=IOS) MaxPow
+	IF (IOS .NE. 0) THEN
+	  HCM_Error = 1034
+!	  Error in power.
+	  RETURN
+	END IF
+!
 	MaxPow = MaxPow - Tx_ant_type_corr
 !
-!	Channel occupation:
-	IF (Chan_occup .EQ. '1') THEN
-		Time_percentage = 1
-	  ELSE
-		Time_percentage = 10
-	END IF      
-!
-!	Default receiver antenna height:
-	H_AntRx = 10
-!
-!	Read data for point to point calculations:
+!	read data according to p2p or p2l
 	IF (C_mode .GE. 0) THEN
+!	Read data for point to point calculations:
 !	  Test co-ordinates:
 	  IF (Coo_Tx .EQ. Coo_Rx) THEN
 !	    Distance between Tx and Rx = 0. P-P Calculations not possible.
@@ -316,7 +306,7 @@
 !
 !	  Get reception frequency 'Rx_frequency':
 	  READ (Rx_frequ(1:11), '(F11.5)', IOSTAT=IOS) Rx_frequency
-	  IF (IOS .NE. 0) THEN
+	  IF ((IOS .NE. 0) .OR. (Rx_frequency .EQ. 0.0))THEN
 		HCM_error = 1023
 !		Error in reception frequency value
 		RETURN
@@ -344,12 +334,19 @@
 	  ELSE
 		Rx_serv_area = 0.0
 	  END IF
+	  Coo_Rx_new = Coo_Rx
+!	end of point to point data
 	ELSE
+!   safe defaults for p2l
+!   no defauilt coords
+		H_AntRx = 10
 		Rx_frequency = 0
+		Rx_serv_area = 0.0
+!		for safety
 		Desig_of_Rx_emis = '       '
 		Cor_fact_frequ_diff = '    '
+		Coo_Rx_new = '               '
 	END IF
-!	end of point to point data
 !
 !	Test point distance (if <30, set it to 100 m):
 	IF (PD .LT. 3.0D-2) PD = 1.0D-1
@@ -360,86 +357,8 @@
 !	*																*
 !	*****************************************************************
 !
-!	Default values for Perm_FS, CBR_D, ERP_ref_Tx:
-	CBR_D      = -999.9
-	ERP_ref_Tx = -999.9
-	Perm_FS    = -999.9
-	Info(4) = .TRUE.
-!
-!	Determination of permissible interference field strength
-!	"Perm_FS", the max. range of harmful interference "CBR_D" and
-!	the E.R.P. of reference transmitter "ERP_ref_Tx":
-	IF ((Tx_frequency .GE. 29.7) .AND. (Tx_frequency .LE. 47.0)) THEN
-	  Perm_FS = 0.0
-	  CBR_D = 100.0
-	  ERP_ref_Tx = 3.0
-	  Info(4) = .FALSE.
-	ELSEIF ((Tx_frequency .GE. 68.0) .AND. (Tx_frequency .LE. 74.8)) THEN
-	  Perm_FS = 6.0
-	  CBR_D = 100.0
-	  ERP_ref_Tx = 9.0
-	  Info(4) = .FALSE.
-	ELSEIF ((Tx_frequency .GE. 75.2) .AND. (Tx_frequency .LE. 87.5)) THEN
-	  Perm_FS = 6.0
-	  CBR_D = 100.0
-	  ERP_ref_Tx = 9.0
-	  Info(4) = .FALSE.
-	ELSEIF ((Tx_frequency .GE. 146.0) .AND. (Tx_frequency .LE. 149.9)) THEN
-	  Perm_FS = 12.0
-	  CBR_D = 80.0
-	  ERP_ref_Tx =12.0
-	  Info(4) = .FALSE.
-	ELSEIF ((Tx_frequency .GE. 150.05) .AND. (Tx_frequency .LE. 174.0)) THEN
-	  Perm_FS = 12.0
-	  CBR_D = 80.0
-	  ERP_ref_Tx = 12.0
-	  Info(4) = .FALSE.
-	ELSEIF ((Tx_frequency .GE. 380.0) .AND. (Tx_frequency .LE. 385.0)) THEN 
-	  Perm_FS = 18.0
-	  CBR_D = 50.0
-	  ERP_ref_Tx = 14.0
-	  Info(4) = .FALSE.
-!	  Correction factors for the band 380 - 400 MHz are used.
-	  Info(18) = .TRUE.
-	ELSEIF ((Tx_frequency .GE. 390.0) .AND. (Tx_frequency .LE. 395.0)) THEN
-	  Perm_FS = 18.0
-	  CBR_D = 50.0
-	  ERP_ref_Tx = 14.0
-	  Info(4) = .FALSE.
-!	  Correction factors for the band 380 - 400 MHz are used.
-	  Info(18) = .TRUE.
-	ELSEIF ((Tx_frequency .GE. 406.1) .AND. (Tx_frequency .LE. 430.0)) THEN
-	  Perm_FS = 20.0
-	  CBR_D = 50.0
-	  ERP_ref_Tx = 16.0
-	  Info(4) = .FALSE.
-	ELSEIF ((Tx_frequency .GE. 440.0) .AND. (Tx_frequency .LE. 470.0)) THEN
-	  Perm_FS = 20.0
-	  CBR_D = 50.0
-	  ERP_ref_Tx = 16.0
-	  Info(4) = .FALSE.
-	ELSEIF ((Tx_frequency .GE. 862.0) .AND. (Tx_frequency .LE. 960.0)) THEN
-	  Perm_FS = 26.0
-	  CBR_D = 30.0
-	  ERP_ref_Tx = 13.0
-	  Info(4) = .FALSE.
-	ELSEIF ((Tx_frequency .GE. 1710.0) .AND. (Tx_frequency .LE. 1785.0)) THEN
-	  Perm_FS = 35.0
-	  CBR_D = 15.0
-	  ERP_ref_Tx = 13.0
-	  Info(4) = .FALSE.
-	ELSEIF ((Tx_frequency .GE. 1805.0) .AND. (Tx_frequency .LE. 1880.0)) THEN
-	  Perm_FS = 35.0
-	  CBR_D = 15.0
-	  ERP_ref_Tx = 13.0
-	  Info(4) = .FALSE.
-	END IF
-!
 !	set C_mode depending parameters
 	SELECT CASE (C_mode)
-!	99 = line as P2P
-		CASE (99)
-!			nothing
 !	12 = P2P non strict HCM t%=1
 		CASE (12)
 			Time_percentage = 1
@@ -461,12 +380,88 @@
 			ERP_ref_Tx = -999.9
 			Perm_FS    = -999.9
 			Info(4) = .TRUE.
-!	0 = normal Vienna Agreement
-		CASE (0)
-!			nothing
-!	-1 = Coordination line calculation (h2 = 10m)
-		CASE (-1)
-!			nothing
+!	99, 0, -1 strict HCM modes
+		CASE (99, 0, -1)
+!			    Determination of freqency dependable parameters according to HCM
+!			    permissible fieldstregth "Perm_FS", the max. range of harmful interference "CBR_D" and
+!			    the E.R.P. of reference transmitter "ERP_ref_Tx":
+			IF ((Tx_frequency .GE. 29.7) .AND. (Tx_frequency .LE. 47.0)) THEN
+	  		    Perm_FS = 0.0
+	  		    CBR_D = 100.0
+	  		    ERP_ref_Tx = 3.0
+	  		    Info(4) = .FALSE.
+			ELSEIF ((Tx_frequency .GE. 68.0) .AND. (Tx_frequency .LE. 74.8)) THEN
+	  		    Perm_FS = 6.0
+	  		    CBR_D = 100.0
+	  		    ERP_ref_Tx = 9.0
+	  		    Info(4) = .FALSE.
+			ELSEIF ((Tx_frequency .GE. 75.2) .AND. (Tx_frequency .LE. 87.5)) THEN
+	  		    Perm_FS = 6.0
+	  		    CBR_D = 100.0
+	  		    ERP_ref_Tx = 9.0
+	  		    Info(4) = .FALSE.
+			ELSEIF ((Tx_frequency .GE. 146.0) .AND. (Tx_frequency .LE. 149.9)) THEN
+	  		    Perm_FS = 12.0
+	  		    CBR_D = 80.0
+	  		    ERP_ref_Tx =12.0
+	  		    Info(4) = .FALSE.
+			ELSEIF ((Tx_frequency .GE. 150.05) .AND. (Tx_frequency .LE. 174.0)) THEN
+	  		    Perm_FS = 12.0
+	  		    CBR_D = 80.0
+	  		    ERP_ref_Tx = 12.0
+	  		    Info(4) = .FALSE.
+			ELSEIF ((Tx_frequency .GE. 380.0) .AND. (Tx_frequency .LE. 385.0)) THEN 
+	  		    Perm_FS = 18.0
+	  		    CBR_D = 50.0
+	  		    ERP_ref_Tx = 14.0
+	  		    Info(4) = .FALSE.
+!	  		    Correction factors for the band 380 - 400 MHz are used.
+	  		    Info(18) = .TRUE.
+			ELSEIF ((Tx_frequency .GE. 390.0) .AND. (Tx_frequency .LE. 395.0)) THEN
+	  		    Perm_FS = 18.0
+	  		    CBR_D = 50.0
+	  		    ERP_ref_Tx = 14.0
+	  		    Info(4) = .FALSE.
+!	  		    Correction factors for the band 380 - 400 MHz are used.
+	  		    Info(18) = .TRUE.
+			ELSEIF ((Tx_frequency .GE. 406.1) .AND. (Tx_frequency .LE. 430.0)) THEN
+	  		    Perm_FS = 20.0
+	  		    CBR_D = 50.0
+	  		    ERP_ref_Tx = 16.0
+	  		    Info(4) = .FALSE.
+			ELSEIF ((Tx_frequency .GE. 440.0) .AND. (Tx_frequency .LE. 470.0)) THEN
+	  		    Perm_FS = 20.0
+	  		    CBR_D = 50.0
+	  		    ERP_ref_Tx = 16.0
+	  		    Info(4) = .FALSE.
+			ELSEIF ((Tx_frequency .GE. 862.0) .AND. (Tx_frequency .LE. 960.0)) THEN
+	  		    Perm_FS = 26.0
+	  		    CBR_D = 30.0
+	  		    ERP_ref_Tx = 13.0
+	  		    Info(4) = .FALSE.
+			ELSEIF ((Tx_frequency .GE. 1710.0) .AND. (Tx_frequency .LE. 1785.0)) THEN
+	  		    Perm_FS = 35.0
+	  		    CBR_D = 15.0
+	  		    ERP_ref_Tx = 13.0
+	  		    Info(4) = .FALSE.
+			ELSEIF ((Tx_frequency .GE. 1805.0) .AND. (Tx_frequency .LE. 1880.0)) THEN
+	  		    Perm_FS = 35.0
+	  		    CBR_D = 15.0
+	  		    ERP_ref_Tx = 13.0
+	  		    Info(4) = .FALSE.
+			ELSE
+	  		    Perm_FS = -999.9
+	  		    CBR_D = -999.9
+	  		    ERP_ref_Tx = -999.9
+	  		    Info(4) = .TRUE.
+			END IF
+!			Channel occupation / harmonized service in harmonized band ?
+			IF ((Info(18) .AND. (Desig_of_Tx_emis(1:7) .EQ. '25K0G7W') .AND. & 
+			  (Desig_of_Rx_emis(1:7) .EQ. '25K0G7W')) .OR. (Chan_occup .EQ. '0')) THEN
+				Time_percentage = 10
+			ELSE
+				Time_percentage = 1
+			END IF      
 !	-9 = P2L non strict HCM t%=10 h2=3
 		CASE (-9)
 			Time_percentage = 10
@@ -478,6 +473,7 @@
 !	-10 = P2L non strict HCM t%=10 h2=10
 		CASE (-10)
 			Time_percentage = 10
+!			H_AntRx = 10
 			CBR_D      = -999.9
 			ERP_ref_Tx = -999.9
 			Perm_FS    = -999.9
@@ -494,12 +490,7 @@
 		CASE DEFAULT
 			HCM_error = 1025
 			RETURN
-!
 	END SELECT
-!
-!	harmonized service in harmonized band ?
-	IF (Info(18) .AND. (Desig_of_Tx_emis(1:7) .EQ. '25K0G7W') .AND. &
-			(Desig_of_Rx_emis(1:7) .EQ. '25K0G7W')) Time_percentage = 10
 !
 	Perm_FS_from_table = Perm_FS
 !
@@ -531,7 +522,7 @@
 !		Input value of maximum cross border range is used
 		CBR_D = REAL(IMR)
 		Info(6) = .TRUE.
-	  ELSE
+	ELSE
 !		No Agreement frequency and CBR is missing
 		IF ((INFO(4)) .AND. (C_mode .LT. 0) .AND. (D_to_border .LT. 0)) THEN
 		  HCM_error = 1050
