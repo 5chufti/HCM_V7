@@ -129,18 +129,23 @@
 		CSXT = 16000
 	ELSE
 		DTX = Desig_of_Tx_emis(1:4)
-		I = INDEX(DTX,'K')
-		IF (I .EQ. 0) THEN
-			I = INDEX(DTX,'M')
-			IF (I .EQ. 0) THEN
-				HCM_Error = 1041
-!			Channel spacing outside definition range (Tx)! 
-				RETURN
-			ELSE 
-				FACTOR = 1000000.0
-			END IF
+		IF (DTX(4:4) .EQ. 'H') THEN
+			FACTOR = 1.0
+			I = 4
 		ELSE
-			FACTOR = 1000.0
+			I = INDEX(DTX,'K')
+			IF (I .EQ. 0) THEN
+				I = INDEX(DTX,'M')
+				IF (I .EQ. 0) THEN
+					HCM_Error = 1041
+!			Channel spacing outside definition range (Tx)! 
+					RETURN
+				ELSE 
+					FACTOR = 1000000.0
+				END IF
+			ELSE
+				FACTOR = 1000.0
+			END IF
 		END IF
 !	Replace 'K' or 'M' with '.':
 		DTX(I:I) = '.'   
@@ -182,18 +187,23 @@
 		CSXR = 16000
 	ELSE
 		DRX = Desig_of_Rx_emis(1:4)
-		I = INDEX(DRX,'K')
-		IF (I .EQ. 0) THEN
-			I = INDEX(DRX,'M')
-			IF (I .EQ. 0) THEN
-				HCM_Error = 1040
-!			Channel spacing outside definition range (Rx)! 
-				RETURN
-			ELSE 
-				FACTOR = 1000000.0
-			END IF
+		IF (DRX(4:4) .EQ. 'H') THEN
+			FACTOR = 1.0
+			I = 4
 		ELSE
-			FACTOR = 1000.0
+			I = INDEX(DRX,'K')
+			IF (I .EQ. 0) THEN
+				I = INDEX(DRX,'M')
+				IF (I .EQ. 0) THEN
+					HCM_Error = 1040
+!			Channel spacing outside definition range (Rx)! 
+					RETURN
+				ELSE 
+					FACTOR = 1000000.0
+				END IF
+			ELSE
+				FACTOR = 1000.0
+			END IF
 		END IF
 !	Replace 'K' or 'M' with '.':
 		DRX(I:I) = '.'   

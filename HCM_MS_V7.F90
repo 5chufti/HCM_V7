@@ -1,6 +1,6 @@
 !	
 !	HCMMS_V7.F90										P.Benner		23.02.2004
-!														G.H.			18.08.2018
+!														G.H.			17.08.2018
 !	Version 7					
 !
 !	Harmonized Calculation Method for mobile services
@@ -111,6 +111,7 @@
 	O_LAD=9999
 	OLD_R=-1
 	Coo_Tx_new = Coo_Tx
+	Coo_Rx_new = Coo_Rx
 !
 !	Read all input data:    
 !	correct countrycodes for filenames
@@ -306,7 +307,7 @@
 !
 !	  Get reception frequency 'Rx_frequency':
 	  READ (Rx_frequ(1:11), '(F11.5)', IOSTAT=IOS) Rx_frequency
-	  IF ((IOS .NE. 0) .OR. (Rx_frequency .EQ. 0.0))THEN
+	  IF (IOS .NE. 0) THEN
 		HCM_error = 1023
 !		Error in reception frequency value
 		RETURN
@@ -334,7 +335,6 @@
 	  ELSE
 		Rx_serv_area = 0.0
 	  END IF
-	  Coo_Rx_new = Coo_Rx
 !	end of point to point data
 	ELSE
 !   safe defaults for p2l
@@ -345,7 +345,6 @@
 !		for safety
 		Desig_of_Rx_emis = '       '
 		Cor_fact_frequ_diff = '    '
-		Coo_Rx_new = '               '
 	END IF
 !
 !	Test point distance (if <30, set it to 100 m):
