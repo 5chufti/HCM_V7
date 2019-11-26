@@ -1,10 +1,12 @@
 !
 !	Line_calculation.f90							P.Benner		23.11.2004
-!													G.H.			18.08.2018
+!													G.H.			26.11.2019
 !
 !	23.11.2004	Steps from 100 / 10 / 1 modified to 25 / 5 / 1
 !	18.07.2011  Steps modified to 5 / 1
 !	06.04.2016  for x-km modified filter: 1.centrepoints 2.all points from 3 highest records
+!	17.04.2018	better ? filehandling
+!	26.11.2019	increase buffer to 1400 records
 !
 !	Subroutine to calculate the field strengs on a line
 !	or to calculate the cross border field strength.
@@ -51,7 +53,7 @@
 	INTEGER				IOS, N_rec, N_List, Rec_N_list(3), N_cp, N_all
 	INTEGER				N_List1, Rec_N_list1(3), teststep
 	INTEGER				I, J, K, Rec_N_x, Rec_x
-	DOUBLE PRECISION	N_Record(22), N_File(26400), RB, PI, Lo, La, Co_cp(1200,2)
+	DOUBLE PRECISION	N_Record(22), N_File(30800), RB, PI, Lo, La, Co_cp(1400,2)
 	REAL				FS_list(3), FS_list1(3), FS_x, d2b
 	CHARACTER*10		BorderFile
 	LOGICAL				Take_it, Test_cut1
@@ -100,7 +102,7 @@
 	  RETURN
 	END IF                            
 !	  Store all center points table 'Co_cp(i,j)':
-	DO N_cp = 1, 1200      
+	DO N_cp = 1, 1400      
 	  READ (3, REC=N_cp, IOSTAT=IOS) N_Record
 !	  End of file reached (or non existing record) ?
 	  IF ((IOS .LT. 0) .OR. (IOS .EQ. 36)) GOTO 10
@@ -128,15 +130,14 @@
 	  RETURN
 	END IF
 !
-	DO N_all = 0, 1200
-		READ (3, REC=N_all+1, IOSTAT=IOS) N_Record
+	DO N_all = 0, 1400
+		READ (3, REC=N_all+1, IOSTAT=IOS) N_File(N_all*22+1:N_all*22+22)
 		IF ((IOS .LT. 0) .OR. (IOS .EQ. 36)) GOTO 20
 		IF (IOS .NE. 0) THEN
 			HCM_Error = 1048
 !	    Selected line data not available
 			RETURN
 		END IF
-		N_File(N_all*22+1:N_all*22+22) = N_Record(1:22)
 	END DO
 !
 !	  Number of full line records
@@ -306,7 +307,7 @@
 !
 	INTEGER				I, N_cp
 	DOUBLE PRECISION	CX, CY, DX, DY, AX, AY, BX, BY, RN, R, S
-	DOUBLE PRECISION	Co_cp(1200,2)
+	DOUBLE PRECISION	Co_cp(1400,2)
 !
 	COMMON /Co_ord_cp/	Co_cp, N_cp
 !
