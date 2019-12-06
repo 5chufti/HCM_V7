@@ -1,6 +1,6 @@
 !
 !	Line_calculation.f90							P.Benner		23.11.2004
-!													G.H.			26.11.2019
+!													G.H.			06.12.2019
 !
 !	23.11.2004	Steps from 100 / 10 / 1 modified to 25 / 5 / 1
 !	18.07.2011  Steps modified to 5 / 1
@@ -130,7 +130,7 @@
 	  RETURN
 	END IF
 !
-	DO N_all = 0, 1400
+	DO N_all = 0, 1399
 		READ (3, REC=N_all+1, IOSTAT=IOS) N_File(N_all*22+1:N_all*22+22)
 		IF ((IOS .LT. 0) .OR. (IOS .EQ. 36)) GOTO 20
 		IF (IOS .NE. 0) THEN
