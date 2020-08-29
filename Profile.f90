@@ -1,6 +1,6 @@
 !
 !	Pofile.f90											P. Benner		20.11.2003
-!														G.H.			20.06.2006
+!														G.H.			22.06.2006
 !
 !	This subroutine constructs a terrain- or morphological profile from point A to
 !	point B in steps of 100 m. The heights or morphological information are stored
@@ -46,15 +46,17 @@
 	INTEGER(2)			Prof(10002)
 	CHARACTER*1			P_Type
 !
+!
 	INTEGER(2)			PC
 	DOUBLE PRECISION	SIDA, SILAB, COLAB, SILAA, COLAA, COLOA, SILOA, COLOB, SILOB
-	DOUBLE PRECISION	LAY, LOY, DD, DA, DIS, DP, A, B, K, x, y, z
+	DOUBLE PRECISION	LAY, LOY, DD, DA, DIS, DP, A, B, K, x, y, z, o_Tx, o_Rx
 !
 !	**********************************************************************************
 !
 !	Max. distance = 1000km; distance between two points = 100m
 !	-> number of points are 10.000 + 2 for Tx site and Rx site
-!	
+!
+	Prof = 0	
 !	Calculate the total distance 'DIS' in km:
 	CALL Calc_distance (LongA, LatA, LongB, LatB, DIS) 
 !
@@ -81,6 +83,16 @@
 !	number of points in profile
 	PN = PN + 1
 !
+!	prepeare for sloped profile
+	o_Tx = DBLE(H_Tx)
+	IF ((c_Mode .GE. 0) .AND. (c_Mode .LT. 99) .AND. (P_Type .EQ. 'e')) THEN
+		K = DBLE(H_Rx - H_Tx) / DIS
+		o_Rx = DBLE(H_Rx)
+	ELSE
+		K = 0
+		o_Rx = DBLE(H_Tx)
+	END IF
+!
 !	first part of profile (TX to center)
 		SILAA = DSIND(LatA)
 		COLAA = DCOSD(LatA)
@@ -90,9 +102,8 @@
 		COLOA = DCOSD(LongA)
 		SILOB = DSIND(LongB)
 		COLOB = DCOSD(LongB)
-		K = DBLE(H_Rx - H_Tx) / DIS
 !
-!	Loop for waypoints
+!	Loop for waypoints Tx to center
 	DO PC = 1, NINT(REAL(PN)/2.0), 1
 !	Distance 'DD' between starting point and new point in degrees:
 		DD = DBLE(PC-1) * DP
@@ -111,6 +122,7 @@
 !
 		IF (P_Type .EQ. 'e') THEN 
 			CALL Point_height (LOY, LAY, Prof(PC))
+			Prof(PC) = Prof(PC) - DNINT(o_Tx + K * DBLE(PC-1) * PD)
 		ELSE
 			CALL Point_type (LOY, LAY, Prof(PC))
 		END IF	
@@ -127,7 +139,7 @@
 		SILOB = DSIND(LongA)
 		COLOB = DCOSD(LongA)
 !
-!	Loop for waypoints
+!	Loop for waypoints Rx to center
 	DO PC = PN, PC, -1
 !	Distance 'DD' between starting point and new point in degrees:
 		DD = DBLE(PN-PC) * DP
@@ -146,18 +158,12 @@
 !
 		IF (P_Type .EQ. 'e') THEN 
 			CALL Point_height (LOY, LAY, Prof(PC)) 
+			Prof(PC) = Prof(PC) - DNINT(o_Rx - K * DBLE(PN-PC) * PD)
 		ELSE
 			CALL Point_type (LOY, LAY, Prof(PC))
 		END IF	
 		IF (HCM_Error .NE. 0) RETURN
 	END DO
-!
-!	Correction for 'new profile'
-	IF ((C_mode .GE. 0) .AND. (C_mode .LT. 99) .AND. (P_Type .EQ. 'e')) THEN
-		DO PC = 1, PN, 1
-			Prof(PC) =Prof(PC) - DNINT(DBLE(H_Tx) + K * DBLE(PC-1) * PD)
-		END DO
-	END IF
 !
 	RETURN
 !
