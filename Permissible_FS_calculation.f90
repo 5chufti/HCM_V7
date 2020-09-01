@@ -249,81 +249,84 @@
 	RX_TETRA = (Desig_of_Rx_emis(1:7) .EQ. '25K0G7W')
 !
 !	Bandwidth of Rx:   
-	IF (RX_TETRA) THEN
-		DRX = '16K0'
+	IF ((RX_TETRA) .AND. (.NOT. TX_TETRA)) THEN
+		CSXR = 16000
 	ELSE
 		DRX = Desig_of_Rx_emis(1:4)
-	ENDIF
-	I = INDEX(DRX,'K')
-	IF (I .EQ. 0) THEN
-		I = INDEX(DRX,'M')
+		I = INDEX(DRX,'K')
 		IF (I .EQ. 0) THEN
-			HCM_Error = 1040
+			I = INDEX(DRX,'M')
+			IF (I .EQ. 0) THEN
+				HCM_Error = 1040
 !			Channel spacing outside definition range (Rx)! 
+				RETURN
+			ELSE 
+				FACTOR = 1000000.0
+			END IF
+		ELSE
+			FACTOR = 1000.0
+		END IF
+!	Replace 'K' or 'M' with '.':
+		DRX(I:I) = '.'   
+		READ (DRX, *, IOSTAT=IOS) X1
+		IF (IOS .NE. 0) THEN
+			HCM_Error = 1040
+!		Channel spacing outside definition range (Rx)!
 			RETURN
 		ELSE 
-			FACTOR = 1000000.0
+			CSXR = NINT(X1 * FACTOR)
 		END IF
-	ELSE
-		FACTOR = 1000.0
-	END IF
-!	Replace 'K' or 'M' with '.':
-	DRX(I:I) = '.'   
-	READ (DRX, *, IOSTAT=IOS) X1
-	IF (IOS .NE. 0) THEN
-		HCM_Error = 1040
-!		Channel spacing outside definition range (Rx)!
-		RETURN
-	ELSE 
-		CSXR = NINT(X1 * FACTOR)
 	END IF
 !
 !	Bandwidth of TX:   
-	IF (TX_TETRA) THEN
-		DTX = '16K0'
+	IF ((TX_TETRA) .AND. (.NOT. RX_TETRA)) THEN
+		CSXT = 16000
 	ELSE
 		DTX = Desig_of_Tx_emis(1:4)
-	ENDIF
-	I = INDEX(DTX,'K')
-	IF (I .EQ. 0) THEN
-		I = INDEX(DTX,'M')
+		I = INDEX(DTX,'K')
 		IF (I .EQ. 0) THEN
-			HCM_Error = 1041
+			I = INDEX(DTX,'M')
+			IF (I .EQ. 0) THEN
+				HCM_Error = 1041
 !			Channel spacing outside definition range (Tx)! 
+				RETURN
+			ELSE 
+				FACTOR = 1000000.0
+			END IF
+		ELSE
+			FACTOR = 1000.0
+		END IF
+!	Replace 'K' or 'M' with '.':
+		DTX(I:I) = '.'   
+		READ (DTX, *, IOSTAT=IOS) X1
+		IF (IOS .NE. 0) THEN
+			HCM_Error = 1041
+!		Channel spacing outside definition range (Tx)!
 			RETURN
 		ELSE 
-			FACTOR = 1000000.0
+			CSXT = NINT(X1 * FACTOR)
 		END IF
-	ELSE
-		FACTOR = 1000.0
 	END IF
-!	Replace 'K' or 'M' with '.':
-	DTX(I:I) = '.'   
-	READ (DTX, *, IOSTAT=IOS) X1
-	IF (IOS .NE. 0) THEN
-		HCM_Error = 1041
-!		Channel spacing outside definition range (Tx)!
-		RETURN
-	ELSE 
-		CSXT = NINT(X1 * FACTOR)
-	END IF
+!
+!	catch "TETRA" or the like
+!	If at least one station is not digital modulation, use normal
+!	Vienna calculation.
+	IF (((C_Mode .EQ. 0) .AND. (RX_TETRA) .AND. (TX_TETRA)) .OR. &
+		((C_Mode .EQ. 8) .AND. (TX_DIG) .AND. (RX_DIG))) THEN 
+!		  Correction factors for the band 380 - 400 MHz are used.
+			Info(18) = .TRUE.
+			GOTO 70
 !
 !	Module normal Berlin:
-	IF ((C_Mode .EQ. 0) .OR. (C_Mode .EQ. 4) .OR. (C_Mode .EQ. 7)) GOTO 100
+	ELSEIF ((C_Mode .EQ. 0) .OR. (C_Mode .EQ. 4) .OR. &
+		(C_Mode .EQ. 7) .OR. (C_Mode .EQ. 8)) GOTO 100
 !
 !	Module GSM 900:
-	IF ((C_Mode .EQ. 1) .OR. (C_Mode .EQ. 2) .OR. (C_Mode .EQ. 3)) GOTO 20
+	ELSEIF ((C_Mode .EQ. 1) .OR. (C_Mode .EQ. 2) .OR. (C_Mode .EQ. 3)) GOTO 20
 !
 !	Module GSM 1800:
-	IF ((C_Mode .EQ. 5) .OR. (C_Mode .EQ. 6)) GOTO 60
+	ELSEIF ((C_Mode .EQ. 5) .OR. (C_Mode .EQ. 6)) GOTO 60
 !
-!	Module 380-400:
-	IF (C_Mode .EQ. 8) THEN
-	  IF ((TX_DIG) .AND. (RX_DIG)) THEN
-		  GOTO 70
-		ELSE
-		  GOTO 100
-	  END IF
 	END IF
 !
 	RETURN
@@ -403,7 +406,6 @@
 !		  NMT interference to GSM
 		  CALL TACSNMT (Delta_frequency, Corr_delta_f)
 	  END IF
-	  GOTO 300
 	END IF              
 !
 	GOTO 300          
@@ -445,10 +447,10 @@
 !	*								
 !	*****************************************************************
 !
-!	If at least one station is not digital modulation, use normal
-!	Vienna calculation.
+70	IF ((C_mode .EQ. 8) .AND. &
+			(TX_TETRA) .AND. (RX_TETRA)) Time_percentage = 10
 !
-70	IF (CSXT .GT. CSXR) THEN
+	IF (CSXT .GT. CSXR) THEN
 		B1 = CSXT
 		B2 = CSXR
 	  ELSE
@@ -546,7 +548,7 @@
 		Corr_delta_f = acorrsinus - (acorrsinus - acorrB1) * B2 / B1
 !
 !	WB/NB correction
-		IF ((Channel_sp_Tx .EQ. 0) .AND. (TX_DIG .OR. RX_DIG)) &
+		IF ((Channel_sp_Tx .EQ. 0) .AND. (TX_DIG) .AND. (Tx_frequency .LE. 470.0)) &
 				Perm_FS = Perm_FS + 6*LOG10(REAL(CSXT)/25000.0)
 ! 
 	ELSE
@@ -625,15 +627,9 @@
 						CSXX = CS17
 					END IF			
 				CASE (25000)
-					IF ((TX_TETRA) .AND. (RX_TETRA)) THEN
-						Info(18) = .TRUE.
-!		  Correction factors for the band 380 - 400 MHz are used.
-						GOTO 70
-					ELSE
 						IF ((.NOT. TX_TETRA) .AND. (.NOT. RX_TETRA)) CSXX = CS18
 						IF ((TX_TETRA) .AND. (.NOT. RX_TETRA)) CSXX = CS22
 						IF ((.NOT. TX_TETRA) .AND. (RX_TETRA)) CSXX = CS28
-					END IF
 			END SELECT
 		END SELECT
 !
@@ -731,6 +727,7 @@
 	IF (Depol_loss .EQ. '-9.9') THEN
 		X1 = Free_space_FS - Calculated_FS
 		IF ((X1 .LT. 50.0) .AND. (.NOT. INFO(7)) .AND. &
+			(Tx_serv_area + Rx_serv_area .EQ. 0.0) .AND. &
 			((Rx_ant_corr .LE. 10.0) .OR. (Tx_ant_corr .LE. 10.0)) ) THEN
 			DPN = 25.0 - 0.5*(X1)
 		ELSE

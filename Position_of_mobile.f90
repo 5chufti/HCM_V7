@@ -169,7 +169,7 @@
 	CHARACTER*176		BREC
 	INTEGER				I, T, IOS
 	DOUBLE PRECISION	BCOO(22), N_Long, N_Lat, PI, B
-	DOUBLE PRECISION	CX, CY, DX, DY, AX, AY, BX, BY, RT, RN, RS, R, S
+	DOUBLE PRECISION	CX, CY, DX, DY, AX, AY, BX, BY, RN, R, S
 !
 	EQUIVALENCE (BREC, BCOO)
 !
@@ -207,13 +207,11 @@
 	DY = BCOO(I) * B
 !
 !	Determine intersection:
-	RS = (AY - CY) * (BX - AX) - (AX - CX) * (BY - AY)
-	RT = (AY - CY) * (DX - CX) - (AX - CX) * (DY - CY)
 	RN = (BX - AX) * (DY - CY) - (BY - AY) * (DX - CX)
 
 	IF (RN .NE. 0.0D0) THEN
-	  R = RT / RN
-	  S = RS / RN
+	  R = ((AY - CY) * (DX - CX) - (AX - CX) * (DY - CY)) / RN
+	  S = ((AY - CY) * (BX - AX) - (AX - CX) * (BY - AY)) / RN
 	  IF ((R .GE. 0.0D0) .AND. (R .LE. 1.0D0) .AND. &
           (S .GE. 0.0D0) .AND. (S .LE. 1.0D0)) THEN
 	    N_Cut = N_Cut + 1
