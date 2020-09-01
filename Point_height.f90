@@ -1,6 +1,6 @@
 !
 !	Point_height.F90									P.Benner		20.11.2003
-!														G.H.			16.04.2007
+!														G.H.			 7.11.2008
 !
 !	Subroutine to read the height of a given point from the terrain-database.
 !
@@ -37,24 +37,27 @@
 !					  in seconds and
 !				   E  for elevation-data.
 !
-!	Filenames correspond to the south-west corner of a 1 * 1
-!	degree block.
+!	!!!!   Longitudes are [0° - 360°[    !!!!!
 !
-!	Record-No. in the files:
+!	Filenames correspond to the south-west corner of a 1 * 1
+!	degree block in !both! hemispheres. 
+!   allways the lowest long(0..360)/lat(-90..+90) = 1st record in file)
+!
+!	Record-No. (R) in the files:
 !
 !       133 134 135 136 137 138 139 140 141 142 143 144                    
 !       121                                         132                    
 !       109                                         120                    
 !       097                                         108                    
 !       085                                         096                    
-!       073                                         084                    
+! (BV)  073                                         084                    
 !       061                                         072                    
 !       049                                         060                    
 !       037                                         048                    
 !       025                                         036                    
 !       013                                         024                    
 !       001 002 003 004 005 006 007 008 009 010 011 012
-!
+!                            (BH)
 !
 !	one record: 
 !                Field H_F_3(I,J)
@@ -63,13 +66,13 @@
 !                     *********************
 !              North  *********************
 !                     *********************
-!                     *********************
+!                (EV) *********************
 !                     *********************
 !                     *********************
 !             South   *********************
 !                     *********************
 !         I=1,J=1     ********************* I=101,J=1
-!     
+!                             (EH)  
 !                   West                 East
 !                                          
 !
@@ -96,7 +99,7 @@
 !                            P
 !
 !
-!                   P1            P2           
+!                   P1(E)         P2           
 !
 !	**********************************************************************************
 !
@@ -106,7 +109,7 @@
 !
 	INCLUDE				'HCM_MS_V7_definitions.F90'
 !
-	DOUBLE PRECISION	Long, Lat
+	DOUBLE PRECISION	Long, Lat, Lo, La
 	INTEGER(2)			Height
 !			
 	INTEGER(2)			H1, H2, H3, H4
@@ -120,49 +123,39 @@
 !
 	Height = -9999.9
 !
-!	split in Integer and Remainder
-	LOD = INT(Long)
-	LOR = ABS(NINT(MOD(Long,1D0)*3.6D3))
-	LAD = INT(Lat)
-	LAR = ABS(NINT(MOD(Lat,1D0)*3.6D3))
+!	convert Longitude, split in Integer and Remainder
+	Lo  = MOD(Long + 3.6D2,3.6D2)
+	LOR = NINT(MOD(Lo,1D0)*3.6D3)
+	LOD = INT(Lo)
+	La  = MOD(Lat + 9D1,9D1)
+	LAR = NINT(MOD(La,1D0)*3.6D3)
+	LAD = INT(La)
 !
-	IF (LOR .GE. 3600) THEN
-	  LOR = 0
-	  IF (LOD .GE. 0) THEN
-		  LOD = LOD + 1
-		ELSE
-		  LOD = LOD - 1
-	  END IF
-	END IF
-	IF (LAR .GE. 3600) THEN
-	  LAR = 0
-	  IF (LAD .GE. 0) THEN
-		  LAD = LAD + 1
-		ELSE
-		  LAD = LAD - 1
-	  END IF
+	IF (LOR .GT. 3599) LOR = 3599
+	IF (LAR .GT. 3599) LAR = 3599
+!
+	IF (LOD .LT. 1.8D2) THEN
+		FN(1:1) = 'E'                     
+	    WRITE (FN(2:4), '(I3.3)') LOD
+	  ELSE
+		FN(1:1) = 'W'
+		WRITE (FN(2:4), '(I3.3)') 360-LOD
 	END IF
 !
-	IF (ABS(LAD) .LT. 50) THEN 
+	IF (Lat .GT. 0.0D0) THEN
+		FN(5:5) = 'N'
+		WRITE (FN(6:7), '(I2.2)') LAD
+	  ELSE
+		FN(5:5) = 'S'
+		WRITE (FN(6:7), '(I2.2)') 90-LAD
+	END IF
+!
+	IF ((Lat .LT. 5D1) .AND. (Lat .GE. -5D1)) THEN 
 		RESH = 100  
 		FN(8:11) = '.33E'
 	  ELSE
 		RESH = 50
 		FN(8:11) = '.63E'
-	END IF
-!
-	WRITE (FN(2:4), '(I3.3)') ABS(LOD)
-	IF (LOD .GT. -1.0D0) THEN
-		FN(1:1) = 'E'                     
-	  ELSE
-		FN(1:1) = 'W'                     
-	END IF
-!
-	WRITE (FN(6:7), '(I2.2)') ABS(LAD)
-	IF (LAD .GT. -1.0D0) THEN
-		FN(5:5) = 'N'
-	  ELSE
-		FN(5:5) = 'S'
 	END IF
 !
 !	coordinates of block containing P
@@ -172,7 +165,7 @@
 	EH = DBLE(LOR-BH*3D2)/DBLE(300/RESH)
 	EV = DBLE(LAR-BV*3D2)/3D0
 !
-	R = 12*BV + BH
+	R = 12*BV + BH + 1
 !
 	IF ((FN .EQ. O_FN) .AND. (R .EQ. OLD_T)) GOTO 200
 	IF (FN .EQ. O_FN) GOTO 100
@@ -183,7 +176,7 @@
 !
 	O_FN=FN
 !
-100	READ (UNIT=5, ERR=450, REC=R+1) H_C(1:(202*(RESH+1)))
+100	READ (UNIT=5, ERR=450, REC=R) H_C(1:(202*(RESH+1)))
 	OLD_T = R
 !
 200	E = INT(EV)*(RESH+1) + INT(EH) + 1
