@@ -1,6 +1,6 @@
 !
 !	P_to_P_calculation.f90								P. Benner		03.02.2004
-!														G.H.			11.11.2017
+!														G.H.			12.05.2021
 !
 !
 !	Subroutine to calculate the field strength (pont to point calculation).
@@ -223,7 +223,6 @@
 	Heff = 0.0
 	Heff_Rx = 0.0
 	Heff_Tx = 0.0
-	D_sea_calculated = 0.0
 	Dh = 50.0
 	Dh_corr = 0.0
 	Land_FS = 0.0
@@ -615,6 +614,7 @@
 !
 !
 	IF (with_morpho) THEN
+		D_sea_calculated = 0.0
 		null = .FALSE.
 		DS1 = 0.0               
 		J1 = 0

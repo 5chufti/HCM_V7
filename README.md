@@ -211,5 +211,8 @@ Version 7ß01:
 
   19.11.26	increased line buffer (1200->1400 records)
 #released as 7.21.4
+
+  21.05.12	moved init of D_sea_calculated to correct position
+#released as 7.21.5
 ```
 
